@@ -111,17 +111,21 @@ efa_model <- fa(data, nfactors = 3, rotate = "oblimin", fm = "minres")
 # View the results
 print(efa_model$loadings, cutoff = 0.3) # We hide loadings below 0.3 for clarity
 ```
+Even though the more common result is a 2 factor test we evaluate the model with 3-factor and compare it later to the 2-factor one.
+
 The factor structure analysis reveals a clear distinction between the dimensions evaluated. The first factor (MR1) is extremely robust and represents the "Eng" dimension, with very high factor loadings ranging from 0.807 to 0.910 for items Eng1 to Eng4. The second factor (MR2) captures the "pos" dimension, where the loading of pos3 stands out at 0.916, while pos1 presents the most moderate loading of the group at 0.471. Conversely, the third factor (MR3) lacks a clear structure, as only Eng3 presents a marginal loading of 0.300 and its eigenvalue (SS loading) is a mere 0.188, which is extremely low and suggests that this factor is not relevant to the model.
+
+To illustrate it we show the diagram, but it presents an error because it does not assign Eng3 to the MR3, however understanding the table above we know that the proportion is really low and this diagram is not accurate and we will not work with the 3-factor model.
 
 ```{r}
 fa.diagram(efa_model)
 ```
+Summary of conclusions of 3-factor selection:
+- Discard Factor 3: The third factor (MR3) explains only 2.7% of the variance and has no strong unique loadings.
+- Clean Structure: Your variables group perfectly by their naming convention (Eng vs. pos), showing excellent convergent and          discriminant validity.
+- High Explained Variance: Together, the first two factors (MR1 and MR2) explain 65.3% of the total variance in your data, which is   a very respectable result for social science research.
 
-Discard Factor 3: The third factor (MR3) explains only 2.7% of the variance and has no strong unique loadings. You should likely re-run the analysis specifying nfactors = 2.
-
-Clean Structure: Your variables group perfectly by their naming convention (Eng vs. pos), showing excellent convergent and discriminant validity.
-
-High Explained Variance: Together, the first two factors (MR1 and MR2) explain 65.3% of the total variance in your data, which is a very respectable result for social science research.
+After realizing the 3-factor model should be discarded, we do the 2-factor EFA:
 
 ```{r}
 final_efa <- psych::fa(data, 
@@ -144,6 +148,76 @@ final_efa$Phi
 psych::fa.diagram(final_efa)
 ```
 ### Short reflection: How could these constructs guide HR intervention design?
+Looking at the correlation matrix between MR1 and MR2 (second image), the correlation is 0.258.
+
+Meaning: This is a low-to-moderate positive correlation.
+
+Interpretation: Since the correlation is relatively low (typically below 0.30 or 0.40), it suggests that while these two factors are related, they are distinct enough to be considered separate constructs. You likely used an oblique rotation (like Promax or Oblimin) to allow them to correlate; if they were completely independent, this value would be 0.
+EFA Summary: Loadings and Variance
+The Loadings table (third image) shows how each item "belongs" to a factor.
+
+Simple Structure: You have achieved a "simple structure," which is the gold standard in EFA. Every item loads strongly onto one factor (all > 0.40) and has no "cross-loadings" (loading onto both factors at the same time).
+
+Factor 1 (MR1): Includes Eng1, Eng2, Eng3, and Eng4. These loadings are very high (0.78 to 0.87), indicating these items are excellent indicators of the MR1 construct.
+
+Factor 2 (MR2): Includes pos1, pos2, and pos3. While pos1 is a bit lower (0.47), pos3 is a powerhouse at 0.92.
+
+Variance Explained: * MR1 explains 40.6% of the total variance.
+
+MR2 explains 24.3% of the total variance.
+
+Cumulative: Together, they explain 64.9% of the variance in your data, which is well above the common 50-60% threshold for a "good" model in social sciences.
+In EFA, "Latent Constructs" are the unobserved "hidden" variables (MR1 and MR2) that cause people to answer the questions the way they do.
+
+MR1 (The "Eng" Factor): Based on the labels, this likely represents "Engagement" or "English Proficiency" (depending on your study). The high loadings suggest these four items are very consistent in measuring this single idea.
+
+MR2 (The "Pos" Factor): This likely represents a "Positive Outlook" or "Position" construct.
+
+The Parallel Analysis (Fourth Image): This plot confirms that a 2-factor solution was the correct choice. The blue line (actual data) drops below the red dashed line (simulated/random data) after the second factor, meaning any factor beyond the second is just "noise."
+
+Your analysis tells a very clear story: Your survey effectively measures two distinct things. Because the KMO was strong and the Bartlett's test was significant, we can trust that these patterns aren't just a fluke in the numbers. The high "Cumulative Var" (64.9%) means that by using just these two factors, you are capturing the vast majority of the information contained in all 7 individual items. This simplifies your research significantly—instead of analyzing 7 different variables, you can now analyze just 2 "Super-Variables" (Factor Scores).
+
+Factor 1 (MR1): Organizational Identification & Advocacy
+The items in this factor (Eng1 through Eng4) go beyond simple "engagement." They measure how much an employee incorporates the company into their own identity.
+
+Eng1 & Eng2: Values and Pride.
+
+Eng3: Identity ("...a big part of who I am").
+
+Eng4: Advocacy ("I would recommend...").
+
+Interpretation: This factor represents Internalized Loyalty. High scores here mean employees aren't just working for a paycheck; they believe in the "brand" of the organization.
+
+Factor 2 (MR2): Perceived Organizational Support (POS)
+The "pos" items (pos1 through pos3) clearly measure the employees' perception of how much the organization values them and cares about their welfare.
+
+pos1: Well-being.
+
+pos2: Contribution value.
+
+pos3: Support/Help.
+
+Interpretation: This factor represents the Safety Net. It is the "give-and-take" relationship. Since pos3 ("Organization is there for me when I need help") has the highest loading (0.919), the core of this factor is Reliability in Crisis.
+
+2. HR Intervention Design
+Strategy for MR1: Strengthening the "Bond"
+Since MR1 explains the most variance (40.6%), your primary HR goal should be culture-building.
+
+Values Alignment (Eng1): Re-evaluate the onboarding process to ensure company values are not just stated, but demonstrated through stories and leadership behavior.
+
+Brand Ambassadorship (Eng4): Because this is your highest loading item for this factor (0.877), create "Employee Referral" programs or "Culture Committees" where these advocates can lead internal initiatives.
+
+Strategy for MR2: Enhancing the "Safety Net"
+Because this factor is distinct (correlation only 0.258), it requires a different approach focused on empathy and resources.
+
+Support Systems (pos3): This is your "Power Item" (loading 0.919). HR should ensure that "Help" is visible and accessible—such as Employee Assistance Programs (EAPs), clear mental health days, or "Manager Open Door" policies.
+
+Recognition of Contribution (pos2): With a strong loading of 0.793, interventions should focus on recognition programs that specifically highlight how an individual's work contributed to a success, rather than just generic "good job" emails.
+
+3. Summary of Meaning
+The low correlation (0.258) between these factors is a vital insight for HR. It means that an employee can love the company’s values (High MR1) but feel like the company doesn't care about them personally (Low MR2).
+
+If you only focus on "Culture" (MR1), you risk losing people to burnout because they don't feel supported. If you only focus on "Support" (MR2), you might have happy employees who don't actually care about the company's success or mission.
 
 # Prompt 2: Scale Reliability Testing
 
