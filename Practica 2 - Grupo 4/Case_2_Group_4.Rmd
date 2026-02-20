@@ -83,11 +83,11 @@ cortest.bartlett(data)
 ```
 
 **1. KMO (Kaiser-Meyer-Olkin)** TestYour Overall MSA = 0.79 is very strong.
-  Interpretation: On the scale of sampling adequacy, 0.79 is considered "Good" (bordering on "Meritorious"). This       value confirms that the variance in the variables is likely caused by underlying factors. It is well above the        minimum threshold of 0.50.
-  Item Breakdown: Eng1 through pos1 are performing exceptionally well (\> 0.80). While pos2 and pos3 are slightly       lower at 0.64, they are still well within the acceptable range for factor analysis.
+  Interpretation: On the scale of sampling adequacy, 0.79 is considered "Good" (bordering on "Meritorious"). This value confirms      that the variance in the variables is likely caused by underlying factors. It is well above the minimum threshold   of 0.50.
+  Item Breakdown: Eng1 through pos1 are performing exceptionally well (\> 0.80). While pos2 and pos3 are slightly lower at 0.64,      they are still well within the acceptable range for factor analysis.
 
 **2.  Bartlett’s Test of Sphericity**: the results shows a \$p.value = 0 (which means $p < .0001$).
-  Interpretation: Since the p-value is less than 0.05, the result is statistically significant. This rejects the null   hypothesis that our variables are unrelated. It proves there is enough correlation in the data to justify running     an EFA.
+  Interpretation: Since the p-value is less than 0.05, the result is statistically significant. This rejects the null   hypothesis    that our variables are unrelated. It proves there is enough correlation in the data to justify running     an EFA.
 
 ```{r}
 # Run Parallel Analysis
@@ -102,7 +102,7 @@ As seen in the plot, the blue triangles for Factor 1 and Factor 2 are clearly ab
 
 Looking at the steep drop after the second factor, a 2-factor solution is the most robust choice for your EFA.´But sometimes the model may give a 3-factor solution, therefore we set a seed
 
-
+### Interpretation of number and type of constructs
 ```{r}
 # fm = "minres" is a common default; "ml" (Maximum Likelihood) is also popular
 # rotate = "oblimin" for oblique rotation
@@ -143,13 +143,6 @@ final_efa$Phi
 # This provides a clear diagram of the two identified constructs
 psych::fa.diagram(final_efa)
 ```
-### Interpretation of number and type of constructs
-
-```{r prompt1.2}
-
-kiohucuihajioahuabuuo
-```
-
 ### Short reflection: How could these constructs guide HR intervention design?
 
 # Prompt 2: Scale Reliability Testing
