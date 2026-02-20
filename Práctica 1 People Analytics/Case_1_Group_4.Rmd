@@ -1,0 +1,386 @@
+---
+# this is the Rmarkdown header. Use the YAML syntax. ---YAML block ---.
+title: "Group_4 Diversity and Analytics" 
+subtitle: "Groupwork Use Case 1 - People Analytics"
+author: "Ferrán Extremera, Irene Morales, Amalia Varo y Martina Iscar "
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_depth: 3
+    toc_float: true
+    code_folding: hide
+
+# the following lines tell R to store the output in the subdirectory reports
+knit: (function(inputFile, encoding) { 
+      rmarkdown::render(inputFile,
+                        encoding=encoding, 
+                        output_dir=file.path(dirname(inputFile),"report" )) })
+---
+
+# Intro
+
+In this workshop, you will use R to explore diversity issues in an organization through descriptive, inferential, and predictive statistical techniques. You will work with gender, ethnicity, and organizational data across teams and functions.
+
+# Setup
+
+Within the project directory, create the following folders if they do not already exist:
+
+-   **Databases**: to store all data sources provided in Moodle (Excel files).\
+-   **data**: to store any ad-hoc data created during the analysis. The native R data format is .rds.\
+-   **report**: to store the HTML output file generated when knitting the R Markdown file.
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse) 
+library(readxl)
+```
+
+# Prompt 1 Gender and Job Grade (Chi-Square Test)
+
+## The problem
+
+The organization 'SlidesRUs' has shared its gender composition across job grades. You are tasked with determining whether gender is associated with job grade using a chi-square test.
+
+### Tasks
+
+-   Import 'Ch4_diversity.xlsx' into R (definitions of all fields are included in the 'variable key' worksheet within the Excel file).\
+-   Recode the gender variable into 'Men' and 'Women'.\
+-   Generate frequency and cross-tabulation tables.\
+-   Run a chi-square test to determine the statistical significance of the observed patterns.
+
+```{r}
+div <- read_excel("Databases/Ch4_diversity.xlsx")
+```
+
+```{r}
+head(div)
+```
+
+```{r}
+unique(div$Gender)
+```
+
+```{r}
+sum(is.na(div$Gender))
+```
+
+```{r}
+div_clean <- div %>%
+  # Filtramos los NA para que no afecten el test estadístico
+  filter(!is.na(Gender)) %>% 
+  mutate(gender_label = case_when(
+    Gender == 2 ~ "Men",
+    Gender == 1 ~ "Women"
+  ))
+```
+
+```{r}
+table(div_clean$gender_label)
+```
+
+There are 746 Women and 745 Men and only two people whose gender is not revealed, but we filter them out.
+
+```{r}
+head(div_clean)
+```
+
+```{r}
+# 3. Generate Cross-tabulation (Observed Frequencies)
+observed_table <- table(div_clean$gender_label, div_clean$JobGrade)
+print("--- Observed Frequencies ---")
+print(observed_table)
+```
+
+```{r}
+# 4. Ejecutar el test de Chi-cuadrado
+chi_resultado <- chisq.test(observed_table)
+```
+
+```{r}
+# 5. Extract Expected Frequencies
+print("--- Expected Frequencies ---")
+print(chi_resultado$expected)
+```
+
+### Deliverables
+
+-   Table of observed vs. expected frequencies.\
+-   Chi-square output with interpretation.\
+-   Brief reflection: What might explain the disparity in gender across grades?
+
+## Solution
+
+### Table of observed vs. expected frequencies
+
+```{r prompt1.1}
+tabla_vs <- matrix(
+  paste0(observed_table, " (", round(chi_resultado$expected, 1), ")"),
+  nrow = nrow(observed_table),
+  dimnames = dimnames(observed_table)
+)
+
+print("TABLE: OBSERVED (EXPECTED) FREQUENCIES")
+print(as.table(tabla_vs))
+```
+
+### Chi-square output with interpretation
+
+```{r prompt1.2}
+# 6. Chi-Square Output
+print("--- Chi-Square Test Results ---")
+print(chi_resultado)
+```
+
+### **Frequency Table (Observed vs. Expected)**
+
+Upon running the code, you will see two tables. The **Observed** table shows the actual number of people in each position. The **Expected** table shows what the company would look like if there were no gender biase
+
+### **Chi-Square Interpretation**
+
+-   **P-value:**the p-value is less than 0.05 (p_value\$ \< 0.05\$), there is a statistically significant association between gender and job grade. This means a person's position in the company is not independent of their gender.
+
+-   **Chi-squared (**$\chi^2$): A high value indicates a greater deviation from what would be expected by pure chance.
+
+### Brief reflection: What might explain the disparity in gender across grades?
+
+If your results show that gender influences job grade, here are three common reasons that might explain it for your reflection:
+
+-   **Historical Recruitment Bias:** In the past, high-level positions (senior grades) were predominantly occupied by men. If turnover is low, that pattern persists today.
+
+-   **The "Broken Rung":** Women often face greater obstacles in obtaining their first promotion to supervisory roles, which reduces their presence in the highest grades.
+
+-   **Differences in Retention:** External factors, such as a lack of work-life balance policies, can cause women to leave the organization before reaching senior grades, creating a structure where men accumulate more seniority and, consequently, higher grades.
+
+# Prompt 2 Descriptive Statistics on Ethnic Diversity Across Teams
+
+## The problem
+
+You now have access to the dataset Ch4_div_group.xlsx, provided by a financial organization. The dataset contains team-level information, including gender composition and statistics related to underrepresented groups (UG).
+
+The organization employs a total of 29,976 individuals across the UK, who are distributed among 928 departments. Employee engagement survey data are aggregated and reported at the level of these 928 work units for analytical purposes.
+
+It is important to note that the work units were defined using a unique “work unit” key assigned by the engagement survey provider. This approach ensures employee anonymity, as no unit with fewer than 10 employees is individually identified. Consequently, the dataset consists of averaged and aggregated data at the team level, with each row in Ch4_div_group.xlsx representing one work unit (department).
+
+### Tasks
+
+-   Import 'Ch4_div_group.xlsx' into R (definitions of all fields are included in the 'Variable key' worksheet within the Excel file).
+
+```{r}
+df <- read_excel("Databases/Ch4_div_group.xlsx")
+head(df)
+```
+
+-   Generate descriptive statistics for PercentMale and UG.
+
+```{r}
+summary(df$PercentMale)
+```
+
+```{r}
+summary(df$UG)
+
+```
+
+## - Interpret means, standard deviations, minimum and maximum values.
+
+Based on the R output provided in the image, here is the interpretation of your descriptive statistics for PercentMale and UG.
+
+1.  PercentMale (Gender Distribution) This variable represents the percentage of male students in the dataset.
+
+Mean (58.95): On average, the institutions in this dataset are approximately 58.95% male.
+
+Minimum (1.00): At least one institution is nearly entirely female (only 1% male).
+
+Maximum (100.00): At least one institution is entirely male (100% male).
+
+Note on Skewness: Notice that the Mean (58.95) is lower than the Median (65.00). This suggests the data is left-skewed, meaning there are a few schools with very low percentages of men pulling the average down.
+
+2.  UG (Undergraduate Enrollment) Note: Looking at these values (ranging from 0 to 0.45), it appears this variable might be scaled (perhaps in thousands or as a proportion) rather than a raw count of individual students.
+
+Mean (0.1184): The average value for undergraduate enrollment across the dataset is 0.1184.
+
+Minimum (0.0000): There is at least one entry with 0 undergraduates. This could indicate a graduate-only institution or a data error.
+
+Maximum (0.4500): The largest value in the dataset is 0.4500.
+
+Note on Skewness: Unlike the previous variable, the Mean (0.1184) is higher than the Median (0.0900). This indicates right-skewness, meaning a few relatively "large" values are pulling the average up.
+
+3.  Standard Deviation (Spread) The R summary() function does not display the Standard Deviation (SD) automatically. However, we can infer the "spread" from the difference between the Min and Max:
+
+PercentMale: Has a huge range (99 units), suggesting high variability in gender composition across schools.
+
+UG: Most of the data (the middle 50%) falls between 0.03 and 0.20. The SD is likely small, but since the Max (0.45) is more than double the 3rd Quartile, there is significant variation at the top end.
+
+### Deliverables
+
+-   Table with descriptive statistics.\
+-   Short analysis: What do the results suggest about gender and UG diversity across teams?
+
+## Solution
+
+### Table with descriptive statistics.
+
+```{r prompt2.1}
+summary(df)
+```
+
+### Short analysis: What do the results suggest about gender and UG diversity across teams?
+
+# Prompt 3 Comparing UG and Gender Across Functions (t-test)
+
+## The problem
+
+You want to test whether the sales and professional service functions differ in terms of UG representation and gender ratio.
+
+### Tasks
+
+-   Import 'Ch4_div_group.xlsx' into R (definitions of all fields are included in the 'Variable key' worksheet within the Excel file).\
+-   Recode 'Function' variable into 'Sales' and 'Professional Service'.\
+-   Conduct independent t-tests on PercentMale and UG.\
+-   Run Levene’s Test to check for equal variances.
+
+```{r}
+# Recoding Function based on your data structure
+df$Function_Label <- factor(df$Function, 
+                            levels = c(1, 2), 
+                            labels = c("Sales", "Professional Service"))
+
+df
+```
+
+### Deliverables
+
+-   t-test output and interpretation for UG and PercentMale.
+-   Levene’s test result and its implication.
+-   Summary: Do the differences point to potential diversity challenges?
+
+## Solution
+
+### t-test output and interpretation for UG and PercentMale.
+
+```{r prompt3.1}
+
+t_test_gender <- t.test(PercentMale ~ Function_Label, data = df, var.equal = TRUE)
+print(t_test_gender)
+t_test_UG <- t.test(UG ~ Function_Label, data = df, var.equal = TRUE)
+print(t_test_UG)
+```
+
+### Levene’s test result and its implication.
+
+```{r prompt3.2}
+library(car)
+
+# Test for PercentMale
+leveneTest(PercentMale ~ Function_Label, data = df)
+
+# Test for UG
+leveneTest(UG ~ Function_Label, data = df)
+
+```
+
+```{r}
+
+Welch_test_gender <- t.test(PercentMale ~ Function_Label, data = df, var.equal = FALSE)
+print(Welch_test_gender)
+Welch_test_UG <- t.test(UG ~ Function_Label, data = df, var.equal = FALSE)
+print(Welch_test_UG)
+```
+
+### Summary: Do the differences point to potential diversity challenges?
+
+The statistical evidence from the Welch t-tests and Levene’s tests confirms that Sales and Professional Service are operating as two distinct cultural silos. The transition from a standard t-test to the Welch Two Sample t-test was necessary because the Levene’s test ($p < 0.05$ for both variables) proved that the groups have unequal variances—meaning the "spread" of diversity and gender balance is fundamentally different in each department.
+
+### 1. Gender Representation: The "Echo Chamber" Risk
+
+The data shows a massive 27-point gap in gender balance. Sales is heavily male-dominated ($71.26\%$) compared to Professional Service ($44.40\%$).
+
+-   It's a network problem. In Sales, the low variance and high male percentage suggest a highly homogenized environment. This often leads to "affinity bias," where hiring managers unconsciously recruit people who mirror the existing team.
+
+-   Business Consequence: A $71\%$ male sales force may lack the cognitive diversity needed to connect with a diverse global client base. Research consistently shows that gender-diverse teams produce higher sales revenue and better customer satisfaction.
+
+### 2. Underrepresented Groups (UG): The Diversity Deficit
+
+The analysis shows that Sales has a significantly lower representation of minority groups ($9.68\%$) compared to Professional Service ($14.39\%$).
+
+-   The lower mean in Sales, combined with the significant difference in variance, suggests that the "entry gates" for minority talent are narrower in Sales. Professional Service is not only more diverse on average but also more varied in its composition, suggesting more inclusive hiring pathways.
+
+-   Business Consequence: The Sales function is the "face" of the company. A lack of UG representation ($<10\%$) can lead to Brand Erosion. In a market that increasingly values Corporate Social Responsibility (CSR), a homogenous sales team may be viewed as a liability or "out of touch" by prospects who prioritize diversity in their vendors.
+
+### 3. Structural Inconsistency (Levene’s Test Implications)
+
+The significant Levene’s test results ($p = 9.544 \times 10^{-08}$ for Gender and $p = 0.003$ for UG) indicate that the consistency of diversity efforts is failing.
+
+-   The "One-Size-Fits-None" Trap: Because the variances are unequal, HR cannot apply a single, blanket diversity training program to both departments. Sales requires an aggressive intervention (rethinking sourcing and job descriptions), while Professional Service likely requires retention and promotion strategies to maintain its current momentum.
+
+-   If these two departments continue to drift apart in their demographic makeup, internal mobility will suffer. Employees may feel they don't "fit" the culture of the other department, stifling the cross-functional collaboration necessary for innovation.
+
+These differences point to severe diversity challenges. The Sales department is a "high-risk" area for the organization. It is characterized by high male representation and low minority representation. Without targeted intervention such as blinded resume reviews for Sales or diverse interview panels the company faces significant talent risks (homogenous thinking) and legal/reputational risks (lack of equal opportunity representation).
+
+# Prompt 4 Predicting UG with Multiple Regression
+
+## The problem
+
+Using multiple regression, explore which organizational variables predict the proportion of UG in a team.
+
+### Tasks
+
+-   Import 'Ch4_div_group.xlsx' into R (definitions of all fields are included in the 'Variable key' worksheet within the Excel file).\
+-   Run a regression model with UG as the dependent variable.\
+-   Include predictors: LondonorNot, Function, GroupSize, NumberFeMaleTeamLeads, PercentMale.\
+-   Interpret the coefficients and R-squared value.\
+-   Identify which predictors significantly affect UG levels.
+
+### Deliverables
+
+-   Regression output with interpretation.
+-   Summary table of standardized coefficients.
+-   Executive summary: Based on this model, what would you recommend the company do next?
+
+## Solution
+
+```{r}
+df2 <- read_excel("Databases/Ch4_div_group.xlsx", sheet = 1)
+
+# Limpieza rápida (quitar NAs en las variables elegidas)
+df2_clean <- na.omit(df[, c("UG", "LondonorNot", "Function", "GroupSize", "NumberFeMaleTeamLeads", "PercentMale")])
+
+# Modelo estándar
+modelo <- lm(UG ~ LondonorNot + Function + GroupSize + NumberFeMaleTeamLeads + PercentMale, 
+             data = df2_clean)
+
+```
+
+### Regression output with interpretation.
+
+```{r prompt4.1}
+# Ver el resumen básico (Coeficientes No Estandarizados y R-squared)
+summary(modelo)
+
+# Calcular Coeficientes Estandarizados manualmente
+# Esto evita el error de 'lm.beta'
+b <- coef(modelo)[-1]  # Extraer coeficientes (quitando el Intercept)
+sx <- sapply(df2_clean[, names(b)], sd) # Desviación estándar de predictores
+sy <- sd(df2_clean$UG) # Desviación estándar de la variable dependiente
+
+beta_std <- b * (sx / sy)
+
+```
+
+### Summary table of standardized coefficients.
+
+```{r prompt4.2}
+
+# Crear la Tabla Resumen 
+tabla_final <- data.frame(
+  Variable = names(beta_std),
+  Coef_No_Est = b,
+  Coef_Estandarizado = beta_std,
+  P_Value = summary(modelo)$coefficients[-1, 4]
+)
+
+print(tabla_final)
+```
+
+### Executive summary: Based on this model, what would you recommend the company do next?

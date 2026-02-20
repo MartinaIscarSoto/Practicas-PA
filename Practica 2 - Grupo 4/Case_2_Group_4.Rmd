@@ -1,0 +1,343 @@
+---
+# this is the Rmarkdown header. Use the YAML syntax. ---YAML block ---.
+title: "Employee Engagement" 
+subtitle: "Groupwork Use Case 2 - People Analytics"
+author: "Ferrán Extremera, Irene Morales, Amalia Varo y Martina Iscar Substitute Group_X by your Group number in the name of the .Rmd file"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    toc: true
+    toc_depth: 3
+    toc_float: true
+    code_folding: hide
+
+# the following lines tell R to store the output in the subdirectory reports
+knit: (function(inputFile, encoding) { 
+      rmarkdown::render(inputFile,
+                        encoding=encoding, 
+                        output_dir=file.path(dirname(inputFile),"report" )) }) 
+---
+
+# Intro
+
+In this workshop, you will analyze employee engagement using both individual- and team-level data. You’ll apply factor analysis, reliability testing, t-tests, and multiple regression to real-world employee survey data. The goal is to understand how engagement is measured, how well survey instruments perform, and what factors predict engagement across teams.
+
+# Setup
+
+Within the project directory, create the following folders if they do not already exist:
+
+-   **Databases**: to store all data sources provided in Moodle (Excel files).\
+-   **data**: to store any ad-hoc data created during the analysis. The native R data format is .rds.\
+-   **report**: to store the HTML output file generated when knitting the R Markdown file.
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse) 
+library(readxl)
+if (!require("pacman")) install.packages("pacman")
+pacman::p_load(readxl, psych, dplyr, GPArotation, scatterplot3d, modelsummary, car, this.path, huxtable, lm.beta)
+```
+
+# Prompt 1: Exploratory Factor Analysis on Engagement Items
+
+### Tasks
+
+-   Import 'Ch5_RAW_Survey_Results.xlsx' into R (definitions of all fields are included in the 'variable key' worksheet within the Excel file).\
+-   Select the seven engagement and support items (Eng1–Eng4, pos1–pos3).\
+-   Conduct an exploratory factor analysis with parallel analysis and oblimin rotation.\
+-   Interpret the factor structure: how many latent constructs are present?\
+-   Assign names to the resulting factors based on item content.
+
+### Deliverables
+
+-   Factor loadings table and scree plot.\
+-   Interpretation of number and type of constructs.\
+-   Short reflection: How could these constructs guide HR intervention design?
+
+## Solution
+
+```{r}
+df <- read_excel("Databases/Ch5_RAW_Survey_Results.xlsx")
+head(df)
+```
+
+Now we proceed to filter to select the engagement and support items.
+
+```{r}
+data<- df %>% 
+  select(Eng1,Eng2,Eng3,Eng4,pos1,pos2, pos3)
+
+head(data)
+
+```
+
+Once the variables are selected, we conduct an exploratory factor analysis with parallel analysis and oblimin rotation. We start by doing two tests that work as the "gatekeepers" of the analysis. Before trying to group variables into factors, we need to prove that they actually relate to each other in a meaningful way. If your variables aren't correlated, the results would just be statistical noise.
+
+### Factor loadings table and scree plot
+
+```{r}
+# Let's assume your dataframe is named 'data'
+# Check suitability with KMO and Bartlett's Test
+KMO(data)
+cortest.bartlett(data)
+```
+
+**1. KMO (Kaiser-Meyer-Olkin)** TestYour Overall MSA = 0.79 is very strong.
+  Interpretation: On the scale of sampling adequacy, 0.79 is considered "Good" (bordering on "Meritorious"). This       value confirms that the variance in the variables is likely caused by underlying factors. It is well above the        minimum threshold of 0.50.
+  Item Breakdown: Eng1 through pos1 are performing exceptionally well (\> 0.80). While pos2 and pos3 are slightly       lower at 0.64, they are still well within the acceptable range for factor analysis.
+
+**2.  Bartlett’s Test of Sphericity**: the results shows a \$p.value = 0 (which means $p < .0001$).
+  Interpretation: Since the p-value is less than 0.05, the result is statistically significant. This rejects the null   hypothesis that our variables are unrelated. It proves there is enough correlation in the data to justify running     an EFA.
+
+```{r}
+# Run Parallel Analysis
+set.seed(1615)
+parallel_res <- fa.parallel(data, fm = "minres", fa = "fa")
+```
+The Parallel Analysis Scree Plot determines the number of factors to extract:
+
+The Decision Rule is to retain factors where the blue line (Actual Data) is above the red dotted line (Simulated Data).
+
+As seen in the plot, the blue triangles for Factor 1 and Factor 2 are clearly above the red lines. Factor 3 appears to sit almost exactly on the line or slightly above it.
+
+Looking at the steep drop after the second factor, a 2-factor solution is the most robust choice for your EFA.´But sometimes the model may give a 3-factor solution, therefore we set a seed
+
+
+```{r}
+# fm = "minres" is a common default; "ml" (Maximum Likelihood) is also popular
+# rotate = "oblimin" for oblique rotation
+efa_model <- fa(data, nfactors = 3, rotate = "oblimin", fm = "minres")
+
+# View the results
+print(efa_model$loadings, cutoff = 0.3) # We hide loadings below 0.3 for clarity
+```
+The factor structure analysis reveals a clear distinction between the dimensions evaluated. The first factor (MR1) is extremely robust and represents the "Eng" dimension, with very high factor loadings ranging from 0.807 to 0.910 for items Eng1 to Eng4. The second factor (MR2) captures the "pos" dimension, where the loading of pos3 stands out at 0.916, while pos1 presents the most moderate loading of the group at 0.471. Conversely, the third factor (MR3) lacks a clear structure, as only Eng3 presents a marginal loading of 0.300 and its eigenvalue (SS loading) is a mere 0.188, which is extremely low and suggests that this factor is not relevant to the model.
+
+```{r}
+fa.diagram(efa_model)
+```
+
+Discard Factor 3: The third factor (MR3) explains only 2.7% of the variance and has no strong unique loadings. You should likely re-run the analysis specifying nfactors = 2.
+
+Clean Structure: Your variables group perfectly by their naming convention (Eng vs. pos), showing excellent convergent and discriminant validity.
+
+High Explained Variance: Together, the first two factors (MR1 and MR2) explain 65.3% of the total variance in your data, which is a very respectable result for social science research.
+
+```{r}
+final_efa <- psych::fa(data, 
+                       nfactors = 2, 
+                       rotate = "oblimin", 
+                       fm = "minres")
+
+# Display the factor loadings
+# This reveals the 2 latent constructs: MR1 (Eng variables) and MR2 (pos variables)
+print(final_efa$loadings, cutoff = 0.3)
+```
+```{r}
+# Check Factor Correlations
+# Since we used Oblimin, this shows how the two latent constructs relate to each other
+final_efa$Phi
+```
+```{r}
+# Visualize the latent structure
+# This provides a clear diagram of the two identified constructs
+psych::fa.diagram(final_efa)
+```
+### Interpretation of number and type of constructs
+
+```{r prompt1.2}
+
+
+```
+
+### Short reflection: How could these constructs guide HR intervention design?
+
+# Prompt 2: Scale Reliability Testing
+
+### Tasks
+
+-   Import 'Ch5_RAW_Survey_Results.xlsx' into R (definitions of all fields are included in the 'variable key' worksheet within the Excel file).\
+-   Select the four OCB items (ocb1–ocb4).\
+-   Compute Cronbach’s alpha for the scale.\
+-   Identify any items that reduce reliability and could be dropped.\
+-   Reflect on the trade-off between brevity and reliability.
+
+### Deliverables
+
+-   Cronbach’s alpha result with interpretation.\
+-   Recommendation on whether to keep or drop specific items.\
+-   Reflection: Why does internal consistency matter in employee surveys?
+
+## Solution
+
+### Cronbach’s alpha result with interpretation
+
+```{r prompt2.1}
+df2 <- read_excel("Databases/Ch5_RAW_Survey_Results.xlsx")
+ocb_items <- df2[, c("ocb1", "ocb2", "ocb3", "ocb4")]
+
+```
+These lines of code load the required packages (readxl and psych) needed to import Excel data and perform reliability analysis. The dataset is then imported into R using read_excel() and stored in the object data. Finally, the four OCB items (ocb1–ocb4) are selected from the dataset and stored in a new object called ocb_items, which will be used for further analysis.´
+
+```{r}
+alpha_result <- alpha(ocb_items) ##Calcula el Cronbach alpha para esos 4 items
+alpha_result ##Imprime el resumen general del analisis de fiabilidad
+```
+
+These lines calculate Cronbach’s alpha for the four OCB items and store the results in `alpha_result`. Printing the object displays the overall reliability statistics for the scale.
+
+```{r}
+alpha_result$total$raw_alpha ##Extrae el alpha clásico de la escala completa 
+alpha_result$alpha.drop ##Muestra la tabla de "alpha if item deleted" en otras palabras, que pasaria con la fiabilidad si eliminas cada item
+```
+These lines extract the overall Cronbach’s alpha for the full scale and display the “alpha if item deleted” table, which shows how reliability would change if each item were removed.
+
+### Recommendation on whether to keep or drop specific items
+
+### Reflection: Why does internal consistency matter in employee surveys?
+
+# Prompt 3: Principal Component Analysis on Aggregated Survey Items
+
+### Tasks
+
+-   Import 'Ch5_SURVEY_PROVIDER_ENGAGEMENT_DATA_TEAM_LEVEL.xlsx' into R (definitions of all fields are included in the 'variable key' worksheet within the Excel file).\
+-   Conduct a principal component analysis (PCA) on the 9 team-level engagement items.\
+-   Identify and name the components.\
+-   Interpret what each component represents in terms of employee experience.
+
+### Deliverables
+
+-   Component loadings table.\
+-   3D scatterplot showing component space (optional).\
+-   Description of the constructs found and their strategic relevance.
+
+## Solution
+
+### Component loadings table
+
+```{r prompt3.1}
+# Importar el archivo (ajusta el nombre si es necesario)
+file_path <- "Databases/Ch5_SURVEY_PROVIDER_ENGAGEMENT_DATA_TEAM_LEVEL.xlsx"
+df3 <- read_excel(file_path, sheet = 1)
+
+# Seleccionar los 9 ítems de compromiso (Eng1 a Eng9)
+engagement_items <- df3[, c("Eng1", "Eng2", "Eng3", "Eng4", "Eng5", "Eng6", "Eng7", "Eng8", "Eng9")]
+
+# Ejecutar PCA con rotación varimax
+# Basado en el análisis, 3 componentes suelen explicar mejor la varianza en este set
+pca_result <- principal(engagement_items, nfactors = 3, rotate = "varimax")
+
+# Deliverable: Tabla de cargas de componentes
+print(pca_result$loadings, cutoff = 0.4, digits = 3)
+
+```
+### 3D scatterplot showing component space (optional)
+
+```{r prompt3.2}
+# Extraer las puntuaciones de los componentes por equipo
+scores <- as.data.frame(pca_result$scores)
+
+# Deliverable: Scatterplot 3D
+scatterplot3d(scores[,1:3], 
+              pch = 16, color = "steelblue",
+              main = "Espacio de Componentes de Compromiso",
+              xlab = "Comp 1: Org. y Propósito", 
+              ylab = "Comp 2: Bienestar", 
+              zlab = "Comp 3: Ética y Seguridad")
+
+```
+
+### Description of the constructs found and their strategic relevance
+
+# Prompt 4: t-Tests on Engagement Across Teams
+
+### Tasks
+
+-   Import 'Ch5_Engagement_CASE_Group_level_data_2023.xlsx' into R (definitions of all fields are included in the 'variable key' worksheet within the Excel file).\
+-   Conduct t-tests comparing engagement by location (London vs Other) and by function (Sales vs Prof. Services).\
+-   Use Levene’s test to check for equal variances.\
+-   Interpret results and discuss practical implications.
+
+### Deliverables
+
+-   t-test outputs with interpretation.\
+-   Summary of significant and non-significant findings.\
+-   Recommendations: Should HR act on these differences?
+
+## Solution
+
+### t-test outputs with interpretation
+
+```{r prompt4.1}
+# 1. Importar los datos
+df4 <- read_excel("Databases/Ch5_Engagement_CASE_Group_level_data_2023.xlsx", sheet = "data")
+
+# 2. Preparar los factores
+df4$LondonorNot <- factor(df4$LondonorNot, levels = c(1, 2), labels = c("London", "Other"))
+df4$Function <- factor(df4$Function, levels = c(1, 2), labels = c("Sales", "Prof. Services"))
+
+# --- COMPARACIÓN POR UBICACIÓN ---
+leveneTest(EMPsurvEngagement ~ LondonorNot, data = df4) # p > 0.05: Varianzas iguales
+t_loc <- t.test(EMPsurvEngagement ~ LondonorNot, data = df4, var.equal = TRUE)
+print(t_loc)
+
+# --- COMPARACIÓN POR FUNCIÓN ---
+leveneTest(EMPsurvEngagement ~ Function, data = df4) # p > 0.05: Varianzas iguales
+t_fun <- t.test(EMPsurvEngagement ~ Function, data = df4, var.equal = TRUE)
+print(t_fun)
+
+```
+
+### Summary of significant and non-significant findings
+
+```{r prompt4.2}
+# Resumen visual rápido
+boxplot(EMPsurvEngagement ~ Function, data = df4, 
+        main = "Compromiso por Función", col = c("orange", "lightblue"))
+
+```
+
+### Recommendations: Should HR act on these differences?
+
+# Prompt 5: Multiple Regression to Predict Team-Level Engagement
+
+### Tasks
+
+-   Import 'Ch5_Engagement_CASE_Group_level_data_2023.xlsx' into R (definitions of all fields are included in the 'variable key' worksheet within the Excel file).\
+-   Run a multiple regression with engagement as the dependent variable. Use predictors: supervisor score, integrity score, team size, % male, % UG, location, and function.\
+-   Analyze standardized coefficients and significance levels.\
+-   Identify the most important drivers of engagement.
+
+### Deliverables
+
+-   Regression summary table.\
+-   Interpretation of model strength and variable impacts.\
+-   Actionable recommendations for HR strategy.
+
+## Solution
+
+### Regression summary table
+
+```{r prompt5.1}
+# 1. Carga de datos
+df5 <- read_excel("Databases/Ch5_Engagement_CASE_Group_level_data_2023.xlsx", sheet = "data")
+
+# 2. Preparar variables (asegurar que sean factores donde corresponda)
+df5$Location <- as.factor(df5$Location)
+df5$Function <- as.factor(df5$Function)
+
+# 3. Ejecutar el modelo de regresión múltiple
+modelo <- lm(EMPsurvEngagement ~ EmpSurvSupervisor + EmployeeSurvOrgIntegrity + 
+             GroupSize + PercentMale + UG + Location + Function, data = df5)
+
+# 4. Obtener coeficientes estandarizados
+modelo_beta <- lm.beta(modelo)
+
+# Deliverable: Resumen de la regresión
+summary(modelo_beta)
+
+```
+
+### Interpretation of model strength and variable impacts
+
+### Actionable recommendations for HR strategy
