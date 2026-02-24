@@ -286,9 +286,7 @@ These lines extract the overall Cronbach’s alpha for the full scale and displa
 # Importar el archivo (ajusta el nombre si es necesario)
 file_path <- "Databases/Ch5_SURVEY_PROVIDER_ENGAGEMENT_DATA_TEAM_LEVEL.xlsx"
 df3 <- read_excel(file_path, sheet = 1)
-
-# Seleccionar los 9 ítems de compromiso (Eng1 a Eng9)
-engagement_items <- df3[, c("Eng1", "Eng2", "Eng3", "Eng4", "Eng5", "Eng6", "Eng7", "Eng8", "Eng9")]
+head(df3)
 
 # Ejecutar PCA con rotación varimax
 # Basado en el análisis, 3 componentes suelen explicar mejor la varianza en este set
@@ -307,15 +305,27 @@ scores <- as.data.frame(pca_result$scores)
 # Deliverable: Scatterplot 3D
 scatterplot3d(scores[,1:3], 
               pch = 16, color = "steelblue",
-              main = "Espacio de Componentes de Compromiso",
-              xlab = "Comp 1: Org. y Propósito", 
-              ylab = "Comp 2: Bienestar", 
-              zlab = "Comp 3: Ética y Seguridad")
+              main = "Components space",
+              xlab = "RC1 Loyalty", 
+              ylab = "RC2 Well-being", 
+              zlab = "RC3 Ethics")
 
 ```
 
 ### Description of the constructs found and their strategic relevance
+The objective of this analysis was to streamline our employee engagement metrics by identifying the underlying drivers of the employee experience. By applying Principal Component Analysis (PCA), the complexity of the original data set was reduced by 66%, from nine variables to just three fundamental components. This simplified model maintains high reliability, explaining 83.3% of the total variance in employee experience.
 
+Now let's analyze the three fundamental components:
+
+1. RC1 Loyalty: This constructor groups together variables related to pride and recommendation. It represents an emotional bond between the individual an the organization. An employee with a high score in this component feels proud of their company and acts as a brand ambassador, actively recommending the company. This helps attract talent and emotionally retain employees.
+
+2. RC2 Well-being: This consolidates the relationship between workload and personal life. It reflects the viability of long-term performance. It indicates that commitment is only healthy if the workload is manageable and does not interfere with private life. If there is a low score, it predicts turnover due to exhaustion, regardless of how much the employee loves the company.
+
+3. RC3 Ethics. Integrates the perception of safety, social responsibility, and values. Validates that the company operates under standards of responsibility, physical safety, and ethical behavior. If this foundation of trust is broken, pride and well-being tend to plummet.
+
+This analysis is highly relevant strategically, as it will enable the company to conduct shorter and more frequent surveys, focusing on the three fundamental components. On the other hand, if they use extensive surveys, these cannot be conducted very frequently, as this would increase fatigue and we would lose data quality.
+
+Furthermore, this model allows leadership to diagnose the root cause of turnover with surgical precision. Rather than implementing generic "engagement" initiatives, we can now identify if a retention issue is a capacity problem (RC2), a cultural problem (RC1), or a trust problem (RC3).
 # Prompt 4: t-Tests on Engagement Across Teams
 
 ### Tasks
