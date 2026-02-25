@@ -9,7 +9,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
-<meta name="author" content="Ferrán Extremera, Irene Morales, Amalia Varo y Martina Iscar Substitute Group_X by your Group number in the name of the .Rmd file" />
+<meta name="author" content="Ferrán Extremera, Irene Morales, Amalia Varo y Martina Iscar" />
 
 <meta name="date" content="2026-02-25" />
 
@@ -1570,8 +1570,7 @@ border-radius: 0px;
 <h1 class="title toc-ignore">Employee Engagement</h1>
 <h3 class="subtitle">Groupwork Use Case 2 - People Analytics</h3>
 <h4 class="author">Ferrán Extremera, Irene Morales, Amalia Varo y
-Martina Iscar Substitute Group_X by your Group number in the name of the
-.Rmd file</h4>
+Martina Iscar</h4>
 <h4 class="date">2026-02-25</h4>
 
 </div>
@@ -1600,6 +1599,7 @@ analysis. The native R data format is .rds.<br />
 <li><strong>report</strong>: to store the HTML output file generated
 when knitting the R Markdown file.</li>
 </ul>
+<hr />
 </div>
 <div id="prompt-1-exploratory-factor-analysis-on-engagement-items" class="section level1">
 <h1>Prompt 1: Exploratory Factor Analysis on Engagement Items</h1>
@@ -1714,14 +1714,15 @@ KMO(data)</code></pre>
 ## 
 ## $df
 ## [1] 21</code></pre>
-<p><strong>1. KMO (Kaiser-Meyer-Olkin)</strong> TestYour Overall MSA =
-0.79 is very strong. Interpretation: On the scale of sampling adequacy,
-0.79 is considered “Good” (bordering on “Meritorious”). This value
-confirms that the variance in the variables is likely caused by
-underlying factors. It is well above the minimum threshold of 0.50. Item
-Breakdown: Eng1 through pos1 are performing exceptionally well (&gt;
-0.80). While pos2 and pos3 are slightly lower at 0.64, they are still
-well within the acceptable range for factor analysis.</p>
+<p><strong>1. KMO (Kaiser-Meyer-Olkin)</strong> The Overall MSA = 0.79
+is very strong.</p>
+<p>On the scale of sampling adequacy, 0.79 is considered “Good”
+(bordering on “Meritorious”). This value confirms that the variance in
+the variables is likely caused by underlying factors. It is well above
+the minimum threshold of 0.50. Item Breakdown: Eng1 through pos1 are
+performing exceptionally well (&gt; 0.80). While pos2 and pos3 are
+slightly lower at 0.64, they are still well within the acceptable range
+for factor analysis.</p>
 <p><strong>2. Bartlett’s Test of Sphericity</strong>: the results shows
 a $p.value = 0 (which means <span class="math inline">\(p &lt;
 .0001\)</span>). Interpretation: Since the p-value is less than 0.05,
@@ -1741,8 +1742,8 @@ Data) is above the red dotted line (Simulated Data).</p>
 clearly above the red lines. Factor 3 appears to sit almost exactly on
 the line or slightly above it.</p>
 <p>Looking at the steep drop after the second factor, a 2-factor
-solution is the most robust choice for your EFA.´But sometimes the model
-may give a 3-factor solution, therefore we set a seed</p>
+solution is the most robust choice for your EFA. But sometimes the model
+may give a 3-factor solution, therefore we set a seed.</p>
 </div>
 <div id="interpretation-of-number-and-type-of-constructs" class="section level3">
 <h3>Interpretation of number and type of constructs</h3>
@@ -1785,14 +1786,15 @@ table above we know that the proportion is really low and this diagram
 is not accurate and we will not work with the 3-factor model.</p>
 <pre class="r"><code>fa.diagram(efa_model)</code></pre>
 <p><img role="img" src="data:image/png;base64,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" width="672" /></p>
-<p>Summary of conclusions of 3-factor selection: - Discard Factor 3: The
-third factor (MR3) explains only 2.7% of the variance and has no strong
-unique loadings. - Clean Structure: Your variables group perfectly by
-their naming convention (Eng vs. pos), showing excellent convergent and
-discriminant validity. - High Explained Variance: Together, the first
-two factors (MR1 and MR2) explain 65.3% of the total variance in your
-data, which is a very respectable result for social science
-research.</p>
+<p>Conclusions of 3-factor selection:</p>
+<p>- Discard Factor 3: The third factor (MR3) explains only 2.7% of the
+variance and has no strong unique loadings.</p>
+<p>- Clean Structure: Your variables group perfectly by their naming
+convention (Eng vs. pos), showing excellent convergent and discriminant
+validity.</p>
+<p>- High Explained Variance: Together, the first two factors (MR1 and
+MR2) explain 65.3% of the total variance in your data, which is a very
+respectable result for social science research.</p>
 <p>After realizing the 3-factor model should be discarded, we do the
 2-factor EFA:</p>
 <pre class="r"><code>final_efa &lt;- psych::fa(data, 
@@ -1853,12 +1855,13 @@ factor. pos1 (0.469) is the weakest, but still well above the common
 <p>If we look at the variable description on the database we can see how
 the items grouped in each construct refer to the same kind of questions,
 further validating the results obtained through the EFA.</p>
-<p>Eng1 I share the values of this organization. Eng2 I am proud of this
-organization. Eng3 This organization is a big part of who I am. Eng4 I
-would recommend this organization as a place to work. pos1 This
-organization cares about my well-being. pos2 This organization is
-interested in my contribution. pos3 This organization is there for me
-when I need help.</p>
+<p>Eng1 I share the values of this organization.</p>
+<p>Eng2 I am proud of this organization.</p>
+<p>Eng3 This organization is a big part of who I am.</p>
+<p>Eng4 I would recommend this organization as a place to work.</p>
+<p>pos1 This organization cares about my well-being.</p>
+<p>pos2 This organization is interested in my contribution.</p>
+<p>pos3 This organization is there for me when I need help.</p>
 <p>The Inter-Factor Correlation of 0.258 is low enough to prove that
 Organizational Identification (MR1) and Perceived Support (MR2) are
 distinct psychological constructs, yet high enough to show they exist
@@ -1880,80 +1883,82 @@ design?</h3>
 <p>Because the correlation between these two factors is relatively low
 (25.77%), HR cannot treat them as a single “engagement” metric. A
 “one-size-fits-all” initiative will likely fail because the levers for
-each factor are entirely different:</p>
-<p>Because the correlation between factors is low (25.8%) it tells HR
-that an employee’s score on MR1 does not predict their score on MR2.To
-improve the workplace, the company must address the 40.6% (Identity) and
-the 24.3% (Support) as two separate projects.This means that an
-employee’s sense of Identity/Pride (MR1) is almost entirely disconnected
-from their sense of Support (MR2). The Risk: In many companies, these
-move together. In yours, they don’t. You likely have a group of “True
-Believers” who are deeply committed to the mission (High MR1) but who
-feel the company does not have their back (Low MR2). This is the
-definition of a Burnout Martyr. Based on the Variance Imbalance (40.6%
-vs. 24.3%) and the Low Correlation (25.8%), your company is structurally
-more vulnerable to Burnout Martyrs than Mercenaries.</p>
+each factor are entirely different. It tells HR that an employee’s score
+on MR1 does not predict their score on MR2.To improve the workplace, the
+company must address the 40.6% (Identity) and the 24.3% (Support) as two
+separate projects.</p>
+<p>This means that an employee’s sense of Identity/Pride (MR1) is almost
+entirely disconnected from their sense of Support (MR2). In many
+companies, these move together here they don’t. Most likely there is a
+group of “True Believers” who are deeply committed to the mission (High
+MR1) but who feel the company does not have their back (Low MR2). This
+is the definition of a Burnout Martyr.</p>
+<p>Based on the Variance Imbalance (40.6% vs. 24.3%) and the Low
+Correlation (25.8%), your company is structurally more vulnerable to
+Burnout Martyrs (MR2 variance is low (24.3%).</p>
+<p>Burnout Martyr -&gt; High MR1, employees that love the mission but
+feel ignored or unsupported. They are the ones who stay late until they
+collapse and quit unexpectedly</p>
+<p>Mercenaries -&gt;Low MR1, people who may be happy and supported (High
+MR2) but have no emotional stake in the company. They are a flight
+risk.</p>
 <ul>
-<li>MR1 represents the “Heart” of the company—measuring pride, values
+<li>MR1 represents the “Heart” of the company measuring pride, values
 alignment, and internal loyalty.</li>
 </ul>
 <p>The Value (40.6% Variance): This is the dominant force in your
 workplace, explaining the largest chunk of employee sentiment. It is an
 incredibly “tight” factor, anchored by Eng4 (Advocacy) at 0.877.</p>
-<p>The primary HR goal should be Culture-Building. High loadings on
-“Values” and “Advocacy” mean you should double down on
+<p>The primary HR goal should be <strong>Culture-Building</strong>. High
+loadings on “Values” and “Advocacy” mean you should double down on
 <strong>mission-driven storytelling</strong> and <strong>brand
-ambassadorship</strong>. The Statistical Strength: With an SS Loading of
-2.841, this factor effectively “does the work” of nearly three
-individual questions, indicating a very cohesive internal culture.</p>
-<p>Risk of Low MR1 (The Mercenary): If an employee scores low here, you
-create a “Mercenary.” These are talented people who may be happy and
-supported (High MR2) but have no emotional stake in the company. They
-are a flight risk for a 5% raise elsewhere because they do not care
-about your “Why.”</p>
+ambassadorship</strong>.</p>
+<p>The Statistical Strength: With an SS Loading of 2.841, this factor
+effectively “does the work” of nearly three individual questions,
+indicating a very cohesive internal culture.</p>
 <ul>
-<li>MR2 represents the “Safety Net”—measuring the organization’s
+<li>MR2 represents the “Safety Net” measuring the organization’s
 reliability and how it values individual contributions.</li>
 </ul>
 <p>The Value (24.3% Variance): This factor is a secondary, but distinct,
-pillar. While it explains less variance than MR1, it is highly defined
-by its “Power Item,” pos3 (0.919).When Identity dominates Support, the
-culture often becomes one of “Sacrifice.” Employees feel a strong
-“Identity” (Eng3: 0.831) and “Advocacy” (Eng4: 0.877), which masks the
-fact that the “Safety Net” (MR2) is secondary.</p>
+pillar.</p>
+<p>While it explains less variance than MR1, it is highly defined by its
+“Power Item,” pos3 (0.919).When Identity dominates Support, the culture
+often becomes one of “Sacrifice.” Employees feel a strong “Identity”
+(Eng3: 0.831) and “Advocacy” (Eng4: 0.877), which masks the fact that
+the “Safety Net” (MR2) is secondary.</p>
 <p>The Power Item (pos3): This massive loading means the entire concept
 of Support in your company hinges on crisis reliability (“Organization
 is there for me when I need help”).</p>
-<p>Risk of Low MR2 (The Burnout Martyr): MR2 variance is low (24.3%). If
-an employee scores low here, you create a “Burnout Martyr.” These
-employees love the mission (High MR1) but feel ignored or unsupported.
-They are the ones who stay late until they collapse and quit
-unexpectedly.</p>
 <p>If your support system is only “Help in a crisis,” your most loyal
-employees (MR1) will keep pushing themselves until a crisis happens.
-Because MR2 only explains 24.3% of the variance, it is currently a much
-“weaker” pillar in your company culture than the high-pressure Identity
-pillar (40.6%).</p>
-<p>The “Social Contract” Gap: The culture pulls heavily toward high
-engagement and advocacy (MR1). However, because Support (MR2) is a
-separate, weaker track, the social contract is lopsided: employees are
-giving more “Identity” than they are receiving “Support.”</p>
-<p>The “Sacrifice” Trap: When Identity dominates Support, culture often
-becomes one of “Sacrifice,” where high advocacy masks the fact that the
-safety net is secondary.</p>
+employees (MR1) will keep pushing themselves until a crisis happens.</p>
+<ul>
+<li><p>The “Social Contract” Gap: The culture pulls heavily toward high
+engagement and advocacy (MR1).</p>
+<p>However, because Support (MR2) is a separate, weaker track, the
+social contract is lopsided: employees are giving more “Identity” than
+they are receiving “Support.”</p></li>
+<li><p>The “Sacrifice” Trap: When Identity dominates Support, culture
+often becomes one of “Sacrifice,” where high advocacy masks the fact
+that the safety net is secondary.</p></li>
+</ul>
 <p>Immediate HR Mitigation Strategy:</p>
 <ul>
-<li>HR interventions must focus on <strong>empathy and tangible
-resources</strong>.Such as working on HR responsiveness, manager
-check-ins, improving Employee Assistance Programs (EAPs) or manager
-empathy training.</li>
-<li>Bridge the Gap: De-link sacrifice from identity. Stop rewarding
-“overwork” as a sign of “loyalty” (MR1).</li>
-<li>Bolster the Anchor (pos3): Since pos3 has a 0.919 loading, any
+<li>HR interventions must focus on **empathy and tangible
+resources**.Such as working on HR responsiveness, manager check-ins,
+improving Employee Assistance Programs (EAPs) or manager empathy
+training.</li>
+</ul>
+<!-- -->
+<ul>
+<li><p>Bridge the Gap: De-link sacrifice from identity. Stop rewarding
+“overwork” as a sign of “loyalty” (MR1).</p></li>
+<li><p>Bolster the Anchor (pos3): Since pos3 has a 0.919 loading, any
 improvement in proactive help will almost single-handedly fix your MR2
 score. Make support part of the weekly workflow rather than a reactive
-crisis response.</li>
+crisis response.</p></li>
 </ul>
+<hr />
 </div>
 </div>
 </div>
@@ -2064,10 +2069,50 @@ reliability would change if each item were removed.</p>
 </div>
 <div id="recommendation-on-whether-to-keep-or-drop-specific-items" class="section level3">
 <h3>Recommendation on whether to keep or drop specific items</h3>
+<p><strong>Cronbach’s Alpha Result and Interpretation</strong> </p>
+<p>Cronbach’s alpha for the four-item OCB scale was <strong>α =
+0.68</strong> (95% CI [0.64, 0.72]).</p>
+<p>This indicates <strong>borderline internal consistency</strong>,
+slightly below the conventional 0.70 threshold. While the scale shows
+moderate coherence, it does not fully meet accepted reliability
+standards.  Item-level diagnostics reveal that <strong>ocb4 reduces
+overall reliability</strong>.</p>
+<p>If removed, alpha increases to <strong>α = 0.78</strong>, indicating
+good internal consistency.</p>
+<p>In contrast, deleting ocb1, ocb2, or ocb3 lowers reliability
+substantially (α between 0.53 and 0.60). Moreover, ocb4 has the lowest
+corrected item–total correlation (r.drop = 0.30), compared to stronger
+correlations for the other items (above 0.50).</p>
+<p>This suggests ocb4 is less strongly aligned with the core OCB
+construct and may reflect a slightly different behavioral
+dimension. </p>
+<p><strong>Recommendation: Keep or Drop Items</strong> </p>
+<p>From a statistical perspective, <strong>dropping ocb4 is
+recommended</strong>, as it clearly improves internal consistency and
+strengthens scale coherence. However, this decision should also be
+informed by theory. If ocb4 represents an important aspect of
+organizational citizenship behavior, removing it may improve reliability
+at the expense of content validity. </p>
+<p><strong>Trade-off Between Brevity and Reliability</strong></p>
+<p>There is an inherent trade-off between brevity and reliability.</p>
+<p>Shorter scales reduce respondent fatigue and improve completion
+rates, which is valuable in employee surveys. However, eliminating items
+to increase alpha may narrow the construct’s conceptual scope. In this
+case, removing ocb4 enhances psychometric quality but may slightly
+reduce behavioral coverage.</p>
 </div>
 <div id="reflection-why-does-internal-consistency-matter-in-employee-surveys" class="section level3">
 <h3>Reflection: Why does internal consistency matter in employee
 surveys?</h3>
+<p>Internal consistency is crucial because unreliable measures introduce
+measurement error, weakening statistical power and potentially
+distorting findings.</p>
+<p>If items do not consistently measure the same construct, group
+comparisons and regression analyses may be less trustworthy.</p>
+<p>Ensuring adequate reliability increases confidence that observed
+differences reflect genuine variation in employee attitudes, thereby
+supporting evidence-based HR decision-making.</p>
+<hr />
 </div>
 </div>
 </div>
@@ -2235,12 +2280,9 @@ and by function (Sales vs Prof. Services).<br />
 </ul>
 </div>
 </div>
-<div id="solution-3" class="section level2">
-<h2>Solution</h2>
+<div id="solution-prompt-4" class="section level2">
+<h2>Solution (Prompt 4)</h2>
 <div id="t-test-outputs-with-interpretation" class="section level3">
-<h3>t-test outputs with interpretation</h3>
-</div>
-<div id="t-test-outputs-with-interpretation-1" class="section level3">
 <h3>t-test outputs with interpretation</h3>
 <pre class="r"><code># 1) Import data
 df4 &lt;- read_excel(&quot;Databases/Ch5_Engagement_CASE_Group_level_data_2023.xlsx&quot;,
@@ -2478,7 +2520,9 @@ used as a segmentation variable for engagement strategy.</p>
 further investigation.</p>
 <p>However, action should not be taken based solely on mean
 differences.</p>
-<p><strong><em>Instead, HR should:</em></strong></p>
+</div>
+<div id="instead-hr-should" class="section level4">
+<h4><strong><em>Instead, HR should:</em></strong></h4>
 <p>Conduct regression analysis (Prompt 5) to test whether function
 remains significant after controlling for supervisor support, integrity,
 team size, and composition variables.</p>
@@ -2487,6 +2531,7 @@ design characteristics (e.g., target pressure, incentive systems,
 leadership climate).</p>
 <p>Avoid broad engagement initiatives and instead diagnose root
 causes.</p>
+<hr />
 </div>
 </div>
 </div>
@@ -2519,7 +2564,7 @@ UG, location, and function.<br />
 <li>Actionable recommendations for HR strategy.</li>
 </ul>
 </div>
-<div id="solution-4" class="section level2">
+<div id="solution-3" class="section level2">
 <h2>Solution</h2>
 <div id="regression-summary-table" class="section level3">
 <h3>Regression summary table</h3>
@@ -2642,8 +2687,43 @@ comfortable and have someone to turn to in case of any problems.</p>
 </div>
 </div>
 </div>
-<div id="final-conclusions" class="section level1">
-<h1>Final Conclusions</h1>
+<div id="final-conclusion-strategic-recommendations" class="section level1">
+<h1>Final Conclusion &amp; Strategic Recommendations</h1>
+<p>This analysis provides a clear, data-driven understanding of
+engagement across the organisation. Engagement is consistent across
+locations but differs meaningfully by function, with Professional
+Services reporting higher levels than Sales. However, structural
+segmentation alone does not explain engagement outcomes. The regression
+results confirm that leadership quality and organisational integrity are
+the strongest drivers, outweighing geographic variables.</p>
+<p>The strategic implication is clear: engagement improvements will not
+come from broad initiatives, but from targeted, driver-focused
+action.</p>
+<div id="hr-priorities" class="section level2">
+<h2>HR Priorities</h2>
+<ul>
+<li><p><strong>Invest in leadership capability</strong>, particularly
+within Sales, as supervisor support is a key engagement driver.</p></li>
+<li><p><strong>Reinforce organisational integrity and ethical
+climate</strong>, ensuring alignment between values and daily managerial
+behavior.</p></li>
+<li><p><strong>Diagnose workload and performance pressure in
+Sales</strong>, addressing structural stressors rather than
+symptoms.</p></li>
+<li><p><strong>Avoid generic engagement campaigns</strong>; focus
+interventions on validated drivers.</p></li>
+<li><p><strong>Implement a simplified engagement dashboard</strong>
+centred on Loyalty, Well-being, and Ethics.</p></li>
+<li><p><strong>Embed engagement metrics into strategic
+accountability</strong>, linking leadership performance to engagement
+outcomes.</p></li>
+</ul>
+<p>In summary, this case demonstrates how rigorous statistical analysis
+can translate employee sentiment data into precise, evidence-based HR
+strategy. The organisation now has a clear roadmap to strengthen
+engagement through leadership, integrity, and structural alignment
+rather than assumption-driven initiatives.</p>
+</div>
 </div>
 
 
