@@ -561,6 +561,14 @@ This is not a “large” effect, but it is meaningful at the organizational lev
 
 #### Summary of significant and non-significant findings
 
+Unlike location, function appears to be meaningfully associated with engagement levels.
+
+Professional Services teams report engagement scores approximately 4.4 points higher than Sales teams.
+Given the effect size and narrow confidence interval, this difference reflects a stable structural disparity across functions.
+
+Importantly, this does not imply causality.
+The t-test identifies group-level differences but does not determine whether function itself drives engagement or whether function serves as a proxy for underlying drivers (e.g., supervisor support, workload, incentive structures).
+
 ```{r prompt4.2}
 # Quick visual summary plot
 boxplot(EMPsurvEngagement ~ Function, data = df4, 
@@ -569,13 +577,13 @@ boxplot(EMPsurvEngagement ~ Function, data = df4,
 
 ```
 
-Unlike location, function appears to be meaningfully associated with engagement levels.
+The boxplot visually reinforces the statistical findings:
 
-Professional Services teams report engagement scores approximately 4.4 points higher than Sales teams.
-Given the effect size and narrow confidence interval, this difference reflects a stable structural disparity across functions.
+-   Engagement does not just differ on average, the entire distribution for Professional Services is shifted upward.
 
-Importantly, this does not imply causality.
-The t-test identifies group-level differences but does not determine whether function itself drives engagement or whether function serves as a proxy for underlying drivers (e.g., supervisor support, workload, incentive structures).
+-   The difference is structural rather than driven by isolated teams.
+
+-   While variability exists in both groups, Sales exhibits slightly more extreme low-engagement outliers.
 
 ### Recommendations: Should HR act on these differences?
 
