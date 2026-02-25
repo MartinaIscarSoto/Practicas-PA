@@ -147,8 +147,7 @@ fa.diagram(efa_model)
 
 Conclusions of 3-factor selection:
 
-\- Discard Factor 3: The third factor (MR3) explains only 2.7% of the variance and has no strong unique loadings.
-\
+\- Discard Factor 3: The third factor (MR3) explains only 2.7% of the variance and has no strong unique loadings.\
 - Clean Structure: Your variables group perfectly by their naming convention (Eng vs. pos), showing excellent convergent and discriminant validity.
 
 \- High Explained Variance: Together, the first two factors (MR1 and MR2) explain 65.3% of the total variance in your data, which is a very respectable result for social science research.
@@ -727,3 +726,27 @@ This will allow them to lead the team smoothly, achieving higher performance and
 ------------------------------------------------------------------------
 
 # Final Conclusions
+
+This analysis provides a clear, data-driven understanding of engagement across the organisation.
+Engagement is consistent across locations but differs meaningfully by function, with Professional Services reporting higher levels than Sales.
+However, structural segmentation alone does not explain engagement outcomes.
+The regression results confirm that leadership quality and organisational integrity are the strongest drivers, outweighing geographic variables.
+
+The strategic implication is clear: engagement improvements will not come from broad initiatives, but from targeted, driver-focused action.
+
+## HR Priorities
+
+-   **Invest in leadership capability**, particularly within Sales, as supervisor support is a key engagement driver.
+
+-   **Reinforce organisational integrity and ethical climate**, ensuring alignment between values and daily managerial behavior.
+
+-   **Diagnose workload and performance pressure in Sales**, addressing structural stressors rather than symptoms.
+
+-   **Avoid generic engagement campaigns**; focus interventions on validated drivers.
+
+-   **Implement a simplified engagement dashboard** centred on Loyalty, Well-being, and Ethics.
+
+-   **Embed engagement metrics into strategic accountability**, linking leadership performance to engagement outcomes.
+
+In summary, this case demonstrates how rigorous statistical analysis can translate employee sentiment data into precise, evidence-based HR strategy.
+The organisation now has a clear roadmap to strengthen engagement through leadership, integrity, and structural alignment rather than assumption-driven initiatives.
