@@ -329,7 +329,7 @@ head(df3)
 
 # Ejecutar PCA con rotación varimax
 # Basado en el análisis, 3 componentes suelen explicar mejor la varianza en este set
-pca_result <- principal(engagement_items, nfactors = 3, rotate = "varimax")
+pca_result <- principal(df3, nfactors = 3, rotate = "varimax")
 
 # Deliverable: Tabla de cargas de componentes
 print(pca_result$loadings, cutoff = 0.4, digits = 3)
@@ -610,25 +610,44 @@ structural variation in employee experience across functions.
 ### Regression summary table
 
 ```{r prompt5.1}
-# 1. Carga de datos
-df5 <- read_excel("Databases/Ch5_Engagement_CASE_Group_level_data_2023.xlsx", sheet = "data")
+# 1. Load necessary libraries
+library(readxl)
+library(lm.beta) # For standardized coefficients
 
-# 2. Preparar variables (asegurar que sean factores donde corresponda)
-df5$Location <- as.factor(df5$Location)
-df5$Function <- as.factor(df5$Function)
+# 2. Import Data
+# Ensure the file is in your working directory
+file_path <- "Databases/Ch5_Engagement_CASE_Group_level_data_2023.xlsx"
+df5 <- read_excel(file_path, sheet = 1)
+head(df5)
 
-# 3. Ejecutar el modelo de regresión múltiple
-modelo <- lm(EMPsurvEngagement ~ EmpSurvSupervisor + EmployeeSurvOrgIntegrity + 
-             GroupSize + PercentMale + UG + Location + Function, data = df5)
+# 3. Run Multiple Regression
+# We include 'location' and 'function' as they are likely categorical factors
+model <- lm(EMPsurvEngagement ~ EmpSurvSupervisor + EmployeeSurvOrgIntegrity + 
+                   GroupSize + PercentMale + UG + Location + Function, 
+                   data = df5)
 
-# 4. Obtener coeficientes estandarizados
-modelo_beta <- lm.beta(modelo)
+# 4. Standardize the coefficients to compare "apples to apples"
+standardized_model <- lm.beta(model)
 
-# Deliverable: Resumen de la regresión
-summary(modelo_beta)
+# 5. Review the results
+summary(standardized_model)
 
 ```
 
 ### Interpretation of model strength and variable impacts
+The model explains 55.31% of the engagement, with an adjusted R-squared of 54.88%. This indicates that the model is reasonably well adjusted for  el analisis del comportamiento humano. El modelo es confiable para la toma de deciones estratégicas, aunque un 45% de la varianza depende de factores externos no medidos.
+
+EmployeeSurvOrgIntegrity refers to the organizational integrity with beta = 0.570, is the most inflluential factor, This suggests that engagement is not merely a social phenomeno but a moral one. Employees are most committed when they perceive the organization as honest, ethical and consisten in its values.
+
+PrecentMale, talking about gender composition with a beta = -0.21. Ther is a statistically significant negative correlation between the percentage of male employees and team engagement. As the proportion of men in a team increases, reported engagement tends to decline. This suggests that current engagement strategies may be resonating differently across genders or that male-dominated teams face specific cultural headwinds.
+
+EmpSurvSupervisor, refering to supervisory quality with beta = 0.14635. While the supervisor is not as dominant as "Integrity," they serve as the primary point of contact for the employee experience. A positive relationship with a direct manager significantly bolsters the day-to-day employee experience.
+
+
 
 ### Actionable recommendations for HR strategy
+What this model tells us is that employees highly value transparency, corporate ethics, and good customer service—in general, the values and image of the company. That is why we recommend that companies have clear values and that their actions are consistent with those values. This is what employees value most. In addition, we would reinforce anonymous reporting channels and ensure that there are visible consequences for breaches of integrity, validating the perception of fairness within the company.
+
+The model also shows us that the more men there are in the team, the lower the level of engagement. Conduct qualitative deep-dives within teams with high male ratios to understand the specific barriers to engagement. This will help determine if the issue is related to work-life balance, lack of social connection, or a disconnect from the company's mission.
+
+We recommend that supervisors not only train in soft skills, but also be able to listen to their team and have greater organizational skills. This will allow them to lead the team smoothly, achieving higher performance and greater engagement, as team members will feel comfortable and have someone to turn to in case of any problems.
