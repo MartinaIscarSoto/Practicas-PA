@@ -42,6 +42,8 @@ if (!require("effsize")) install.packages("effsize")
 library(effsize)
 ```
 
+---
+
 # Prompt 1: Exploratory Factor Analysis on Engagement Items
 
 ### Tasks
@@ -255,6 +257,8 @@ Immediate HR Mitigation Strategy:
 -   Bridge the Gap: De-link sacrifice from identity. Stop rewarding "overwork" as a sign of "loyalty" (MR1).
 -   Bolster the Anchor (pos3): Since pos3 has a 0.919 loading, any improvement in proactive help will almost single-handedly fix your MR2 score. Make support part of the weekly workflow rather than a reactive crisis response.
 
+---
+
 # Prompt 2: Scale Reliability Testing
 
 ### Tasks
@@ -303,6 +307,8 @@ These lines extract the overall Cronbach’s alpha for the full scale and displa
 ### Recommendation on whether to keep or drop specific items
 
 ### Reflection: Why does internal consistency matter in employee surveys?
+
+---
 
 # Prompt 3: Principal Component Analysis on Aggregated Survey Items
 
@@ -397,9 +403,7 @@ Rather than implementing generic "engagement" initiatives, we can now identify i
 -   Summary of significant and non-significant findings.\
 -   Recommendations: Should HR act on these differences?
 
-## Solution
-
-### t-test outputs with interpretation
+## Solution (Prompt 4)
 
 ### t-test outputs with interpretation
 
@@ -608,6 +612,8 @@ Determine whether the functional difference reflects structural work design char
 
 Avoid broad engagement initiatives and instead diagnose root causes.
 
+---
+
 # Prompt 5: Multiple Regression to Predict Team-Level Engagement
 
 ### Tasks
@@ -684,6 +690,30 @@ This will help determine if the issue is related to work-life balance, lack of s
 We recommend that supervisors not only train in soft skills, but also be able to listen to their team and have greater organizational skills.
 This will allow them to lead the team smoothly, achieving higher performance and greater engagement, as team members will feel comfortable and have someone to turn to in case of any problems.
 
----
+------------------------------------------------------------------------
 
-# Final Conclusions
+# Final Conclusion & Strategic Recommendations
+
+This analysis provides a clear, data-driven understanding of engagement across the organisation.
+Engagement is consistent across locations but differs meaningfully by function, with Professional Services reporting higher levels than Sales.
+However, structural segmentation alone does not explain engagement outcomes.
+The regression results confirm that leadership quality and organisational integrity are the strongest drivers, outweighing geographic variables.
+
+The strategic implication is clear: engagement improvements will not come from broad initiatives, but from targeted, driver-focused action.
+
+## HR Priorities
+
+-   **Invest in leadership capability**, particularly within Sales, as supervisor support is a key engagement driver.
+
+-   **Reinforce organisational integrity and ethical climate**, ensuring alignment between values and daily managerial behavior.
+
+-   **Diagnose workload and performance pressure in Sales**, addressing structural stressors rather than symptoms.
+
+-   **Avoid generic engagement campaigns**; focus interventions on validated drivers.
+
+-   **Implement a simplified engagement dashboard** centred on Loyalty, Well-being, and Ethics.
+
+-   **Embed engagement metrics into strategic accountability**, linking leadership performance to engagement outcomes.
+
+In summary, this case demonstrates how rigorous statistical analysis can translate employee sentiment data into precise, evidence-based HR strategy.
+The organisation now has a clear roadmap to strengthen engagement through leadership, integrity, and structural alignment rather than assumption-driven initiatives.
