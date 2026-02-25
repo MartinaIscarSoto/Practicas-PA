@@ -42,7 +42,7 @@ if (!require("effsize")) install.packages("effsize")
 library(effsize)
 ```
 
----
+------------------------------------------------------------------------
 
 # Prompt 1: Exploratory Factor Analysis on Engagement Items
 
@@ -257,7 +257,7 @@ Immediate HR Mitigation Strategy:
 -   Bridge the Gap: De-link sacrifice from identity. Stop rewarding "overwork" as a sign of "loyalty" (MR1).
 -   Bolster the Anchor (pos3): Since pos3 has a 0.919 loading, any improvement in proactive help will almost single-handedly fix your MR2 score. Make support part of the weekly workflow rather than a reactive crisis response.
 
----
+------------------------------------------------------------------------
 
 # Prompt 2: Scale Reliability Testing
 
@@ -308,7 +308,7 @@ These lines extract the overall Cronbach’s alpha for the full scale and displa
 
 ### Reflection: Why does internal consistency matter in employee surveys?
 
----
+------------------------------------------------------------------------
 
 # Prompt 3: Principal Component Analysis on Aggregated Survey Items
 
@@ -612,7 +612,7 @@ Determine whether the functional difference reflects structural work design char
 
 Avoid broad engagement initiatives and instead diagnose root causes.
 
----
+------------------------------------------------------------------------
 
 # Prompt 5: Multiple Regression to Predict Team-Level Engagement
 
