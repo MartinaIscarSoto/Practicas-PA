@@ -184,16 +184,35 @@ This high variance explained suggests that the model isn't just skimming the sur
 The Parallel Analysis compares the actual data against a random simulation to ensure that these two factors are genuine patterns rather than mathematical coincidences.
 Once confirmed, the Factor Loadings revealed the strength of the "affinity" between each question and its parent factor.
 
-The Loadings table shows the "correlation" between an item and the underlying factor.
+-   We used **Oblique Rotation (Oblimin)** because the workplace is "messy." We allowed these factors to relate naturally rather than forcing them to be independent. 
 
-MR1 (The Identity Factor): All items (Eng1–Eng4) load between 0.78 and 0.87.
-This is exceptionally high.
-It suggests that these four questions are essentially measuring the same core psychological pulse.
-If an employee agrees with one, they almost certainly agree with the others.
+<!-- -->
 
-MR2 (The Support Factor): This factor is anchored by pos3 (0.919).
-A loading this high makes pos3 the "Definition Item" it essentially is the factor.
-pos1 (0.469) is the weakest, but still well above the common 0.40 cutoff for significance.
+-   **We also did the Inter-Factor Correlation (0.258):** This is the most critical finding.
+    It proves that **Identity and Support are separate tracks**: Loving the company mission (Identity) does **not** guarantee the employee feels cared for (Support). 
+
+The Factor Loadings revealed the strength of the "affinity" between each question and its parent factor. 
+
+-   **MR1** (The Identity Factor): All items (Eng1–Eng4) load between 0.78 and 0.87.
+    This is exceptionally high.
+    It suggests that these four questions are essentially measuring the same core psychological pulse.
+    If an employee agrees with one, they almost certainly agree with the others.
+    It measures pride, values alignment, and internal loyalty.
+
+    The Value (40.6% Variance): This is the dominant force in your workplace, explaining the largest chunk of employee sentiment.
+    It is an incredibly "tight" factor, anchored by Eng4 (Advocacy) at 0.877.
+
+    The Statistical Strength: With an SS Loading of 2.841, this factor effectively "does the work" of nearly three individual questions, indicating a very cohesive internal culture.
+
+-   **MR2** (The Support Factor): This factor is anchored by pos3 (0.919).
+    A loading this high makes pos3 the "Definition Item" it essentially is the factor.
+    pos1 (0.469) is the weakest, but still well above the common 0.40 cutoff for significance.
+    It measures the organization’s reliability and how it values individual contributions.
+
+    The Value (24.3% Variance): This factor is a secondary, but distinct, pillar.
+    While it explains less variance than MR1, it is highly defined by its
+
+    Power Item, pos3 (0.919).When Identity dominates Support, the culture often becomes one of "Sacrifice." This massive loading means the entire concept of Support in your company hinges on crisis reliability ("Organization is there for me when I need help").
 
 If we look at the variable description on the database we can see how the items grouped in each construct refer to the same kind of questions, further validating the results obtained through the EFA.
 
@@ -211,11 +230,6 @@ pos2 This organization is interested in my contribution.
 
 pos3 This organization is there for me when I need help.
 
-The Inter-Factor Correlation of 0.258 is low enough to prove that Organizational Identification (MR1) and Perceived Support (MR2) are distinct psychological constructs, yet high enough to show they exist within the same organizational ecosystem.
-At 0.258, the data says: "Knowing if an employee loves the company brand (MR1) tells you very little about whether they feel the company supports them personally (MR2)." They are independent psychological tracks.
-
-By using an Oblique Rotation (Oblimin), we allowed the model to reflect the messy reality of the workplace: an employee's sense of identity and their sense of being supported are related, but they are certainly not the same thing.
-
 Overall, together these two factors account for 64.9% of all the differences in your employees' answers.
 We aren't just measuring noise; we are measuring the core drivers of the workforce.
 
@@ -224,31 +238,10 @@ We aren't just measuring noise; we are measuring the core drivers of the workfor
 Because the correlation between these two factors is relatively low (25.77%), HR cannot treat them as a single "engagement" metric.
 A "one-size-fits-all" initiative will likely fail because the levers for each factor are entirely different:
 
-Because the correlation between factors is low (25.8%) it tells HR that an employee’s score on MR1 does not predict their score on MR2.To improve the workplace, the company must address the 40.6% (Identity) and the 24.3% (Support) as two separate projects.This means that an employee’s sense of Identity/Pride (MR1) is almost entirely disconnected from their sense of Support (MR2).
-The Risk: In many companies, these move together.
-In yours, they don't.
-You likely have a group of "True Believers" who are deeply committed to the mission (High MR1) but who feel the company does not have their back (Low MR2).
+Because the correlation between factors is low (25.8%) it tells HR that an employee’s score on MR1 does not predict their score on MR2.T o improve the workplace, the company must address the 40.6% (Identity) and the 24.3% (Support) as two separate projects.This means that an employee’s sense of Identity/Pride (MR1) is almost entirely disconnected from their sense of Support (MR2).
+There is likely a group of "True Believers" who are deeply committed to the mission (High MR1) but who feel the company does not have their back (Low MR2).
 This is the definition of a Burnout Martyr.
 Based on the Variance Imbalance (40.6% vs. 24.3%) and the Low Correlation (25.8%), your company is structurally more vulnerable to Burnout Martyrs than Mercenaries.
-
--   MR1 represents the "Heart" of the company—measuring pride, values alignment, and internal loyalty.
-
-The Value (40.6% Variance): This is the dominant force in your workplace, explaining the largest chunk of employee sentiment.
-It is an incredibly "tight" factor, anchored by Eng4 (Advocacy) at 0.877.
-
-The primary HR goal should be Culture-Building.
-High loadings on "Values" and "Advocacy" mean you should double down on **mission-driven storytelling** and **brand ambassadorship**.
-The Statistical Strength: With an SS Loading of 2.841, this factor effectively "does the work" of nearly three individual questions, indicating a very cohesive internal culture.
-
-Risk of Low MR1 (The Mercenary): If an employee scores low here, you create a "Mercenary." These are talented people who may be happy and supported (High MR2) but have no emotional stake in the company.
-They are a flight risk for a 5% raise elsewhere because they do not care about your "Why."
-
--   MR2 represents the "Safety Net"—measuring the organization’s reliability and how it values individual contributions.
-
-The Value (24.3% Variance): This factor is a secondary, but distinct, pillar.
-While it explains less variance than MR1, it is highly defined by its "Power Item," pos3 (0.919).When Identity dominates Support, the culture often becomes one of "Sacrifice." Employees feel a strong "Identity" (Eng3: 0.831) and "Advocacy" (Eng4: 0.877), which masks the fact that the "Safety Net" (MR2) is secondary.
-
-The Power Item (pos3): This massive loading means the entire concept of Support in your company hinges on crisis reliability ("Organization is there for me when I need help").
 
 Risk of Low MR2 (The Burnout Martyr): MR2 variance is low (24.3%).
 If an employee scores low here, you create a "Burnout Martyr." These employees love the mission (High MR1) but feel ignored or unsupported.
@@ -263,6 +256,12 @@ However, because Support (MR2) is a separate, weaker track, the social contract 
 The "Sacrifice" Trap: When Identity dominates Support, culture often becomes one of "Sacrifice," where high advocacy masks the fact that the safety net is secondary.
 
 Immediate HR Mitigation Strategy:
+
+-   To target MR1 improvements.
+    The primary HR goal should be Culture-Building.
+    The company should double down on **mission-driven storytelling** and **brand ambassadorship**.
+
+<!-- -->
 
 -   HR interventions must focus on **empathy and tangible resources**.Such as working on HR responsiveness, manager check-ins, improving Employee Assistance Programs (EAPs) or manager empathy training.
 -   Bridge the Gap: De-link sacrifice from identity. Stop rewarding "overwork" as a sign of "loyalty" (MR1).
