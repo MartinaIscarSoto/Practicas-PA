@@ -353,19 +353,33 @@ scatterplot3d(scores[,1:3],
 ```
 
 ### Description of the constructs found and their strategic relevance
-The objective of this analysis was to streamline our employee engagement metrics by identifying the underlying drivers of the employee experience. By applying Principal Component Analysis (PCA), the complexity of the original data set was reduced by 66%, from nine variables to just three fundamental components. This simplified model maintains high reliability, explaining 83.3% of the total variance in employee experience.
+
+The objective of this analysis was to streamline our employee engagement metrics by identifying the underlying drivers of the employee experience.
+By applying Principal Component Analysis (PCA), the complexity of the original data set was reduced by 66%, from nine variables to just three fundamental components.
+This simplified model maintains high reliability, explaining 83.3% of the total variance in employee experience.
 
 Now let's analyze the three fundamental components:
 
-1. RC1 Loyalty: This constructor groups together variables related to pride and recommendation. It represents an emotional bond between the individual an the organization. An employee with a high score in this component feels proud of their company and acts as a brand ambassador, actively recommending the company. This helps attract talent and emotionally retain employees.
+1.  RC1 Loyalty: This constructor groups together variables related to pride and recommendation.
+    It represents an emotional bond between the individual an the organization.
+    An employee with a high score in this component feels proud of their company and acts as a brand ambassador, actively recommending the company.
+    This helps attract talent and emotionally retain employees.
 
-2. RC2 Well-being: This consolidates the relationship between workload and personal life. It reflects the viability of long-term performance. It indicates that commitment is only healthy if the workload is manageable and does not interfere with private life. If there is a low score, it predicts turnover due to exhaustion, regardless of how much the employee loves the company.
+2.  RC2 Well-being: This consolidates the relationship between workload and personal life.
+    It reflects the viability of long-term performance.
+    It indicates that commitment is only healthy if the workload is manageable and does not interfere with private life.
+    If there is a low score, it predicts turnover due to exhaustion, regardless of how much the employee loves the company.
 
-3. RC3 Ethics. Integrates the perception of safety, social responsibility, and values. Validates that the company operates under standards of responsibility, physical safety, and ethical behavior. If this foundation of trust is broken, pride and well-being tend to plummet.
+3.  RC3 Ethics.
+    Integrates the perception of safety, social responsibility, and values.
+    Validates that the company operates under standards of responsibility, physical safety, and ethical behavior.
+    If this foundation of trust is broken, pride and well-being tend to plummet.
 
-This analysis is highly relevant strategically, as it will enable the company to conduct shorter and more frequent surveys, focusing on the three fundamental components. On the other hand, if they use extensive surveys, these cannot be conducted very frequently, as this would increase fatigue and we would lose data quality.
+This analysis is highly relevant strategically, as it will enable the company to conduct shorter and more frequent surveys, focusing on the three fundamental components.
+On the other hand, if they use extensive surveys, these cannot be conducted very frequently, as this would increase fatigue and we would lose data quality.
 
-Furthermore, this model allows leadership to diagnose the root cause of turnover with surgical precision. Rather than implementing generic "engagement" initiatives, we can now identify if a retention issue is a capacity problem (RC2), a cultural problem (RC1), or a trust problem (RC3).
+Furthermore, this model allows leadership to diagnose the root cause of turnover with surgical precision.
+Rather than implementing generic "engagement" initiatives, we can now identify if a retention issue is a capacity problem (RC2), a cultural problem (RC1), or a trust problem (RC3).
 # Prompt 4: t-Tests on Engagement Across Teams
 
 ### Tasks
@@ -423,8 +437,13 @@ print(t_loc)
 d_loc <- cohen.d(EMPsurvEngagement ~ LondonorNot, data = df4, hedges.correction = TRUE)
 ```
 
-First we can see that both groups are reasonably balanced and the sample
-is large so there's a strong statistical power.
+The groups are reasonably balanced:
+
+-   London: 533 teams
+
+-   Other locations: 394 teams
+
+The large total sample size (N = 927) ensures high statistical power, reducing the likelihood of Type II error.
 
 #### Levene’s Test (Homogeneity of Variance)
 
@@ -432,46 +451,46 @@ is large so there's a strong statistical power.
 
 -   p = 0.9879
 
--   p \>\> .05 → No evidence to say variances aren't equal
+-   p \>\> .05
 
-We can see Levene’s test did not reject the null of equal variances (p =
-.99) so in this case Student's t-test is completely valid. Aditionally
-we did Welch’s t-test to see if there would be any differences, and we
-observed that results were substantively identical under both
-specifications.
+Since p \> 0.05, we fail to reject the null hypothesis of equal variances.
+This indicates no statistical evidence of variance inequality between the two groups.
+Therefore, the homogeneity assumption required for the standard Student t-test holds.
 
-For the purpose of coherence for the next section we chose to analyse
-Welch's t-test results. Nevertheless the analysis would be the same.
+For robustness, both Student and Welch specifications were examined.
+Results were substantively identical, confirming stability of findings.
 
-#### Welch t-test
+#### Mean Comparison Results
 
--   t = 1.320
--   df ≈ 857
--   p = 0.187
+-   Student t-test:
+
+-   t(925) = 1.316
+
+-   p = 0.189
+
 -   Mean London = 81.55
+
 -   Mean Other = 80.67
+
 -   Mean difference ≈ 0.88 points
+
 -   95% CI = [−0.43, 2.18]
 
-The difference is not statistically significant (p \> .05) and the
-confidence interval includes zero. Therefore, we fail to reject the null
-hypothesis.
+The difference is not statistically significant (p \> .05), and the confidence interval includes zero.
+Therefore, there is no evidence that average engagement differs by location.
 
-**There is no statistical evidence of engagement differences by
-location.**
+**There is no statistical evidence of engagement differences by location.**
 
 Even if it had been significant: The difference is \< 1 point.
 
-On a 0–100 scale, this is negligible --\> statistical significance does
-not equal practical importance (here we have neither).
+On a 0–100 scale, this is negligible --\> statistical significance does not equal practical importance (here we have neither).
 
 #### Conclusion
 
 Engagement does not differ meaningfully by location.
 
-HR Actionability: No intervention required at geographic level. Location
-should not be treated as an engagement segmentation variable in this
-organization.
+HR Actionability: No intervention required at geographic level.
+Location should not be treated as an engagement segmentation variable in this organization.
 
 #### COMPARISON BY FUNCTION
 
@@ -494,21 +513,24 @@ d_fun <- cohen.d(EMPsurvEngagement ~ Function, data = df4, hedges.correction = T
 print(d_fun)
 ```
 
-We can see that both groups are balanced and the sample is large so
-there's a strong statistical power.
+Group sizes are also balanced:
+
+-   Sales: 502 teams
+
+-   Professional Services: 425 teams
+
+Again, the sample size provides strong statistical power.
 
 #### Levene’s Test
 
 -   F = 3.760
 
--   p = 0.0528 –\> Borderline but technically p \> .05.
+-   p = 0.0528
 
-Again, Levene’s test did not reject the null of equal variances (p =
-.053), but since it's borderline, Welch’s t-test was used in this case
-as it is more robust to potential variance inequality and unequal group
-sizes.
+Although technically non-significant (p \> .05), the value is borderline.
+To ensure robustness, Welch’s t-test was applied, which does not assume equal variances.
 
-#### Welch t-Test 
+#### Welch t-Test
 
 -   t = −6.943
 
@@ -524,23 +546,20 @@ sizes.
 
 -   95% CI = [−5.68, −3.18] –\> The CI does not include zero.
 
-**There is strong evidence of a difference in engagement between
-functions.**
+The difference is highly statistically significant (p \< .001), and the confidence interval does not include zero.
+The negative sign indicates that Sales teams report lower engagement than Professional Services teams.
 
 #### Effect Size (Hedges’ g)
 
 -   g = −0.453
-
-<!-- -->
-
--    CI ≈ [−0.58, −0.32]
+-   CI ≈ [−0.58, −0.32]
 
 Interpreted as **small-to-moderate effect**
 
-A g of 0.45 is not trivial. This is not a “large” effect, but it is
-meaningful at the organizational level.
+A g of 0.45 is not trivial.
+This is not a “large” effect, but it is meaningful at the organizational level.
 
-### Summary of significant and non-significant findings
+#### Summary of significant and non-significant findings
 
 ```{r prompt4.2}
 # Quick visual summary plot
@@ -550,45 +569,34 @@ boxplot(EMPsurvEngagement ~ Function, data = df4,
 
 ```
 
+Unlike location, function appears to be meaningfully associated with engagement levels.
+
+Professional Services teams report engagement scores approximately 4.4 points higher than Sales teams.
+Given the effect size and narrow confidence interval, this difference reflects a stable structural disparity across functions.
+
+Importantly, this does not imply causality.
+The t-test identifies group-level differences but does not determine whether function itself drives engagement or whether function serves as a proxy for underlying drivers (e.g., supervisor support, workload, incentive structures).
+
 ### Recommendations: Should HR act on these differences?
 
-### Location
+#### Location
 
-There is no statistically significant difference in engagement between
-London and other locations (p = .187). The mean difference is less than
-one point, indicating no practical relevance. HR should not segment
-engagement strategy by location.
+No intervention required at geographic level.
+Location should not be used as a segmentation variable for engagement strategy.
 
-### Function
+#### Function
 
-Engagement differs significantly by function (p \< .001). Professional
-Services teams report engagement scores approximately 4.4 points higher
-than Sales teams. The effect size (Hedges’ g = 0.45) indicates a
-small-to-moderate practical difference. This suggests a meaningful
-structural variation in employee experience across functions.
+The engagement gap between Sales and Professional Services warrants further investigation.
 
-#### HR should:
+However, action should not be taken based solely on mean differences.
 
-1.   Investigate drivers within Sales:
+***Instead, HR should:***
 
-    -   Supervisor support?
+Conduct regression analysis (Prompt 5) to test whether function remains significant after controlling for supervisor support, integrity, team size, and composition variables.
 
-    -   Incentive pressure?
+Determine whether the functional difference reflects structural work design characteristics (e.g., target pressure, incentive systems, leadership climate).
 
-    -   Performance targets?
-
-    -   Workload?
-
-2.   Use regression analysis (Prompt 5) to test whether:
-
-    -   Function remains significant after controlling for supervisor
-        and integrity scores.
-
-
-    -   Or whether function is simply a proxy for deeper drivers.
-
-3.   Avoid blanket engagement initiatives and target structural causes
-    instead.
+Avoid broad engagement initiatives and instead diagnose root causes.
 
 # Prompt 5: Multiple Regression to Predict Team-Level Engagement
 
@@ -635,19 +643,33 @@ summary(standardized_model)
 ```
 
 ### Interpretation of model strength and variable impacts
-The model explains 55.31% of the engagement, with an adjusted R-squared of 54.88%. This indicates that the model is reasonably well adjusted for  el analisis del comportamiento humano. El modelo es confiable para la toma de deciones estratégicas, aunque un 45% de la varianza depende de factores externos no medidos.
 
-EmployeeSurvOrgIntegrity refers to the organizational integrity with beta = 0.570, is the most inflluential factor, This suggests that engagement is not merely a social phenomeno but a moral one. Employees are most committed when they perceive the organization as honest, ethical and consisten in its values.
+The model explains 55.31% of the engagement, with an adjusted R-squared of 54.88%.
+This indicates that the model is reasonably well adjusted for el analisis del comportamiento humano.
+El modelo es confiable para la toma de deciones estratégicas, aunque un 45% de la varianza depende de factores externos no medidos.
 
-PrecentMale, talking about gender composition with a beta = -0.21. Ther is a statistically significant negative correlation between the percentage of male employees and team engagement. As the proportion of men in a team increases, reported engagement tends to decline. This suggests that current engagement strategies may be resonating differently across genders or that male-dominated teams face specific cultural headwinds.
+EmployeeSurvOrgIntegrity refers to the organizational integrity with beta = 0.570, is the most inflluential factor, This suggests that engagement is not merely a social phenomeno but a moral one.
+Employees are most committed when they perceive the organization as honest, ethical and consisten in its values.
 
-EmpSurvSupervisor, refering to supervisory quality with beta = 0.14635. While the supervisor is not as dominant as "Integrity," they serve as the primary point of contact for the employee experience. A positive relationship with a direct manager significantly bolsters the day-to-day employee experience.
+PrecentMale, talking about gender composition with a beta = -0.21.
+Ther is a statistically significant negative correlation between the percentage of male employees and team engagement.
+As the proportion of men in a team increases, reported engagement tends to decline.
+This suggests that current engagement strategies may be resonating differently across genders or that male-dominated teams face specific cultural headwinds.
 
-
+EmpSurvSupervisor, refering to supervisory quality with beta = 0.14635.
+While the supervisor is not as dominant as "Integrity," they serve as the primary point of contact for the employee experience.
+A positive relationship with a direct manager significantly bolsters the day-to-day employee experience.
 
 ### Actionable recommendations for HR strategy
-What this model tells us is that employees highly value transparency, corporate ethics, and good customer service—in general, the values and image of the company. That is why we recommend that companies have clear values and that their actions are consistent with those values. This is what employees value most. In addition, we would reinforce anonymous reporting channels and ensure that there are visible consequences for breaches of integrity, validating the perception of fairness within the company.
 
-The model also shows us that the more men there are in the team, the lower the level of engagement. Conduct qualitative deep-dives within teams with high male ratios to understand the specific barriers to engagement. This will help determine if the issue is related to work-life balance, lack of social connection, or a disconnect from the company's mission.
+What this model tells us is that employees highly value transparency, corporate ethics, and good customer service—in general, the values and image of the company.
+That is why we recommend that companies have clear values and that their actions are consistent with those values.
+This is what employees value most.
+In addition, we would reinforce anonymous reporting channels and ensure that there are visible consequences for breaches of integrity, validating the perception of fairness within the company.
 
-We recommend that supervisors not only train in soft skills, but also be able to listen to their team and have greater organizational skills. This will allow them to lead the team smoothly, achieving higher performance and greater engagement, as team members will feel comfortable and have someone to turn to in case of any problems.
+The model also shows us that the more men there are in the team, the lower the level of engagement.
+Conduct qualitative deep-dives within teams with high male ratios to understand the specific barriers to engagement.
+This will help determine if the issue is related to work-life balance, lack of social connection, or a disconnect from the company's mission.
+
+We recommend that supervisors not only train in soft skills, but also be able to listen to their team and have greater organizational skills.
+This will allow them to lead the team smoothly, achieving higher performance and greater engagement, as team members will feel comfortable and have someone to turn to in case of any problems.
