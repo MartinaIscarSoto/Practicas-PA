@@ -1,7 +1,7 @@
 ---
 title: "Employee Engagement" 
 subtitle: "Groupwork Use Case 2 - People Analytics"
-author: "Ferrán Extremera, Irene Morales, Amalia Varo y Martina Iscar"
+author: "Ferrán Extremera, Irene Morales, Amalia Varo y Martina Iscar Substitute Group_X by your Group number in the name of the .Rmd file"
 date: "`r Sys.Date()`"
 output: 
   html_document:
@@ -93,9 +93,8 @@ KMO(data)
 cortest.bartlett(data)
 ```
 
-**1. KMO (Kaiser-Meyer-Olkin)** The Overall MSA = 0.79 is very strong.
-
-On the scale of sampling adequacy, 0.79 is considered "Good" (bordering on "Meritorious").
+**1. KMO (Kaiser-Meyer-Olkin)** TestYour Overall MSA = 0.79 is very strong.
+Interpretation: On the scale of sampling adequacy, 0.79 is considered "Good" (bordering on "Meritorious").
 This value confirms that the variance in the variables is likely caused by underlying factors.
 It is well above the minimum threshold of 0.50.
 Item Breakdown: Eng1 through pos1 are performing exceptionally well (\> 0.80).
@@ -119,8 +118,7 @@ The Decision Rule is to retain factors where the blue line (Actual Data) is abov
 As seen in the plot, the blue triangles for Factor 1 and Factor 2 are clearly above the red lines.
 Factor 3 appears to sit almost exactly on the line or slightly above it.
 
-Looking at the steep drop after the second factor, a 2-factor solution is the most robust choice for your EFA.
-But sometimes the model may give a 3-factor solution, therefore we set a seed.
+Looking at the steep drop after the second factor, a 2-factor solution is the most robust choice for your EFA.´But sometimes the model may give a 3-factor solution, therefore we set a seed
 
 ### Interpretation of number and type of constructs
 
@@ -146,13 +144,9 @@ To illustrate it we show the diagram, but it presents an error because it does n
 fa.diagram(efa_model)
 ```
 
-Conclusions of 3-factor selection:
-
-\- Discard Factor 3: The third factor (MR3) explains only 2.7% of the variance and has no strong unique loadings.
-
-\- Clean Structure: Your variables group perfectly by their naming convention (Eng vs. pos), showing excellent convergent and discriminant validity.
-
-\- High Explained Variance: Together, the first two factors (MR1 and MR2) explain 65.3% of the total variance in your data, which is a very respectable result for social science research.
+Summary of conclusions of 3-factor selection: - Discard Factor 3: The third factor (MR3) explains only 2.7% of the variance and has no strong unique loadings.
+- Clean Structure: Your variables group perfectly by their naming convention (Eng vs. pos), showing excellent convergent and discriminant validity.
+- High Explained Variance: Together, the first two factors (MR1 and MR2) explain 65.3% of the total variance in your data, which is a very respectable result for social science research.
 
 After realizing the 3-factor model should be discarded, we do the 2-factor EFA:
 
@@ -199,17 +193,11 @@ pos1 (0.469) is the weakest, but still well above the common 0.40 cutoff for sig
 If we look at the variable description on the database we can see how the items grouped in each construct refer to the same kind of questions, further validating the results obtained through the EFA.
 
 Eng1 I share the values of this organization.
-
 Eng2 I am proud of this organization.
-
 Eng3 This organization is a big part of who I am.
-
 Eng4 I would recommend this organization as a place to work.
-
 pos1 This organization cares about my well-being.
-
 pos2 This organization is interested in my contribution.
-
 pos3 This organization is there for me when I need help.
 
 The Inter-Factor Correlation of 0.258 is low enough to prove that Organizational Identification (MR1) and Perceived Support (MR2) are distinct psychological constructs, yet high enough to show they exist within the same organizational ecosystem.
@@ -223,59 +211,51 @@ We aren't just measuring noise; we are measuring the core drivers of the workfor
 ### Short reflection: How could these constructs guide HR intervention design?
 
 Because the correlation between these two factors is relatively low (25.77%), HR cannot treat them as a single "engagement" metric.
-A "one-size-fits-all" initiative will likely fail because the levers for each factor are entirely different.
-It tells HR that an employee’s score on MR1 does not predict their score on MR2.To improve the workplace, the company must address the 40.6% (Identity) and the 24.3% (Support) as two separate projects.
+A "one-size-fits-all" initiative will likely fail because the levers for each factor are entirely different:
 
-This means that an employee’s sense of Identity/Pride (MR1) is almost entirely disconnected from their sense of Support (MR2).
-In many companies, these move together here they don't.
-Most likely there is a group of "True Believers" who are deeply committed to the mission (High MR1) but who feel the company does not have their back (Low MR2).
+Because the correlation between factors is low (25.8%) it tells HR that an employee’s score on MR1 does not predict their score on MR2.To improve the workplace, the company must address the 40.6% (Identity) and the 24.3% (Support) as two separate projects.This means that an employee’s sense of Identity/Pride (MR1) is almost entirely disconnected from their sense of Support (MR2).
+The Risk: In many companies, these move together.
+In yours, they don't.
+You likely have a group of "True Believers" who are deeply committed to the mission (High MR1) but who feel the company does not have their back (Low MR2).
 This is the definition of a Burnout Martyr.
+Based on the Variance Imbalance (40.6% vs. 24.3%) and the Low Correlation (25.8%), your company is structurally more vulnerable to Burnout Martyrs than Mercenaries.
 
-Based on the Variance Imbalance (40.6% vs. 24.3%) and the Low Correlation (25.8%), your company is structurally more vulnerable to Burnout Martyrs (MR2 variance is low (24.3%).
-
-Burnout Martyr -\> High MR1, employees that love the mission but feel ignored or unsupported.
-They are the ones who stay late until they collapse and quit unexpectedly
-
-Mercenaries -\>Low MR1, people who may be happy and supported (High MR2) but have no emotional stake in the company.
-They are a flight risk.
-
--   MR1 represents the "Heart" of the company measuring pride, values alignment, and internal loyalty.
+-   MR1 represents the "Heart" of the company—measuring pride, values alignment, and internal loyalty.
 
 The Value (40.6% Variance): This is the dominant force in your workplace, explaining the largest chunk of employee sentiment.
 It is an incredibly "tight" factor, anchored by Eng4 (Advocacy) at 0.877.
 
-The primary HR goal should be **Culture-Building**.
+The primary HR goal should be Culture-Building.
 High loadings on "Values" and "Advocacy" mean you should double down on **mission-driven storytelling** and **brand ambassadorship**.
-
 The Statistical Strength: With an SS Loading of 2.841, this factor effectively "does the work" of nearly three individual questions, indicating a very cohesive internal culture.
 
--   MR2 represents the "Safety Net" measuring the organization’s reliability and how it values individual contributions.
+Risk of Low MR1 (The Mercenary): If an employee scores low here, you create a "Mercenary." These are talented people who may be happy and supported (High MR2) but have no emotional stake in the company.
+They are a flight risk for a 5% raise elsewhere because they do not care about your "Why."
+
+-   MR2 represents the "Safety Net"—measuring the organization’s reliability and how it values individual contributions.
 
 The Value (24.3% Variance): This factor is a secondary, but distinct, pillar.
-
 While it explains less variance than MR1, it is highly defined by its "Power Item," pos3 (0.919).When Identity dominates Support, the culture often becomes one of "Sacrifice." Employees feel a strong "Identity" (Eng3: 0.831) and "Advocacy" (Eng4: 0.877), which masks the fact that the "Safety Net" (MR2) is secondary.
 
 The Power Item (pos3): This massive loading means the entire concept of Support in your company hinges on crisis reliability ("Organization is there for me when I need help").
 
+Risk of Low MR2 (The Burnout Martyr): MR2 variance is low (24.3%).
+If an employee scores low here, you create a "Burnout Martyr." These employees love the mission (High MR1) but feel ignored or unsupported.
+They are the ones who stay late until they collapse and quit unexpectedly.
+
 If your support system is only "Help in a crisis," your most loyal employees (MR1) will keep pushing themselves until a crisis happens.
+Because MR2 only explains 24.3% of the variance, it is currently a much "weaker" pillar in your company culture than the high-pressure Identity pillar (40.6%).
 
--   The "Social Contract" Gap: The culture pulls heavily toward high engagement and advocacy (MR1).
+The "Social Contract" Gap: The culture pulls heavily toward high engagement and advocacy (MR1).
+However, because Support (MR2) is a separate, weaker track, the social contract is lopsided: employees are giving more "Identity" than they are receiving "Support."
 
-    However, because Support (MR2) is a separate, weaker track, the social contract is lopsided: employees are giving more "Identity" than they are receiving "Support."
-
--   The "Sacrifice" Trap: When Identity dominates Support, culture often becomes one of "Sacrifice," where high advocacy masks the fact that the safety net is secondary.
+The "Sacrifice" Trap: When Identity dominates Support, culture often becomes one of "Sacrifice," where high advocacy masks the fact that the safety net is secondary.
 
 Immediate HR Mitigation Strategy:
 
--   HR interventions must focus on \*\*empathy and tangible resources\*\*.Such as working on HR responsiveness, manager check-ins, improving Employee Assistance Programs (EAPs) or manager empathy training.
-
-<!-- -->
-
--   Bridge the Gap: De-link sacrifice from identity.
-    Stop rewarding "overwork" as a sign of "loyalty" (MR1).
-
--   Bolster the Anchor (pos3): Since pos3 has a 0.919 loading, any improvement in proactive help will almost single-handedly fix your MR2 score.
-    Make support part of the weekly workflow rather than a reactive crisis response.
+-   HR interventions must focus on **empathy and tangible resources**.Such as working on HR responsiveness, manager check-ins, improving Employee Assistance Programs (EAPs) or manager empathy training.
+-   Bridge the Gap: De-link sacrifice from identity. Stop rewarding "overwork" as a sign of "loyalty" (MR1).
+-   Bolster the Anchor (pos3): Since pos3 has a 0.919 loading, any improvement in proactive help will almost single-handedly fix your MR2 score. Make support part of the weekly workflow rather than a reactive crisis response.
 
 ------------------------------------------------------------------------
 
@@ -326,42 +306,7 @@ These lines extract the overall Cronbach’s alpha for the full scale and displa
 
 ### Recommendation on whether to keep or drop specific items
 
-**Cronbach’s Alpha Result and Interpretation** 
-
-Cronbach’s alpha for the four-item OCB scale was **α = 0.68** (95% CI [0.64, 0.72]).
-
-This indicates **borderline internal consistency**, slightly below the conventional 0.70 threshold.
-While the scale shows moderate coherence, it does not fully meet accepted reliability standards. 
-Item-level diagnostics reveal that **ocb4 reduces overall reliability**.
-
-If removed, alpha increases to **α = 0.78**, indicating good internal consistency.
-
-In contrast, deleting ocb1, ocb2, or ocb3 lowers reliability substantially (α between 0.53 and 0.60).
-Moreover, ocb4 has the lowest corrected item–total correlation (r.drop = 0.30), compared to stronger correlations for the other items (above 0.50).
-
-This suggests ocb4 is less strongly aligned with the core OCB construct and may reflect a slightly different behavioral dimension. 
-
-**Recommendation: Keep or Drop Items** 
-
-From a statistical perspective, **dropping ocb4 is recommended**, as it clearly improves internal consistency and strengthens scale coherence.
-However, this decision should also be informed by theory.
-If ocb4 represents an important aspect of organizational citizenship behavior, removing it may improve reliability at the expense of content validity. 
-
-**Trade-off Between Brevity and Reliability**
-
-There is an inherent trade-off between brevity and reliability.
-
-Shorter scales reduce respondent fatigue and improve completion rates, which is valuable in employee surveys.
-However, eliminating items to increase alpha may narrow the construct’s conceptual scope.
-In this case, removing ocb4 enhances psychometric quality but may slightly reduce behavioral coverage.
-
 ### Reflection: Why does internal consistency matter in employee surveys?
-
-Internal consistency is crucial because unreliable measures introduce measurement error, weakening statistical power and potentially distorting findings.
-
-If items do not consistently measure the same construct, group comparisons and regression analyses may be less trustworthy.
-
-Ensuring adequate reliability increases confidence that observed differences reflect genuine variation in employee attitudes, thereby supporting evidence-based HR decision-making.
 
 ------------------------------------------------------------------------
 
@@ -659,7 +604,7 @@ The engagement gap between Sales and Professional Services warrants further inve
 
 However, action should not be taken based solely on mean differences.
 
-#### ***Instead, HR should:***
+***Instead, HR should:***
 
 Conduct regression analysis (Prompt 5) to test whether function remains significant after controlling for supervisor support, integrity, team size, and composition variables.
 
