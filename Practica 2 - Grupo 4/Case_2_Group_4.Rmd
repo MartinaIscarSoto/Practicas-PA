@@ -80,6 +80,8 @@ If your variables aren't correlated, the results would just be statistical noise
 
 ### Factor loadings table and scree plot
 
+Before diving into findings, we validated that the data is statistically relevant enough to trust. 
+
 ```{r}
 # Let's assume your dataframe is named 'data'
 # Check suitability with KMO and Bartlett's Test
@@ -248,14 +250,8 @@ The "Sacrifice" Trap: When Identity dominates Support, culture often becomes one
 Immediate HR Mitigation Strategy:
 
 -   HR interventions must focus on **empathy and tangible resources**.Such as working on HR responsiveness, manager check-ins, improving Employee Assistance Programs (EAPs) or manager empathy training.
-
-<!-- -->
-
--   Bridge the Gap: De-link sacrifice from identity.
-    Stop rewarding "overwork" as a sign of "loyalty" (MR1).
-
--   Bolster the Anchor (pos3): Since pos3 has a 0.919 loading, any improvement in proactive help will almost single-handedly fix your MR2 score.
-    Make support part of the weekly workflow rather than a reactive crisis response.
+-   Bridge the Gap: De-link sacrifice from identity. Stop rewarding "overwork" as a sign of "loyalty" (MR1).
+-   Bolster the Anchor (pos3): Since pos3 has a 0.919 loading, any improvement in proactive help will almost single-handedly fix your MR2 score. Make support part of the weekly workflow rather than a reactive crisis response.
 
 # Prompt 2: Scale Reliability Testing
 
