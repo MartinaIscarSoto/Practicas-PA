@@ -317,7 +317,38 @@ These lines extract the overall Cronbach’s alpha for the full scale and displa
 
 ### Recommendation on whether to keep or drop specific items
 
+In this prompt, we assess the internal consistency of the four OCB items (ocb1–ocb4) using Cronbach’s alpha to determine whether they reliably measure a single underlying construct. 
+
+**Cronbach’s Alpha Result and Interpretation** 
+
+Cronbach’s alpha for the four-item OCB scale was **α = 0.68** (95% CI [0.64, 0.72]).
+This indicates **borderline internal consistency**, slightly below the conventional 0.70 threshold.
+While the scale shows moderate coherence, it does not fully meet accepted reliability standards. 
+
+Item-level diagnostics reveal that **ocb4 reduces overall reliability**.
+If removed, alpha increases to **α = 0.78**, indicating good internal consistency.
+In contrast, deleting ocb1, ocb2, or ocb3 lowers reliability substantially (α between 0.53 and 0.60).
+Moreover, ocb4 has the lowest corrected item–total correlation (r.drop = 0.30), compared to stronger correlations for the other items (above 0.50).
+This suggests ocb4 is less strongly aligned with the core OCB construct and may reflect a slightly different behavioral dimension. 
+
+**Recommendation: Keep or Drop Items** 
+
+From a statistical perspective, **dropping ocb4 is recommended**, as it clearly improves internal consistency and strengthens scale coherence.
+However, this decision should also be informed by theory.
+If ocb4 represents an important aspect of organizational citizenship behavior, removing it may improve reliability at the expense of content validity. 
+
+**Trade-off Between Brevity and Reliability** 
+
+There is an inherent trade-off between brevity and reliability.
+Shorter scales reduce respondent fatigue and improve completion rates, which is valuable in employee surveys.
+However, eliminating items to increase alpha may narrow the construct’s conceptual scope.
+In this case, removing ocb4 enhances psychometric quality but may slightly reduce behavioral coverage. 
+
 ### Reflection: Why does internal consistency matter in employee surveys?
+
+Internal consistency is crucial because unreliable measures introduce measurement error, weakening statistical power and potentially distorting findings.
+If items do not consistently measure the same construct, group comparisons and regression analyses may be less trustworthy.
+Ensuring adequate reliability increases confidence that observed differences reflect genuine variation in employee attitudes, thereby supporting evidence-based HR decision-making. 
 
 ------------------------------------------------------------------------
 
