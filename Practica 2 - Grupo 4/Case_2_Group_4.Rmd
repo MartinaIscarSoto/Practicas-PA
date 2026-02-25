@@ -182,14 +182,13 @@ The Exploratory Factor Analysis (EFA) acts as a mathematical filter, distilling 
 This high variance explained suggests that the model isn't just skimming the surface; it’s capturing the core drivers of the employee experience.
 
 The Parallel Analysis compares the actual data against a random simulation to ensure that these two factors are genuine patterns rather than mathematical coincidences.
-Once confirmed, the Factor Loadings revealed the strength of the "affinity" between each question and its parent factor.
 
 -   We used **Oblique Rotation (Oblimin)** because the workplace is "messy." We allowed these factors to relate naturally rather than forcing them to be independent. 
 
 <!-- -->
 
 -   **We also did the Inter-Factor Correlation (0.258):** This is the most critical finding.
-    It proves that **Identity and Support are separate tracks**: Loving the company mission (Identity) does **not** guarantee the employee feels cared for (Support). 
+    It proves that Identity and Support are separate tracks: Loving the company mission (Identity) does not guarantee the employee feels cared for (Support). 
 
 The Factor Loadings revealed the strength of the "affinity" between each question and its parent factor. 
 
@@ -243,7 +242,7 @@ There is likely a group of "True Believers" who are deeply committed to the miss
 This is the definition of a Burnout Martyr.
 Based on the Variance Imbalance (40.6% vs. 24.3%) and the Low Correlation (25.8%), your company is structurally more vulnerable to Burnout Martyrs than Mercenaries.
 
-Risk of Low MR2 (The Burnout Martyr): MR2 variance is low (24.3%).
+**Risk of Low MR2** (The Burnout Martyr): MR2 variance is low (24.3%).
 If an employee scores low here, you create a "Burnout Martyr." These employees love the mission (High MR1) but feel ignored or unsupported.
 They are the ones who stay late until they collapse and quit unexpectedly.
 
@@ -255,7 +254,7 @@ However, because Support (MR2) is a separate, weaker track, the social contract 
 
 The "Sacrifice" Trap: When Identity dominates Support, culture often becomes one of "Sacrifice," where high advocacy masks the fact that the safety net is secondary.
 
-Immediate HR Mitigation Strategy:
+**Immediate HR Mitigation Strategy:**
 
 -   To target MR1 improvements.
     The primary HR goal should be Culture-Building.
