@@ -38,6 +38,8 @@ library(tidyverse)
 library(readxl)
 if (!require("pacman")) install.packages("pacman")
 pacman::p_load(readxl, psych, dplyr, GPArotation, scatterplot3d, modelsummary, car, this.path, huxtable, lm.beta)
+if (!require("effsize")) install.packages("effsize")
+library(effsize)
 ```
 
 # Prompt 1: Exploratory Factor Analysis on Engagement Items
@@ -653,14 +655,14 @@ summary(standardized_model)
 ### Interpretation of model strength and variable impacts
 
 The model explains 55.31% of the engagement, with an adjusted R-squared of 54.88%.
-This indicates that the model is reasonably well adjusted for el analisis del comportamiento humano.
-El modelo es confiable para la toma de deciones estratégicas, aunque un 45% de la varianza depende de factores externos no medidos.
+This indicates that the model provides a reasonably good fit for analysing human behaviour.
+The model can be considered reliable for strategic decision-making purposes, although approximately 45% of the variance remains unexplained and may be attributable to external or unmeasured factors.
 
-EmployeeSurvOrgIntegrity refers to the organizational integrity with beta = 0.570, is the most inflluential factor, This suggests that engagement is not merely a social phenomeno but a moral one.
+EmployeeSurvOrgIntegrity refers to the organizational integrity with beta = 0.570, is the most inflluential factor, This suggests that engagement is not merely a social phenomenon but a moral one.
 Employees are most committed when they perceive the organization as honest, ethical and consisten in its values.
 
 PrecentMale, talking about gender composition with a beta = -0.21.
-Ther is a statistically significant negative correlation between the percentage of male employees and team engagement.
+There is a statistically significant negative correlation between the percentage of male employees and team engagement.
 As the proportion of men in a team increases, reported engagement tends to decline.
 This suggests that current engagement strategies may be resonating differently across genders or that male-dominated teams face specific cultural headwinds.
 
@@ -670,7 +672,7 @@ A positive relationship with a direct manager significantly bolsters the day-to-
 
 ### Actionable recommendations for HR strategy
 
-What this model tells us is that employees highly value transparency, corporate ethics, and good customer service—in general, the values and image of the company.
+What this model tells us is that employees highly value transparency, corporate ethics, and good customer service, in general, the values and image of the company.
 That is why we recommend that companies have clear values and that their actions are consistent with those values.
 This is what employees value most.
 In addition, we would reinforce anonymous reporting channels and ensure that there are visible consequences for breaches of integrity, validating the perception of fairness within the company.
@@ -681,3 +683,7 @@ This will help determine if the issue is related to work-life balance, lack of s
 
 We recommend that supervisors not only train in soft skills, but also be able to listen to their team and have greater organizational skills.
 This will allow them to lead the team smoothly, achieving higher performance and greater engagement, as team members will feel comfortable and have someone to turn to in case of any problems.
+
+---
+
+# Final Conclusions
