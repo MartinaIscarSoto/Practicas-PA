@@ -389,36 +389,210 @@ Furthermore, this model allows leadership to diagnose the root cause of turnover
 
 ### t-test outputs with interpretation
 
+### t-test outputs with interpretation
+
 ```{r prompt4.1}
-# 1. Importar los datos
-df4 <- read_excel("Databases/Ch5_Engagement_CASE_Group_level_data_2023.xlsx", sheet = "data")
+# 1) Import data
+df4 <- read_excel("Databases/Ch5_Engagement_CASE_Group_level_data_2023.xlsx",
+                  sheet = "data")
 
-# 2. Preparar los factores
+# 2) Prepare factors (adjust levels/labels to match your variable coding)
 df4$LondonorNot <- factor(df4$LondonorNot, levels = c(1, 2), labels = c("London", "Other"))
-df4$Function <- factor(df4$Function, levels = c(1, 2), labels = c("Sales", "Prof. Services"))
-
-# --- COMPARACIÓN POR UBICACIÓN ---
-leveneTest(EMPsurvEngagement ~ LondonorNot, data = df4) # p > 0.05: Varianzas iguales
-t_loc <- t.test(EMPsurvEngagement ~ LondonorNot, data = df4, var.equal = TRUE)
-print(t_loc)
-
-# --- COMPARACIÓN POR FUNCIÓN ---
-leveneTest(EMPsurvEngagement ~ Function, data = df4) # p > 0.05: Varianzas iguales
-t_fun <- t.test(EMPsurvEngagement ~ Function, data = df4, var.equal = TRUE)
-print(t_fun)
+df4$Function    <- factor(df4$Function,    levels = c(1, 2), labels = c("Sales", "Prof. Services"))
 
 ```
+
+#### COMPARISON BY LOCATION
+
+```{r}
+cat("Engagement by Location\n=======================\n")
+
+cat("Group sizes:")
+print(table(df4$LondonorNot, useNA = "ifany"))
+cat("\n")
+
+# Levene’s test (center = median is robust)
+lev_loc <- leveneTest(EMPsurvEngagement ~ LondonorNot, data = df4, center = median)
+print(lev_loc)
+
+# Student t-test
+t_loc1 <- t.test(EMPsurvEngagement ~ LondonorNot, data = df4, var.equal = TRUE)
+print(t_loc1)
+
+# Welch t-test (more robust if variances differ)
+t_loc <- t.test(EMPsurvEngagement ~ LondonorNot, data = df4)
+print(t_loc)
+
+# Effect size (Cohen's d)
+d_loc <- cohen.d(EMPsurvEngagement ~ LondonorNot, data = df4, hedges.correction = TRUE)
+```
+
+First we can see that both groups are reasonably balanced and the sample
+is large so there's a strong statistical power.
+
+#### Levene’s Test (Homogeneity of Variance)
+
+-   F = 0.0002
+
+-   p = 0.9879
+
+-   p \>\> .05 → No evidence to say variances aren't equal
+
+We can see Levene’s test did not reject the null of equal variances (p =
+.99) so in this case Student's t-test is completely valid. Aditionally
+we did Welch’s t-test to see if there would be any differences, and we
+observed that results were substantively identical under both
+specifications.
+
+For the purpose of coherence for the next section we chose to analyse
+Welch's t-test results. Nevertheless the analysis would be the same.
+
+#### Welch t-test
+
+-   t = 1.320
+-   df ≈ 857
+-   p = 0.187
+-   Mean London = 81.55
+-   Mean Other = 80.67
+-   Mean difference ≈ 0.88 points
+-   95% CI = [−0.43, 2.18]
+
+The difference is not statistically significant (p \> .05) and the
+confidence interval includes zero. Therefore, we fail to reject the null
+hypothesis.
+
+**There is no statistical evidence of engagement differences by
+location.**
+
+Even if it had been significant: The difference is \< 1 point.
+
+On a 0–100 scale, this is negligible --\> statistical significance does
+not equal practical importance (here we have neither).
+
+#### Conclusion
+
+Engagement does not differ meaningfully by location.
+
+HR Actionability: No intervention required at geographic level. Location
+should not be treated as an engagement segmentation variable in this
+organization.
+
+#### COMPARISON BY FUNCTION
+
+```{r}
+cat("Engagement by Function\n=======================\n")
+
+cat("Group sizes:")
+print(table(df4$Function, useNA = "ifany"))
+cat("\n")
+
+lev_fun <- leveneTest(EMPsurvEngagement ~ Function, data = df4, center = median)
+print(lev_fun)
+
+# Welch t-test (default)
+t_fun <- t.test(EMPsurvEngagement ~ Function, data = df4)
+print(t_fun)
+
+# Effect size (Cohen's d)
+d_fun <- cohen.d(EMPsurvEngagement ~ Function, data = df4, hedges.correction = TRUE)
+print(d_fun)
+```
+
+We can see that both groups are balanced and the sample is large so
+there's a strong statistical power.
+
+#### Levene’s Test
+
+-   F = 3.760
+
+-   p = 0.0528 –\> Borderline but technically p \> .05.
+
+Again, Levene’s test did not reject the null of equal variances (p =
+.053), but since it's borderline, Welch’s t-test was used in this case
+as it is more robust to potential variance inequality and unequal group
+sizes.
+
+#### Welch t-Test 
+
+-   t = −6.943
+
+-   df ≈ 923
+
+-   p = 7.22e−12 –\> Highly statistically significant (p \< .001).
+
+-   Mean Sales = 83.57
+
+-   Mean Prof. Services = 80.67
+
+-   Mean difference ≈ 4.42 points
+
+-   95% CI = [−5.68, −3.18] –\> The CI does not include zero.
+
+**There is strong evidence of a difference in engagement between
+functions.**
+
+#### Effect Size (Hedges’ g)
+
+-   g = −0.453
+
+<!-- -->
+
+-    CI ≈ [−0.58, −0.32]
+
+Interpreted as **small-to-moderate effect**
+
+A g of 0.45 is not trivial. This is not a “large” effect, but it is
+meaningful at the organizational level.
 
 ### Summary of significant and non-significant findings
 
 ```{r prompt4.2}
-# Resumen visual rápido
+# Quick visual summary plot
 boxplot(EMPsurvEngagement ~ Function, data = df4, 
-        main = "Compromiso por Función", col = c("orange", "lightblue"))
+        main = "Engagement by Function",
+        xlab = "Function", ylab = "EMPsurvEngagement", col = c("orange", "lightblue"))
 
 ```
 
 ### Recommendations: Should HR act on these differences?
+
+### Location
+
+There is no statistically significant difference in engagement between
+London and other locations (p = .187). The mean difference is less than
+one point, indicating no practical relevance. HR should not segment
+engagement strategy by location.
+
+### Function
+
+Engagement differs significantly by function (p \< .001). Professional
+Services teams report engagement scores approximately 4.4 points higher
+than Sales teams. The effect size (Hedges’ g = 0.45) indicates a
+small-to-moderate practical difference. This suggests a meaningful
+structural variation in employee experience across functions.
+
+#### HR should:
+
+1.   Investigate drivers within Sales:
+
+    -   Supervisor support?
+
+    -   Incentive pressure?
+
+    -   Performance targets?
+
+    -   Workload?
+
+2.   Use regression analysis (Prompt 5) to test whether:
+
+    -   Function remains significant after controlling for supervisor
+        and integrity scores.
+
+
+    -   Or whether function is simply a proxy for deeper drivers.
+
+3.   Avoid blanket engagement initiatives and target structural causes
+    instead.
 
 # Prompt 5: Multiple Regression to Predict Team-Level Engagement
 
