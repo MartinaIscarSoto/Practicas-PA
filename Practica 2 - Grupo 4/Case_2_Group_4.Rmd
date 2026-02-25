@@ -1,5 +1,4 @@
 ---
-# this is the Rmarkdown header. Use the YAML syntax. ---YAML block ---.
 title: "Employee Engagement" 
 subtitle: "Groupwork Use Case 2 - People Analytics"
 author: "Ferrán Extremera, Irene Morales, Amalia Varo y Martina Iscar Substitute Group_X by your Group number in the name of the .Rmd file"
@@ -10,17 +9,20 @@ output:
     toc_depth: 3
     toc_float: true
     code_folding: hide
-
-# the following lines tell R to store the output in the subdirectory reports
 knit: (function(inputFile, encoding) { 
       rmarkdown::render(inputFile,
                         encoding=encoding, 
                         output_dir=file.path(dirname(inputFile),"report" )) }) 
+editor_options: 
+  markdown: 
+    wrap: sentence
 ---
 
 # Intro
 
-In this workshop, you will analyze employee engagement using both individual- and team-level data. You’ll apply factor analysis, reliability testing, t-tests, and multiple regression to real-world employee survey data. The goal is to understand how engagement is measured, how well survey instruments perform, and what factors predict engagement across teams.
+In this workshop, you will analyze employee engagement using both individual- and team-level data.
+You’ll apply factor analysis, reliability testing, t-tests, and multiple regression to real-world employee survey data.
+The goal is to understand how engagement is measured, how well survey instruments perform, and what factors predict engagement across teams.
 
 # Setup
 
@@ -71,7 +73,10 @@ head(data)
 
 ```
 
-Once the variables are selected, we conduct an exploratory factor analysis with parallel analysis and oblimin rotation. We start by doing two tests that work as the "gatekeepers" of the analysis. Before trying to group variables into factors, we need to prove that they actually relate to each other in a meaningful way. If your variables aren't correlated, the results would just be statistical noise.
+Once the variables are selected, we conduct an exploratory factor analysis with parallel analysis and oblimin rotation.
+We start by doing two tests that work as the "gatekeepers" of the analysis.
+Before trying to group variables into factors, we need to prove that they actually relate to each other in a meaningful way.
+If your variables aren't correlated, the results would just be statistical noise.
 
 ### Factor loadings table and scree plot
 
@@ -83,26 +88,34 @@ cortest.bartlett(data)
 ```
 
 **1. KMO (Kaiser-Meyer-Olkin)** TestYour Overall MSA = 0.79 is very strong.
-  Interpretation: On the scale of sampling adequacy, 0.79 is considered "Good" (bordering on "Meritorious"). This value confirms      that the variance in the variables is likely caused by underlying factors. It is well above the minimum threshold   of 0.50.
-  Item Breakdown: Eng1 through pos1 are performing exceptionally well (\> 0.80). While pos2 and pos3 are slightly lower at 0.64,      they are still well within the acceptable range for factor analysis.
+Interpretation: On the scale of sampling adequacy, 0.79 is considered "Good" (bordering on "Meritorious").
+This value confirms that the variance in the variables is likely caused by underlying factors.
+It is well above the minimum threshold of 0.50.
+Item Breakdown: Eng1 through pos1 are performing exceptionally well (\> 0.80).
+While pos2 and pos3 are slightly lower at 0.64, they are still well within the acceptable range for factor analysis.
 
-**2.  Bartlett’s Test of Sphericity**: the results shows a \$p.value = 0 (which means $p < .0001$).
-  Interpretation: Since the p-value is less than 0.05, the result is statistically significant. This rejects the null   hypothesis    that our variables are unrelated. It proves there is enough correlation in the data to justify running     an EFA.
+**2. Bartlett’s Test of Sphericity**: the results shows a \$p.value = 0 (which means $p < .0001$).
+Interpretation: Since the p-value is less than 0.05, the result is statistically significant.
+This rejects the null hypothesis that our variables are unrelated.
+It proves there is enough correlation in the data to justify running an EFA.
 
 ```{r}
 # Run Parallel Analysis
 set.seed(1615)
 parallel_res <- fa.parallel(data, fm = "minres", fa = "fa")
 ```
+
 The Parallel Analysis Scree Plot determines the number of factors to extract:
 
 The Decision Rule is to retain factors where the blue line (Actual Data) is above the red dotted line (Simulated Data).
 
-As seen in the plot, the blue triangles for Factor 1 and Factor 2 are clearly above the red lines. Factor 3 appears to sit almost exactly on the line or slightly above it.
+As seen in the plot, the blue triangles for Factor 1 and Factor 2 are clearly above the red lines.
+Factor 3 appears to sit almost exactly on the line or slightly above it.
 
 Looking at the steep drop after the second factor, a 2-factor solution is the most robust choice for your EFA.´But sometimes the model may give a 3-factor solution, therefore we set a seed
 
 ### Interpretation of number and type of constructs
+
 ```{r}
 # fm = "minres" is a common default; "ml" (Maximum Likelihood) is also popular
 # rotate = "oblimin" for oblique rotation
@@ -111,19 +124,23 @@ efa_model <- fa(data, nfactors = 3, rotate = "oblimin", fm = "minres")
 # View the results
 print(efa_model$loadings, cutoff = 0.3) # We hide loadings below 0.3 for clarity
 ```
+
 Even though the more common result is a 2 factor test we evaluate the model with 3-factor and compare it later to the 2-factor one.
 
-The factor structure analysis reveals a clear distinction between the dimensions evaluated. The first factor (MR1) is extremely robust and represents the "Eng" dimension, with very high factor loadings ranging from 0.807 to 0.910 for items Eng1 to Eng4. The second factor (MR2) captures the "pos" dimension, where the loading of pos3 stands out at 0.916, while pos1 presents the most moderate loading of the group at 0.471. Conversely, the third factor (MR3) lacks a clear structure, as only Eng3 presents a marginal loading of 0.300 and its eigenvalue (SS loading) is a mere 0.188, which is extremely low and suggests that this factor is not relevant to the model.
+The factor structure analysis reveals a clear distinction between the dimensions evaluated.
+The first factor (MR1) is extremely robust and represents the "Eng" dimension, with very high factor loadings ranging from 0.807 to 0.910 for items Eng1 to Eng4.
+The second factor (MR2) captures the "pos" dimension, where the loading of pos3 stands out at 0.916, while pos1 presents the most moderate loading of the group at 0.471.
+Conversely, the third factor (MR3) lacks a clear structure, as only Eng3 presents a marginal loading of 0.300 and its eigenvalue (SS loading) is a mere 0.188, which is extremely low and suggests that this factor is not relevant to the model.
 
 To illustrate it we show the diagram, but it presents an error because it does not assign Eng3 to the MR3, however understanding the table above we know that the proportion is really low and this diagram is not accurate and we will not work with the 3-factor model.
 
 ```{r}
 fa.diagram(efa_model)
 ```
-Summary of conclusions of 3-factor selection:
-- Discard Factor 3: The third factor (MR3) explains only 2.7% of the variance and has no strong unique loadings.
-- Clean Structure: Your variables group perfectly by their naming convention (Eng vs. pos), showing excellent convergent and          discriminant validity.
-- High Explained Variance: Together, the first two factors (MR1 and MR2) explain 65.3% of the total variance in your data, which is   a very respectable result for social science research.
+
+Summary of conclusions of 3-factor selection: - Discard Factor 3: The third factor (MR3) explains only 2.7% of the variance and has no strong unique loadings.
+- Clean Structure: Your variables group perfectly by their naming convention (Eng vs. pos), showing excellent convergent and discriminant validity.
+- High Explained Variance: Together, the first two factors (MR1 and MR2) explain 65.3% of the total variance in your data, which is a very respectable result for social science research.
 
 After realizing the 3-factor model should be discarded, we do the 2-factor EFA:
 
@@ -137,87 +154,108 @@ final_efa <- psych::fa(data,
 # This reveals the 2 latent constructs: MR1 (Eng variables) and MR2 (pos variables)
 print(final_efa$loadings, cutoff = 0.3)
 ```
+
 ```{r}
 # Check Factor Correlations
 # Since we used Oblimin, this shows how the two latent constructs relate to each other
 final_efa$Phi
 ```
+
 ```{r}
 # Visualize the latent structure
 # This provides a clear diagram of the two identified constructs
 psych::fa.diagram(final_efa)
 ```
+
+The Exploratory Factor Analysis (EFA) acts as a mathematical filter, distilling 7 individual survey questions into 2 robust "Super-Variables" (latent constructs) that capture 64.9% of the total sentiment expressed by the employees.
+This high variance explained suggests that the model isn't just skimming the surface; it’s capturing the core drivers of the employee experience.
+
+The Parallel Analysis compares the actual data against a random simulation to ensure that these two factors are genuine patterns rather than mathematical coincidences.
+Once confirmed, the Factor Loadings revealed the strength of the "affinity" between each question and its parent factor.
+
+The Loadings table shows the "correlation" between an item and the underlying factor.
+
+MR1 (The Identity Factor): All items (Eng1–Eng4) load between 0.78 and 0.87.
+This is exceptionally high.
+It suggests that these four questions are essentially measuring the same core psychological pulse.
+If an employee agrees with one, they almost certainly agree with the others.
+
+MR2 (The Support Factor): This factor is anchored by pos3 (0.919).
+A loading this high makes pos3 the "Definition Item"—it essentially is the factor.
+pos1 (0.469) is the weakest, but still well above the common 0.40 cutoff for significance.
+
+If we look at the variable description on the database we can see how the items grouped in each construct refer to the same kind of questions, further validating the results obtained through the EFA.
+
+Eng1 I share the values of this organization.
+Eng2 I am proud of this organization.
+Eng3 This organization is a big part of who I am.
+Eng4 I would recommend this organization as a place to work.
+pos1 This organization cares about my well-being.
+pos2 This organization is interested in my contribution.
+pos3 This organization is there for me when I need help.
+
+The Inter-Factor Correlation of 0.258 is low enough to prove that Organizational Identification (MR1) and Perceived Support (MR2) are distinct psychological constructs, yet high enough to show they exist within the same organizational ecosystem.
+At 0.258, the data says: "Knowing if an employee loves the company brand (MR1) tells you very little about whether they feel the company supports them personally (MR2)." They are independent psychological tracks.
+
+By using an Oblique Rotation (Oblimin), we allowed the model to reflect the messy reality of the workplace: an employee's sense of identity and their sense of being supported are related, but they are certainly not the same thing.
+
+Overall, together these two factors account for 64.9% of all the differences in your employees' answers.
+We aren't just measuring noise; we are measuring the core drivers of the workforce.
+
 ### Short reflection: How could these constructs guide HR intervention design?
-Looking at the correlation matrix between MR1 and MR2 (second image), the correlation is 0.258.
 
-Meaning: This is a low-to-moderate positive correlation.
+Because the correlation between these two factors is relatively low (25.77%), HR cannot treat them as a single "engagement" metric.
+A "one-size-fits-all" initiative will likely fail because the levers for each factor are entirely different:
 
-Interpretation: Since the correlation is relatively low (typically below 0.30 or 0.40), it suggests that while these two factors are related, they are distinct enough to be considered separate constructs. You likely used an oblique rotation (like Promax or Oblimin) to allow them to correlate; if they were completely independent, this value would be 0.
-EFA Summary: Loadings and Variance
-The Loadings table (third image) shows how each item "belongs" to a factor.
+Because the correlation between factors is low (25.8%) it tells HR that an employee’s score on MR1 does not predict their score on MR2.To improve the workplace, the company must address the 40.6% (Identity) and the 24.3% (Support) as two separate projects.This means that an employee’s sense of Identity/Pride (MR1) is almost entirely disconnected from their sense of Support (MR2).
+The Risk: In many companies, these move together.
+In yours, they don't.
+You likely have a group of "True Believers" who are deeply committed to the mission (High MR1) but who feel the company does not have their back (Low MR2).
+This is the definition of a Burnout Martyr.
+Based on the Variance Imbalance (40.6% vs. 24.3%) and the Low Correlation (25.8%), your company is structurally more vulnerable to Burnout Martyrs than Mercenaries.
 
-Simple Structure: You have achieved a "simple structure," which is the gold standard in EFA. Every item loads strongly onto one factor (all > 0.40) and has no "cross-loadings" (loading onto both factors at the same time).
+-   MR1 represents the "Heart" of the company—measuring pride, values alignment, and internal loyalty.
 
-Factor 1 (MR1): Includes Eng1, Eng2, Eng3, and Eng4. These loadings are very high (0.78 to 0.87), indicating these items are excellent indicators of the MR1 construct.
+The Value (40.6% Variance): This is the dominant force in your workplace, explaining the largest chunk of employee sentiment.
+It is an incredibly "tight" factor, anchored by Eng4 (Advocacy) at 0.877.
 
-Factor 2 (MR2): Includes pos1, pos2, and pos3. While pos1 is a bit lower (0.47), pos3 is a powerhouse at 0.92.
+The primary HR goal should be Culture-Building.
+High loadings on "Values" and "Advocacy" mean you should double down on **mission-driven storytelling** and **brand ambassadorship**.
+The Statistical Strength: With an SS Loading of 2.841, this factor effectively "does the work" of nearly three individual questions, indicating a very cohesive internal culture.
 
-Variance Explained: * MR1 explains 40.6% of the total variance.
+Risk of Low MR1 (The Mercenary): If an employee scores low here, you create a "Mercenary." These are talented people who may be happy and supported (High MR2) but have no emotional stake in the company.
+They are a flight risk for a 5% raise elsewhere because they do not care about your "Why."
 
-MR2 explains 24.3% of the total variance.
+-   MR2 represents the "Safety Net"—measuring the organization’s reliability and how it values individual contributions.
 
-Cumulative: Together, they explain 64.9% of the variance in your data, which is well above the common 50-60% threshold for a "good" model in social sciences.
-In EFA, "Latent Constructs" are the unobserved "hidden" variables (MR1 and MR2) that cause people to answer the questions the way they do.
+The Value (24.3% Variance): This factor is a secondary, but distinct, pillar.
+While it explains less variance than MR1, it is highly defined by its "Power Item," pos3 (0.919).When Identity dominates Support, the culture often becomes one of "Sacrifice." Employees feel a strong "Identity" (Eng3: 0.831) and "Advocacy" (Eng4: 0.877), which masks the fact that the "Safety Net" (MR2) is secondary.
 
-MR1 (The "Eng" Factor): Based on the labels, this likely represents "Engagement" or "English Proficiency" (depending on your study). The high loadings suggest these four items are very consistent in measuring this single idea.
+The Power Item (pos3): This massive loading means the entire concept of Support in your company hinges on crisis reliability ("Organization is there for me when I need help").
 
-MR2 (The "Pos" Factor): This likely represents a "Positive Outlook" or "Position" construct.
+Risk of Low MR2 (The Burnout Martyr): MR2 variance is low (24.3%).
+If an employee scores low here, you create a "Burnout Martyr." These employees love the mission (High MR1) but feel ignored or unsupported.
+They are the ones who stay late until they collapse and quit unexpectedly.
 
-The Parallel Analysis (Fourth Image): This plot confirms that a 2-factor solution was the correct choice. The blue line (actual data) drops below the red dashed line (simulated/random data) after the second factor, meaning any factor beyond the second is just "noise."
+If your support system is only "Help in a crisis," your most loyal employees (MR1) will keep pushing themselves until a crisis happens.
+Because MR2 only explains 24.3% of the variance, it is currently a much "weaker" pillar in your company culture than the high-pressure Identity pillar (40.6%).
 
-Your analysis tells a very clear story: Your survey effectively measures two distinct things. Because the KMO was strong and the Bartlett's test was significant, we can trust that these patterns aren't just a fluke in the numbers. The high "Cumulative Var" (64.9%) means that by using just these two factors, you are capturing the vast majority of the information contained in all 7 individual items. This simplifies your research significantly—instead of analyzing 7 different variables, you can now analyze just 2 "Super-Variables" (Factor Scores).
+The "Social Contract" Gap: The culture pulls heavily toward high engagement and advocacy (MR1).
+However, because Support (MR2) is a separate, weaker track, the social contract is lopsided: employees are giving more "Identity" than they are receiving "Support."
 
-Factor 1 (MR1): Organizational Identification & Advocacy
-The items in this factor (Eng1 through Eng4) go beyond simple "engagement." They measure how much an employee incorporates the company into their own identity.
+The "Sacrifice" Trap: When Identity dominates Support, culture often becomes one of "Sacrifice," where high advocacy masks the fact that the safety net is secondary.
 
-Eng1 & Eng2: Values and Pride.
+Immediate HR Mitigation Strategy:
 
-Eng3: Identity ("...a big part of who I am").
+-   HR interventions must focus on **empathy and tangible resources**.Such as working on HR responsiveness, manager check-ins, improving Employee Assistance Programs (EAPs) or manager empathy training.
 
-Eng4: Advocacy ("I would recommend...").
+<!-- -->
 
-Interpretation: This factor represents Internalized Loyalty. High scores here mean employees aren't just working for a paycheck; they believe in the "brand" of the organization.
+-   Bridge the Gap: De-link sacrifice from identity.
+    Stop rewarding "overwork" as a sign of "loyalty" (MR1).
 
-Factor 2 (MR2): Perceived Organizational Support (POS)
-The "pos" items (pos1 through pos3) clearly measure the employees' perception of how much the organization values them and cares about their welfare.
-
-pos1: Well-being.
-
-pos2: Contribution value.
-
-pos3: Support/Help.
-
-Interpretation: This factor represents the Safety Net. It is the "give-and-take" relationship. Since pos3 ("Organization is there for me when I need help") has the highest loading (0.919), the core of this factor is Reliability in Crisis.
-
-2. HR Intervention Design
-Strategy for MR1: Strengthening the "Bond"
-Since MR1 explains the most variance (40.6%), your primary HR goal should be culture-building.
-
-Values Alignment (Eng1): Re-evaluate the onboarding process to ensure company values are not just stated, but demonstrated through stories and leadership behavior.
-
-Brand Ambassadorship (Eng4): Because this is your highest loading item for this factor (0.877), create "Employee Referral" programs or "Culture Committees" where these advocates can lead internal initiatives.
-
-Strategy for MR2: Enhancing the "Safety Net"
-Because this factor is distinct (correlation only 0.258), it requires a different approach focused on empathy and resources.
-
-Support Systems (pos3): This is your "Power Item" (loading 0.919). HR should ensure that "Help" is visible and accessible—such as Employee Assistance Programs (EAPs), clear mental health days, or "Manager Open Door" policies.
-
-Recognition of Contribution (pos2): With a strong loading of 0.793, interventions should focus on recognition programs that specifically highlight how an individual's work contributed to a success, rather than just generic "good job" emails.
-
-3. Summary of Meaning
-The low correlation (0.258) between these factors is a vital insight for HR. It means that an employee can love the company’s values (High MR1) but feel like the company doesn't care about them personally (Low MR2).
-
-If you only focus on "Culture" (MR1), you risk losing people to burnout because they don't feel supported. If you only focus on "Support" (MR2), you might have happy employees who don't actually care about the company's success or mission.
+-   Bolster the Anchor (pos3): Since pos3 has a 0.919 loading, any improvement in proactive help will almost single-handedly fix your MR2 score.
+    Make support part of the weekly workflow rather than a reactive crisis response.
 
 # Prompt 2: Scale Reliability Testing
 
@@ -244,19 +282,24 @@ df2 <- read_excel("Databases/Ch5_RAW_Survey_Results.xlsx")
 ocb_items <- df2[, c("ocb1", "ocb2", "ocb3", "ocb4")]
 
 ```
-These lines of code load the required packages (readxl and psych) needed to import Excel data and perform reliability analysis. The dataset is then imported into R using read_excel() and stored in the object data. Finally, the four OCB items (ocb1–ocb4) are selected from the dataset and stored in a new object called ocb_items, which will be used for further analysis.´
+
+These lines of code load the required packages (readxl and psych) needed to import Excel data and perform reliability analysis.
+The dataset is then imported into R using read_excel() and stored in the object data.
+Finally, the four OCB items (ocb1–ocb4) are selected from the dataset and stored in a new object called ocb_items, which will be used for further analysis.´
 
 ```{r}
 alpha_result <- alpha(ocb_items) ##Calcula el Cronbach alpha para esos 4 items
 alpha_result ##Imprime el resumen general del analisis de fiabilidad
 ```
 
-These lines calculate Cronbach’s alpha for the four OCB items and store the results in `alpha_result`. Printing the object displays the overall reliability statistics for the scale.
+These lines calculate Cronbach’s alpha for the four OCB items and store the results in `alpha_result`.
+Printing the object displays the overall reliability statistics for the scale.
 
 ```{r}
 alpha_result$total$raw_alpha ##Extrae el alpha clásico de la escala completa 
 alpha_result$alpha.drop ##Muestra la tabla de "alpha if item deleted" en otras palabras, que pasaria con la fiabilidad si eliminas cada item
 ```
+
 These lines extract the overall Cronbach’s alpha for the full scale and display the “alpha if item deleted” table, which shows how reliability would change if each item were removed.
 
 ### Recommendation on whether to keep or drop specific items
@@ -298,6 +341,7 @@ pca_result <- principal(engagement_items, nfactors = 3, rotate = "varimax")
 print(pca_result$loadings, cutoff = 0.4, digits = 3)
 
 ```
+
 ### 3D scatterplot showing component space (optional)
 
 ```{r prompt3.2}
