@@ -33,6 +33,7 @@ Within the project directory, create the following folders if they do not alread
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse) 
+library(readxl)
 ```
 
 # Prompt 1: Estimating differences in turnover by country
@@ -50,12 +51,37 @@ library(tidyverse)
 -   Interpretation: Should HR be concerned about country differences in individual turnover based on this analysis alone?
 
 ## Solution
+```{r}
+df1 <- read_excel("Databases/Individual_Turnover.xlsx")
+head(df1)
+```
+```{r}
+str(df1)
+```
+
+```{r}
+summary(df1)
+```
+Hay que tener cuidado, pues la variable Gender y LeaverStatus tienen 2 y 1 valor nulo. Por lo tanto, debemos quitarlos sobretodo por precaución y además al tratarse de como mucho tres filas del dataset frente a las 1653 filas totales, es tan solo una mínima eliminación que tiene como porpósito tener un dataset más puro y anticiparnos a posibles problemas que den estos valores nulos en los modelos usados a lo largo de la práctica.
+
+```{r}
+data <- df1 %>%
+  drop_na(Gender, LeaverStatus)
+```
+
+```{r}
+summary(data)
+```
+Comprobamos que se han eliminado las filas nulas y tenemos un total de 1650 datos para nuestro análisis.
+```{r}
+str(data)
+```
+
 
 ### Cross-tabulation table with expected frequencies
 
 ```{r prompt1.1}
-
-
+tabla_cruzada <- table(data$Country, data$LeaverStatus)
 ```
 
 ### Chi-square test output
