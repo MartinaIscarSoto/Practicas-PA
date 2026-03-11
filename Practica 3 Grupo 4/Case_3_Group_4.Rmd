@@ -1,0 +1,228 @@
+---
+# this is the Rmarkdown header. Use the YAML syntax. ---YAML block ---.
+title: "Advanced Turnover Modelling and Business Case Development" 
+subtitle: "Groupwork Use Case 3 - People Analytics"
+author: "Ferrán Extremera, Irene Morales, Amalia Varo y Martina Iscar"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    toc: true
+    toc_depth: 3
+    toc_float: true
+    code_folding: hide
+
+# the following lines tell R to store the output in the subdirectory reports
+knit: (function(inputFile, encoding) { 
+      rmarkdown::render(inputFile,
+                        encoding=encoding, 
+                        output_dir=file.path(dirname(inputFile),"report" )) }) 
+---
+
+# Intro
+Employee turnover is a critical concern for organizations due to its substantial financial and human costs. HR functions frequently report turnover statistics, but descriptive reporting alone may lead to misdiagnosis of problems and poorly targeted interventions.
+In this use case, you will apply inferential and predictive analytics to understand voluntary employee turnover at both individual and team levels in a multinational organization
+
+# Setup
+
+Within the project directory, create the following folders if they do not already exist:
+
+- **Databases**: to store all data sources provided in Moodle (Excel files).\
+- **data**: to store any ad-hoc data created during the analysis. The native R data format is .rds.\
+- **report**: to store the HTML output file generated when knitting the R Markdown file.
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse) 
+```
+
+# Prompt 1: Estimating differences in turnover by country
+
+### Tasks
+
+-   Import 'Individual_Turnover.xlsx' into R (definitions of all fields are included in the 'variable key' worksheet within the Excel file).\
+-   Produce a cross-tabulation of Country × Leaver Status.\
+-   Conduct a chi-square test of independence to assess whether turnover differs significantly by country. Interpret the results, paying attention to: expected vs observed frequencies; statistical significance;	limitations related to small subgroup sizes.\
+
+### Deliverables
+
+-   Cross-tabulation table with expected frequencies.\
+-   Chi-square test output.\
+-   Interpretation: Should HR be concerned about country differences in individual turnover based on this analysis alone?
+
+## Solution
+
+### Cross-tabulation table with expected frequencies
+
+```{r prompt1.1}
+
+
+```
+
+### Chi-square test output
+
+```{r prompt1.2}
+
+
+```
+
+### Interpretation: Should HR be concerned about country differences in individual turnover based on this analysis alone?
+
+# Prompt 2: Cross-Country Differences in Team Engagement and Turnover
+
+### Tasks
+
+-   Import 'Turnover_Team_Data.xlsx' into R (definitions of all fields are included in the 'variable key' worksheet within the Excel file).\
+-   Generate descriptive statistics (N, Mean, SD, Min, Max) for Team engagement and Team turnover rate by country.\
+-   Conduct a one-way ANOVA for each variable: Test the assumption of homogeneity of variances using Levene’s test; Use Welch’s ANOVA if variances are unequal; Perform appropriate post-hoc tests to identify which countries differ.\
+
+
+### Deliverables
+
+-   Descriptive statistics tables.\
+-   ANOVA output (including Welch correction if required).\
+-   Post-hoc comparison table
+-   Interpretation: Which country or countries should HR prioritize for further diagnosis, and why?
+
+## Solution
+
+### Descriptive statistics tables
+
+```{r prompt2.1}
+
+
+```
+
+### ANOVA output (including Welch correction if required)
+
+```{r prompt2.2}
+
+
+```
+
+### Post-hoc comparison table
+
+```{r prompt2.3}
+
+
+```
+
+### Interpretation: Which country or countries should HR prioritize for further diagnosis, and why?
+
+# Prompt 3: Individual-Level Predictors of Voluntary Turnover
+
+### Tasks
+
+-   Import 'Individual_Turnover.xlsx' into R (definitions of all fields are included in the 'variable key' worksheet within the Excel file).\
+-   Estimate a logistic regression model predicting leaver status using: Gender; Age; Length of service; Performance appraisal rating; Country (as a categorical variable).\
+-   Evaluate overall model fit using: Likelihood ratio test; Nagelkerke R².\
+-   Interpret coefficients using odds ratios.
+
+### Deliverables
+
+-   Logistic regression output.\
+-   Table of log-odds and odds ratios.\
+-   Interpretation: Which variables significantly predict turnover? How should HR interpret the effect of gender and performance ratings?
+
+## Solution
+
+### Logistic regression output
+
+```{r prompt3.1}
+
+
+```
+
+### Table of log-odds and odds ratios
+
+```{r prompt3.2}
+
+
+```
+
+### Interpretation: Which variables significantly predict turnover? How should HR interpret the effect of gender and performance ratings?
+
+# Prompt 4: Gender Differences in Employee Turnover Over Tenure
+
+### Tasks
+
+-   Import 'Individual_Turnover.xlsx' into R (definitions of all fields are included in the 'variable key' worksheet within the Excel file).\
+-   Conduct a Kaplan–Meier survival analysis using: Length of service as time variable; Leaver status as event indicator; Gender as grouping variable.\
+-   Compare survival curves using a statistical test.\
+-   Visualize survival probabilities over time.
+
+### Deliverables
+
+-   Survival table and summary statistics.\
+-   Survival plot\
+-   Interpretation: At what stages of tenure are gender differences in turnover most pronounced, and what HR processes might this implicate?
+
+## Solution
+
+### Survival table and summary statistics
+
+```{r prompt4.1}
+
+
+```
+
+### Survival plot
+
+```{r prompt4.2}
+
+
+```
+
+### Interpretation: At what stages of tenure are gender differences in turnover most pronounced, and what HR processes might this implicate?
+
+# Prompt 5: Team-Level Drivers of Employee Turnover
+
+### Tasks
+
+-   Import 'Turnover_Team_Data.xlsx' into R (definitions of all fields are included in the 'variable key' worksheet within the Excel file).\
+-   Estimate an OLS multiple regression model predicting team turnover using: Engagement; Team leader rating; CSR; Drive for performance; Performance, development and reward; Work–life balance; Country dummy variables (with one reference category).\
+-   Examine: Model fit (R², F-test).\
+-   Unstandardized and standardized coefficients.
+
+### Deliverables
+
+-   Regression output and Table of standardized coefficients.\
+-   Interpretation: Which team-level factors are most strongly associated with turnover, and how should HR respond?
+
+## Solution
+
+### Regression output and Table of standardized coefficients
+
+```{r prompt5.1}
+
+
+```
+
+### Interpretation: Which team-level factors are most strongly associated with turnover, and how should HR respond?
+
+# Prompt 6: Team-Level Drivers of Employee Turnover
+
+### Tasks
+
+-   Import 'Individual_Turnover.xlsx' into R (definitions of all fields are included in the 'variable key' worksheet within the Excel file).\
+-   Estimate the proportion of individual turnover explained by gender alone using logistic regression.\
+-   Use the Nagelkerke R² to approximate the share of turnover costs attributable to gender.\
+-   Assume a total annual voluntary turnover cost of £4 million. Calculate potential cost savings if gender-related turnover were eliminated or reduced.
+
+### Deliverables
+
+-   Cost calculation.\
+-   Executive-style summary answering: Is there a strong enough business case to justify a targeted retention intervention?
+-   What cautions should HR keep in mind when interpreting these figures?
+
+## Solution
+
+### Cost calculation
+
+```{r prompt6.1}
+
+
+```
+
+### Executive-style summary answering: Is there a strong enough business case to justify a targeted retention intervention?
+
+### What cautions should HR keep in mind when interpreting these figures?
