@@ -1,8 +1,7 @@
 ---
-# this is the Rmarkdown header. Use the YAML syntax. ---YAML block ---.
 title: "Employee Engagement" 
 subtitle: "Groupwork Use Case 2 - People Analytics"
-author: "Ferrán Extremera, Irene Morales, Amalia Varo y Martina Iscar Substitute Group_X by your Group number in the name of the .Rmd file"
+author: "Ferrán Extremera, Irene Morales, Amalia Varo y Martina Iscar"
 date: "`r Sys.Date()`"
 output: 
   html_document:
@@ -10,17 +9,20 @@ output:
     toc_depth: 3
     toc_float: true
     code_folding: hide
-
-# the following lines tell R to store the output in the subdirectory reports
 knit: (function(inputFile, encoding) { 
       rmarkdown::render(inputFile,
                         encoding=encoding, 
                         output_dir=file.path(dirname(inputFile),"report" )) }) 
+editor_options: 
+  markdown: 
+    wrap: sentence
 ---
 
 # Intro
 
-In this workshop, you will analyze employee engagement using both individual- and team-level data. You’ll apply factor analysis, reliability testing, t-tests, and multiple regression to real-world employee survey data. The goal is to understand how engagement is measured, how well survey instruments perform, and what factors predict engagement across teams.
+In this workshop, you will analyze employee engagement using both individual- and team-level data.
+You’ll apply factor analysis, reliability testing, t-tests, and multiple regression to real-world employee survey data.
+The goal is to understand how engagement is measured, how well survey instruments perform, and what factors predict engagement across teams.
 
 # Setup
 
@@ -36,7 +38,11 @@ library(tidyverse)
 library(readxl)
 if (!require("pacman")) install.packages("pacman")
 pacman::p_load(readxl, psych, dplyr, GPArotation, scatterplot3d, modelsummary, car, this.path, huxtable, lm.beta)
+if (!require("effsize")) install.packages("effsize")
+library(effsize)
 ```
+
+------------------------------------------------------------------------
 
 # Prompt 1: Exploratory Factor Analysis on Engagement Items
 
@@ -71,9 +77,14 @@ head(data)
 
 ```
 
-Once the variables are selected, we conduct an exploratory factor analysis with parallel analysis and oblimin rotation. We start by doing two tests that work as the "gatekeepers" of the analysis. Before trying to group variables into factors, we need to prove that they actually relate to each other in a meaningful way. If your variables aren't correlated, the results would just be statistical noise.
+Once the variables are selected, we conduct an exploratory factor analysis with parallel analysis and oblimin rotation.
+We start by doing two tests that work as the "gatekeepers" of the analysis.
+Before trying to group variables into factors, we need to prove that they actually relate to each other in a meaningful way.
+If your variables aren't correlated, the results would just be statistical noise.
 
 ### Factor loadings table and scree plot
+
+Before diving into findings, we validated that the data is statistically relevant enough to trust. 
 
 ```{r}
 # Let's assume your dataframe is named 'data'
@@ -82,26 +93,35 @@ KMO(data)
 cortest.bartlett(data)
 ```
 
-**1. KMO (Kaiser-Meyer-Olkin)** TestYour Overall MSA = 0.79 is very strong.
-  Interpretation: On the scale of sampling adequacy, 0.79 is considered "Good" (bordering on "Meritorious"). This       value confirms that the variance in the variables is likely caused by underlying factors. It is well above the        minimum threshold of 0.50.
-  Item Breakdown: Eng1 through pos1 are performing exceptionally well (\> 0.80). While pos2 and pos3 are slightly       lower at 0.64, they are still well within the acceptable range for factor analysis.
+**1. KMO (Kaiser-Meyer-Olkin)** The overall MSA = 0.79 is very strong.
+Interpretation: On the scale of sampling adequacy, 0.79 is considered "Good" (bordering on "Meritorious").
+This value confirms that the variance in the variables is likely caused by underlying factors.
+It is well above the minimum threshold of 0.50.
+Item Breakdown: Eng1 through pos1 are performing exceptionally well (\> 0.80).
+While pos2 and pos3 are slightly lower at 0.64, they are still well within the acceptable range for factor analysis.
 
-**2.  Bartlett’s Test of Sphericity**: the results shows a \$p.value = 0 (which means $p < .0001$).
-  Interpretation: Since the p-value is less than 0.05, the result is statistically significant. This rejects the null   hypothesis that our variables are unrelated. It proves there is enough correlation in the data to justify running     an EFA.
+**2. Bartlett’s Test of Sphericity**: the results shows a \$p.value = 0 (which means $p < .0001$).
+Interpretation: Since the p-value is less than 0.05, the result is statistically significant.
+This rejects the null hypothesis that our variables are unrelated.
+It proves there is enough correlation in the data to justify running an EFA.
 
 ```{r}
 # Run Parallel Analysis
 set.seed(1615)
 parallel_res <- fa.parallel(data, fm = "minres", fa = "fa")
 ```
+
 The Parallel Analysis Scree Plot determines the number of factors to extract:
 
 The Decision Rule is to retain factors where the blue line (Actual Data) is above the red dotted line (Simulated Data).
 
-As seen in the plot, the blue triangles for Factor 1 and Factor 2 are clearly above the red lines. Factor 3 appears to sit almost exactly on the line or slightly above it.
+As seen in the plot, the blue triangles for Factor 1 and Factor 2 are clearly above the red lines.
+Factor 3 appears to sit almost exactly on the line or slightly above it.
 
-Looking at the steep drop after the second factor, a 2-factor solution is the most robust choice for your EFA.´But sometimes the model may give a 3-factor solution, therefore we set a seed
+Looking at the steep drop after the second factor, a 2-factor solution is the most robust choice for your EFA.
+But sometimes the model may give a 3-factor solution, therefore we set a seed
 
+### Interpretation of number and type of constructs
 
 ```{r}
 # fm = "minres" is a common default; "ml" (Maximum Likelihood) is also popular
@@ -111,17 +131,29 @@ efa_model <- fa(data, nfactors = 3, rotate = "oblimin", fm = "minres")
 # View the results
 print(efa_model$loadings, cutoff = 0.3) # We hide loadings below 0.3 for clarity
 ```
-The factor structure analysis reveals a clear distinction between the dimensions evaluated. The first factor (MR1) is extremely robust and represents the "Eng" dimension, with very high factor loadings ranging from 0.807 to 0.910 for items Eng1 to Eng4. The second factor (MR2) captures the "pos" dimension, where the loading of pos3 stands out at 0.916, while pos1 presents the most moderate loading of the group at 0.471. Conversely, the third factor (MR3) lacks a clear structure, as only Eng3 presents a marginal loading of 0.300 and its eigenvalue (SS loading) is a mere 0.188, which is extremely low and suggests that this factor is not relevant to the model.
+
+Even though the more common result is a 2 factor test we evaluate the model with 3-factor and compare it later to the 2-factor one.
+
+The factor structure analysis reveals a clear distinction between the dimensions evaluated.
+The first factor (MR1) is extremely robust and represents the "Eng" dimension, with very high factor loadings ranging from 0.807 to 0.910 for items Eng1 to Eng4.
+The second factor (MR2) captures the "pos" dimension, where the loading of pos3 stands out at 0.916, while pos1 presents the most moderate loading of the group at 0.471.
+Conversely, the third factor (MR3) lacks a clear structure, as only Eng3 presents a marginal loading of 0.300 and its eigenvalue (SS loading) is a mere 0.188, which is extremely low and suggests that this factor is not relevant to the model.
+
+To illustrate it we show the diagram, but it presents an error because it does not assign Eng3 to the MR3, however understanding the table above we know that the proportion is really low and this diagram is not accurate and we will not work with the 3-factor model.
 
 ```{r}
 fa.diagram(efa_model)
 ```
 
-Discard Factor 3: The third factor (MR3) explains only 2.7% of the variance and has no strong unique loadings. You should likely re-run the analysis specifying nfactors = 2.
+Conclusions of 3-factor selection:
 
-Clean Structure: Your variables group perfectly by their naming convention (Eng vs. pos), showing excellent convergent and discriminant validity.
+\- Discard Factor 3: The third factor (MR3) explains only 2.7% of the variance and has no strong unique loadings.
 
-High Explained Variance: Together, the first two factors (MR1 and MR2) explain 65.3% of the total variance in your data, which is a very respectable result for social science research.
+\- Clean Structure: Your variables group perfectly by their naming convention (Eng vs. pos), showing excellent convergent and discriminant validity.
+
+ - High Explained Variance: Together, the first two factors (MR1 and MR2) explain 65.3% of the total variance in your data, which is a very respectable result for social science research.
+
+After realizing the 3-factor model should be discarded, we do the 2-factor EFA:
 
 ```{r}
 final_efa <- psych::fa(data, 
@@ -133,24 +165,108 @@ final_efa <- psych::fa(data,
 # This reveals the 2 latent constructs: MR1 (Eng variables) and MR2 (pos variables)
 print(final_efa$loadings, cutoff = 0.3)
 ```
+
 ```{r}
 # Check Factor Correlations
 # Since we used Oblimin, this shows how the two latent constructs relate to each other
 final_efa$Phi
 ```
+
 ```{r}
 # Visualize the latent structure
 # This provides a clear diagram of the two identified constructs
 psych::fa.diagram(final_efa)
 ```
-### Interpretation of number and type of constructs
 
-```{r prompt1.2}
+The Exploratory Factor Analysis (EFA) acts as a mathematical filter, distilling 7 individual survey questions into 2 robust "Super-Variables" (latent constructs) that capture 64.9% of the total sentiment expressed by the employees.
+This high variance explained suggests that the model isn't just skimming the surface; it’s capturing the core drivers of the employee experience.
 
+The Parallel Analysis compares the actual data against a random simulation to ensure that these two factors are genuine patterns rather than mathematical coincidences.
 
-```
+-   We used **Oblique Rotation (Oblimin)** because the workplace is "messy." We allowed these factors to relate naturally rather than forcing them to be independent. 
+
+<!-- -->
+
+-   **We also did the Inter-Factor Correlation (0.258):** This is the most critical finding.
+    It proves that Identity and Support are separate tracks: Loving the company mission (Identity) does not guarantee the employee feels cared for (Support). 
+
+The Factor Loadings revealed the strength of the "affinity" between each question and its parent factor. 
+
+-   **MR1** (The Identity Factor): All items (Eng1–Eng4) load between 0.78 and 0.87.
+    This is exceptionally high.
+    It suggests that these four questions are essentially measuring the same core psychological pulse.
+    If an employee agrees with one, they almost certainly agree with the others.
+    It measures pride, values alignment, and internal loyalty.
+
+    The Value (40.6% Variance): This is the dominant force in your workplace, explaining the largest chunk of employee sentiment.
+    It is an incredibly "tight" factor, anchored by Eng4 (Advocacy) at 0.877.
+
+    The Statistical Strength: With an SS Loading of 2.841, this factor effectively "does the work" of nearly three individual questions, indicating a very cohesive internal culture.
+
+-   **MR2** (The Support Factor): This factor is anchored by pos3 (0.919).
+    A loading this high makes pos3 the "Definition Item" it essentially is the factor.
+    pos1 (0.469) is the weakest, but still well above the common 0.40 cutoff for significance.
+    It measures the organization’s reliability and how it values individual contributions.
+
+    The Value (24.3% Variance): This factor is a secondary, but distinct, pillar.
+    While it explains less variance than MR1, it is highly defined by its
+
+    Power Item, pos3 (0.919).When Identity dominates Support, the culture often becomes one of "Sacrifice." This massive loading means the entire concept of Support in your company hinges on crisis reliability ("Organization is there for me when I need help").
+
+If we look at the variable description on the database we can see how the items grouped in each construct refer to the same kind of questions, further validating the results obtained through the EFA.
+
+Eng1 I share the values of this organization.
+
+Eng2 I am proud of this organization.
+
+Eng3 This organization is a big part of who I am.
+
+Eng4 I would recommend this organization as a place to work.
+
+pos1 This organization cares about my well-being.
+
+pos2 This organization is interested in my contribution.
+
+pos3 This organization is there for me when I need help.
+
+Overall, together these two factors account for 64.9% of all the differences in your employees' answers.
+We aren't just measuring noise; we are measuring the core drivers of the workforce.
 
 ### Short reflection: How could these constructs guide HR intervention design?
+
+Because the correlation between these two factors is relatively low (25.77%), HR cannot treat them as a single "engagement" metric.
+A "one-size-fits-all" initiative will likely fail because the levers for each factor are entirely different:
+
+Because the correlation between factors is low (25.8%) it tells HR that an employee’s score on MR1 does not predict their score on MR2.T o improve the workplace, the company must address the 40.6% (Identity) and the 24.3% (Support) as two separate projects.This means that an employee’s sense of Identity/Pride (MR1) is almost entirely disconnected from their sense of Support (MR2).
+There is likely a group of "True Believers" who are deeply committed to the mission (High MR1) but who feel the company does not have their back (Low MR2).
+This is the definition of a Burnout Martyr.
+Based on the Variance Imbalance (40.6% vs. 24.3%) and the Low Correlation (25.8%), your company is structurally more vulnerable to Burnout Martyrs than Mercenaries.
+
+**Risk of Low MR2** (The Burnout Martyr): MR2 variance is low (24.3%).
+If an employee scores low here, you create a "Burnout Martyr." These employees love the mission (High MR1) but feel ignored or unsupported.
+They are the ones who stay late until they collapse and quit unexpectedly.
+
+If your support system is only "Help in a crisis," your most loyal employees (MR1) will keep pushing themselves until a crisis happens.
+Because MR2 only explains 24.3% of the variance, it is currently a much "weaker" pillar in your company culture than the high-pressure Identity pillar (40.6%).
+
+The "Social Contract" Gap: The culture pulls heavily toward high engagement and advocacy (MR1).
+However, because Support (MR2) is a separate, weaker track, the social contract is lopsided: employees are giving more "Identity" than they are receiving "Support."
+
+The "Sacrifice" Trap: When Identity dominates Support, culture often becomes one of "Sacrifice," where high advocacy masks the fact that the safety net is secondary.
+
+**Immediate HR Mitigation Strategy:**
+
+-   To target MR1 improvements.
+    The primary HR goal should be Culture-Building.
+    The company should double down on **mission-driven storytelling** and **brand ambassadorship**.
+
+<!-- -->
+
+-   HR interventions must focus on **empathy and tangible resources**.Such as working on HR responsiveness, manager check-ins, improving Employee Assistance Programs (EAPs) or manager empathy training.
+-   Bridge the Gap: De-link sacrifice from identity. Stop rewarding "overwork" as a sign of "loyalty" (MR1).
+-   Bolster the Anchor (pos3): Since pos3 has a 0.919 loading, any improvement in proactive help will almost single-handedly fix your MR2 score. Make support part of the weekly workflow rather than a reactive crisis response.
+
+------------------------------------------------------------------------
 
 # Prompt 2: Scale Reliability Testing
 
@@ -177,24 +293,62 @@ df2 <- read_excel("Databases/Ch5_RAW_Survey_Results.xlsx")
 ocb_items <- df2[, c("ocb1", "ocb2", "ocb3", "ocb4")]
 
 ```
-These lines of code load the required packages (readxl and psych) needed to import Excel data and perform reliability analysis. The dataset is then imported into R using read_excel() and stored in the object data. Finally, the four OCB items (ocb1–ocb4) are selected from the dataset and stored in a new object called ocb_items, which will be used for further analysis.´
+
+These lines of code load the required packages (readxl and psych) needed to import Excel data and perform reliability analysis.
+The dataset is then imported into R using read_excel() and stored in the object data.
+Finally, the four OCB items (ocb1–ocb4) are selected from the dataset and stored in a new object called ocb_items, which will be used for further analysis.´
 
 ```{r}
 alpha_result <- alpha(ocb_items) ##Calcula el Cronbach alpha para esos 4 items
 alpha_result ##Imprime el resumen general del analisis de fiabilidad
 ```
 
-These lines calculate Cronbach’s alpha for the four OCB items and store the results in `alpha_result`. Printing the object displays the overall reliability statistics for the scale.
+These lines calculate Cronbach’s alpha for the four OCB items and store the results in `alpha_result`.
+Printing the object displays the overall reliability statistics for the scale.
 
 ```{r}
 alpha_result$total$raw_alpha ##Extrae el alpha clásico de la escala completa 
 alpha_result$alpha.drop ##Muestra la tabla de "alpha if item deleted" en otras palabras, que pasaria con la fiabilidad si eliminas cada item
 ```
+
 These lines extract the overall Cronbach’s alpha for the full scale and display the “alpha if item deleted” table, which shows how reliability would change if each item were removed.
 
 ### Recommendation on whether to keep or drop specific items
 
+In this prompt, we assess the internal consistency of the four OCB items (ocb1–ocb4) using Cronbach’s alpha to determine whether they reliably measure a single underlying construct. 
+
+**Cronbach’s Alpha Result and Interpretation** 
+
+Cronbach’s alpha for the four-item OCB scale was **α = 0.68** (95% CI [0.64, 0.72]).
+This indicates **borderline internal consistency**, slightly below the conventional 0.70 threshold.
+While the scale shows moderate coherence, it does not fully meet accepted reliability standards. 
+
+Item-level diagnostics reveal that **ocb4 reduces overall reliability**.
+If removed, alpha increases to **α = 0.78**, indicating good internal consistency.
+In contrast, deleting ocb1, ocb2, or ocb3 lowers reliability substantially (α between 0.53 and 0.60).
+Moreover, ocb4 has the lowest corrected item–total correlation (r.drop = 0.30), compared to stronger correlations for the other items (above 0.50).
+This suggests ocb4 is less strongly aligned with the core OCB construct and may reflect a slightly different behavioral dimension. 
+
+**Recommendation: Keep or Drop Items** 
+
+From a statistical perspective, **dropping ocb4 is recommended**, as it clearly improves internal consistency and strengthens scale coherence.
+However, this decision should also be informed by theory.
+If ocb4 represents an important aspect of organizational citizenship behavior, removing it may improve reliability at the expense of content validity. 
+
+**Trade-off Between Brevity and Reliability** 
+
+There is an inherent trade-off between brevity and reliability.
+Shorter scales reduce respondent fatigue and improve completion rates, which is valuable in employee surveys.
+However, eliminating items to increase alpha may narrow the construct’s conceptual scope.
+In this case, removing ocb4 enhances psychometric quality but may slightly reduce behavioral coverage. 
+
 ### Reflection: Why does internal consistency matter in employee surveys?
+
+Internal consistency is crucial because unreliable measures introduce measurement error, weakening statistical power and potentially distorting findings.
+If items do not consistently measure the same construct, group comparisons and regression analyses may be less trustworthy.
+Ensuring adequate reliability increases confidence that observed differences reflect genuine variation in employee attitudes, thereby supporting evidence-based HR decision-making. 
+
+------------------------------------------------------------------------
 
 # Prompt 3: Principal Component Analysis on Aggregated Survey Items
 
@@ -219,18 +373,17 @@ These lines extract the overall Cronbach’s alpha for the full scale and displa
 # Importar el archivo (ajusta el nombre si es necesario)
 file_path <- "Databases/Ch5_SURVEY_PROVIDER_ENGAGEMENT_DATA_TEAM_LEVEL.xlsx"
 df3 <- read_excel(file_path, sheet = 1)
-
-# Seleccionar los 9 ítems de compromiso (Eng1 a Eng9)
-engagement_items <- df3[, c("Eng1", "Eng2", "Eng3", "Eng4", "Eng5", "Eng6", "Eng7", "Eng8", "Eng9")]
+head(df3)
 
 # Ejecutar PCA con rotación varimax
 # Basado en el análisis, 3 componentes suelen explicar mejor la varianza en este set
-pca_result <- principal(engagement_items, nfactors = 3, rotate = "varimax")
+pca_result <- principal(df3, nfactors = 3, rotate = "varimax")
 
 # Deliverable: Tabla de cargas de componentes
 print(pca_result$loadings, cutoff = 0.4, digits = 3)
 
 ```
+
 ### 3D scatterplot showing component space (optional)
 
 ```{r prompt3.2}
@@ -240,15 +393,41 @@ scores <- as.data.frame(pca_result$scores)
 # Deliverable: Scatterplot 3D
 scatterplot3d(scores[,1:3], 
               pch = 16, color = "steelblue",
-              main = "Espacio de Componentes de Compromiso",
-              xlab = "Comp 1: Org. y Propósito", 
-              ylab = "Comp 2: Bienestar", 
-              zlab = "Comp 3: Ética y Seguridad")
+              main = "Components space",
+              xlab = "RC1 Loyalty", 
+              ylab = "RC2 Well-being", 
+              zlab = "RC3 Ethics")
 
 ```
 
 ### Description of the constructs found and their strategic relevance
 
+The objective of this analysis was to streamline our employee engagement metrics by identifying the underlying drivers of the employee experience.
+By applying Principal Component Analysis (PCA), the complexity of the original data set was reduced by 66%, from nine variables to just three fundamental components.
+This simplified model maintains high reliability, explaining 83.3% of the total variance in employee experience.
+
+Now let's analyze the three fundamental components:
+
+1.  RC1 Loyalty: This constructor groups together variables related to pride and recommendation.
+    It represents an emotional bond between the individual an the organization.
+    An employee with a high score in this component feels proud of their company and acts as a brand ambassador, actively recommending the company.
+    This helps attract talent and emotionally retain employees.
+
+2.  RC2 Well-being: This consolidates the relationship between workload and personal life.
+    It reflects the viability of long-term performance.
+    It indicates that commitment is only healthy if the workload is manageable and does not interfere with private life.
+    If there is a low score, it predicts turnover due to exhaustion, regardless of how much the employee loves the company.
+
+3.  RC3 Ethics.
+    Integrates the perception of safety, social responsibility, and values.
+    Validates that the company operates under standards of responsibility, physical safety, and ethical behavior.
+    If this foundation of trust is broken, pride and well-being tend to plummet.
+
+This analysis is highly relevant strategically, as it will enable the company to conduct shorter and more frequent surveys, focusing on the three fundamental components.
+On the other hand, if they use extensive surveys, these cannot be conducted very frequently, as this would increase fatigue and we would lose data quality.
+
+Furthermore, this model allows leadership to diagnose the root cause of turnover with surgical precision.
+Rather than implementing generic "engagement" initiatives, we can now identify if a retention issue is a capacity problem (RC2), a cultural problem (RC1), or a trust problem (RC3).
 # Prompt 4: t-Tests on Engagement Across Teams
 
 ### Tasks
@@ -264,40 +443,216 @@ scatterplot3d(scores[,1:3],
 -   Summary of significant and non-significant findings.\
 -   Recommendations: Should HR act on these differences?
 
-## Solution
+## Solution (Prompt 4)
 
 ### t-test outputs with interpretation
 
 ```{r prompt4.1}
-# 1. Importar los datos
-df4 <- read_excel("Databases/Ch5_Engagement_CASE_Group_level_data_2023.xlsx", sheet = "data")
+# 1) Import data
+df4 <- read_excel("Databases/Ch5_Engagement_CASE_Group_level_data_2023.xlsx",
+                  sheet = "data")
 
-# 2. Preparar los factores
+# 2) Prepare factors (adjust levels/labels to match your variable coding)
 df4$LondonorNot <- factor(df4$LondonorNot, levels = c(1, 2), labels = c("London", "Other"))
-df4$Function <- factor(df4$Function, levels = c(1, 2), labels = c("Sales", "Prof. Services"))
+df4$Function    <- factor(df4$Function,    levels = c(1, 2), labels = c("Sales", "Prof. Services"))
 
-# --- COMPARACIÓN POR UBICACIÓN ---
-leveneTest(EMPsurvEngagement ~ LondonorNot, data = df4) # p > 0.05: Varianzas iguales
-t_loc <- t.test(EMPsurvEngagement ~ LondonorNot, data = df4, var.equal = TRUE)
+```
+
+#### COMPARISON BY LOCATION
+
+```{r}
+cat("Engagement by Location\n=======================\n")
+
+cat("Group sizes:")
+print(table(df4$LondonorNot, useNA = "ifany"))
+cat("\n")
+
+# Levene’s test (center = median is robust)
+lev_loc <- leveneTest(EMPsurvEngagement ~ LondonorNot, data = df4, center = median)
+print(lev_loc)
+
+# Student t-test
+t_loc1 <- t.test(EMPsurvEngagement ~ LondonorNot, data = df4, var.equal = TRUE)
+print(t_loc1)
+
+# Welch t-test (more robust if variances differ)
+t_loc <- t.test(EMPsurvEngagement ~ LondonorNot, data = df4)
 print(t_loc)
 
-# --- COMPARACIÓN POR FUNCIÓN ---
-leveneTest(EMPsurvEngagement ~ Function, data = df4) # p > 0.05: Varianzas iguales
-t_fun <- t.test(EMPsurvEngagement ~ Function, data = df4, var.equal = TRUE)
+# Effect size (Cohen's d)
+d_loc <- cohen.d(EMPsurvEngagement ~ LondonorNot, data = df4, hedges.correction = TRUE)
+```
+
+The groups are reasonably balanced:
+
+-   London: 533 teams
+
+-   Other locations: 394 teams
+
+The large total sample size (N = 927) ensures high statistical power, reducing the likelihood of Type II error.
+
+#### Levene’s Test (Homogeneity of Variance)
+
+-   F = 0.0002
+
+-   p = 0.9879
+
+-   p \>\> .05
+
+Since p \> 0.05, we fail to reject the null hypothesis of equal variances.
+This indicates no statistical evidence of variance inequality between the two groups.
+Therefore, the homogeneity assumption required for the standard Student t-test holds.
+
+For robustness, both Student and Welch specifications were examined.
+Results were substantively identical, confirming stability of findings.
+
+#### Mean Comparison Results
+
+-   Student t-test:
+
+-   t(925) = 1.316
+
+-   p = 0.189
+
+-   Mean London = 81.55
+
+-   Mean Other = 80.67
+
+-   Mean difference ≈ 0.88 points
+
+-   95% CI = [−0.43, 2.18]
+
+The difference is not statistically significant (p \> .05), and the confidence interval includes zero.
+Therefore, there is no evidence that average engagement differs by location.
+
+**There is no statistical evidence of engagement differences by location.**
+
+Even if it had been significant: The difference is \< 1 point.
+
+On a 0–100 scale, this is negligible --\> statistical significance does not equal practical importance (here we have neither).
+
+#### Conclusion
+
+Engagement does not differ meaningfully by location.
+
+HR Actionability: No intervention required at geographic level.
+Location should not be treated as an engagement segmentation variable in this organization.
+
+#### COMPARISON BY FUNCTION
+
+```{r}
+cat("Engagement by Function\n=======================\n")
+
+cat("Group sizes:")
+print(table(df4$Function, useNA = "ifany"))
+cat("\n")
+
+lev_fun <- leveneTest(EMPsurvEngagement ~ Function, data = df4, center = median)
+print(lev_fun)
+
+# Welch t-test (default)
+t_fun <- t.test(EMPsurvEngagement ~ Function, data = df4)
 print(t_fun)
 
+# Effect size (Cohen's d)
+d_fun <- cohen.d(EMPsurvEngagement ~ Function, data = df4, hedges.correction = TRUE)
+print(d_fun)
 ```
 
-### Summary of significant and non-significant findings
+Group sizes are also balanced:
+
+-   Sales: 502 teams
+
+-   Professional Services: 425 teams
+
+Again, the sample size provides strong statistical power.
+
+#### Levene’s Test
+
+-   F = 3.760
+
+-   p = 0.0528
+
+Although technically non-significant (p \> .05), the value is borderline.
+To ensure robustness, Welch’s t-test was applied, which does not assume equal variances.
+
+#### Welch t-Test
+
+-   t = −6.943
+
+-   df ≈ 923
+
+-   p = 7.22e−12 –\> Highly statistically significant (p \< .001).
+
+-   Mean Sales = 83.57
+
+-   Mean Prof. Services = 80.67
+
+-   Mean difference ≈ 4.42 points
+
+-   95% CI = [−5.68, −3.18] –\> The CI does not include zero.
+
+The difference is highly statistically significant (p \< .001), and the confidence interval does not include zero.
+The negative sign indicates that Sales teams report lower engagement than Professional Services teams.
+
+#### Effect Size (Hedges’ g)
+
+-   g = −0.453
+-   CI ≈ [−0.58, −0.32]
+
+Interpreted as **small-to-moderate effect**
+
+A g of 0.45 is not trivial.
+This is not a “large” effect, but it is meaningful at the organizational level.
+
+#### Summary of significant and non-significant findings
+
+Unlike location, function appears to be meaningfully associated with engagement levels.
+
+Professional Services teams report engagement scores approximately 4.4 points higher than Sales teams.
+Given the effect size and narrow confidence interval, this difference reflects a stable structural disparity across functions.
+
+Importantly, this does not imply causality.
+The t-test identifies group-level differences but does not determine whether function itself drives engagement or whether function serves as a proxy for underlying drivers (e.g., supervisor support, workload, incentive structures).
 
 ```{r prompt4.2}
-# Resumen visual rápido
+# Quick visual summary plot
 boxplot(EMPsurvEngagement ~ Function, data = df4, 
-        main = "Compromiso por Función", col = c("orange", "lightblue"))
+        main = "Engagement by Function",
+        xlab = "Function", ylab = "EMPsurvEngagement", col = c("orange", "lightblue"))
 
 ```
 
+The boxplot visually reinforces the statistical findings:
+
+-   Engagement does not just differ on average, the entire distribution for Professional Services is shifted upward.
+
+-   The difference is structural rather than driven by isolated teams.
+
+-   While variability exists in both groups, Sales exhibits slightly more extreme low-engagement outliers.
+
 ### Recommendations: Should HR act on these differences?
+
+#### Location
+
+No intervention required at geographic level.
+Location should not be used as a segmentation variable for engagement strategy.
+
+#### Function
+
+The engagement gap between Sales and Professional Services warrants further investigation.
+
+However, action should not be taken based solely on mean differences.
+
+***Instead, HR should:***
+
+Conduct regression analysis (Prompt 5) to test whether function remains significant after controlling for supervisor support, integrity, team size, and composition variables.
+
+Determine whether the functional difference reflects structural work design characteristics (e.g., target pressure, incentive systems, leadership climate).
+
+Avoid broad engagement initiatives and instead diagnose root causes.
+
+------------------------------------------------------------------------
 
 # Prompt 5: Multiple Regression to Predict Team-Level Engagement
 
@@ -319,25 +674,86 @@ boxplot(EMPsurvEngagement ~ Function, data = df4,
 ### Regression summary table
 
 ```{r prompt5.1}
-# 1. Carga de datos
-df5 <- read_excel("Databases/Ch5_Engagement_CASE_Group_level_data_2023.xlsx", sheet = "data")
+# 1. Load necessary libraries
+library(readxl)
+library(lm.beta) # For standardized coefficients
 
-# 2. Preparar variables (asegurar que sean factores donde corresponda)
-df5$Location <- as.factor(df5$Location)
-df5$Function <- as.factor(df5$Function)
+# 2. Import Data
+# Ensure the file is in your working directory
+file_path <- "Databases/Ch5_Engagement_CASE_Group_level_data_2023.xlsx"
+df5 <- read_excel(file_path, sheet = 1)
+head(df5)
 
-# 3. Ejecutar el modelo de regresión múltiple
-modelo <- lm(EMPsurvEngagement ~ EmpSurvSupervisor + EmployeeSurvOrgIntegrity + 
-             GroupSize + PercentMale + UG + Location + Function, data = df5)
+# 3. Run Multiple Regression
+# We include 'location' and 'function' as they are likely categorical factors
+model <- lm(EMPsurvEngagement ~ EmpSurvSupervisor + EmployeeSurvOrgIntegrity + 
+                   GroupSize + PercentMale + UG + Location + Function, 
+                   data = df5)
 
-# 4. Obtener coeficientes estandarizados
-modelo_beta <- lm.beta(modelo)
+# 4. Standardize the coefficients to compare "apples to apples"
+standardized_model <- lm.beta(model)
 
-# Deliverable: Resumen de la regresión
-summary(modelo_beta)
+# 5. Review the results
+summary(standardized_model)
 
 ```
 
 ### Interpretation of model strength and variable impacts
 
+The model explains 55.31% of the engagement, with an adjusted R-squared of 54.88%.
+This indicates that the model provides a reasonably good fit for analysing human behaviour.
+The model can be considered reliable for strategic decision-making purposes, although approximately 45% of the variance remains unexplained and may be attributable to external or unmeasured factors.
+
+EmployeeSurvOrgIntegrity refers to the organizational integrity with beta = 0.570, is the most inflluential factor, This suggests that engagement is not merely a social phenomenon but a moral one.
+Employees are most committed when they perceive the organization as honest, ethical and consisten in its values.
+
+PrecentMale, talking about gender composition with a beta = -0.21.
+There is a statistically significant negative correlation between the percentage of male employees and team engagement.
+As the proportion of men in a team increases, reported engagement tends to decline.
+This suggests that current engagement strategies may be resonating differently across genders or that male-dominated teams face specific cultural headwinds.
+
+EmpSurvSupervisor, refering to supervisory quality with beta = 0.14635.
+While the supervisor is not as dominant as "Integrity," they serve as the primary point of contact for the employee experience.
+A positive relationship with a direct manager significantly bolsters the day-to-day employee experience.
+
 ### Actionable recommendations for HR strategy
+
+What this model tells us is that employees highly value transparency, corporate ethics, and good customer service, in general, the values and image of the company.
+That is why we recommend that companies have clear values and that their actions are consistent with those values.
+This is what employees value most.
+In addition, we would reinforce anonymous reporting channels and ensure that there are visible consequences for breaches of integrity, validating the perception of fairness within the company.
+
+The model also shows us that the more men there are in the team, the lower the level of engagement.
+Conduct qualitative deep-dives within teams with high male ratios to understand the specific barriers to engagement.
+This will help determine if the issue is related to work-life balance, lack of social connection, or a disconnect from the company's mission.
+
+We recommend that supervisors not only train in soft skills, but also be able to listen to their team and have greater organizational skills.
+This will allow them to lead the team smoothly, achieving higher performance and greater engagement, as team members will feel comfortable and have someone to turn to in case of any problems.
+
+------------------------------------------------------------------------
+
+# Final Conclusion & Strategic Recommendations
+
+This analysis provides a clear, data-driven understanding of engagement across the organisation.
+Engagement is consistent across locations but differs meaningfully by function, with Professional Services reporting higher levels than Sales.
+However, structural segmentation alone does not explain engagement outcomes.
+The regression results confirm that leadership quality and organisational integrity are the strongest drivers, outweighing geographic variables.
+
+The strategic implication is clear: engagement improvements will not come from broad initiatives, but from targeted, driver-focused action.
+
+## HR Priorities
+
+-   **Invest in leadership capability**, particularly within Sales, as supervisor support is a key engagement driver.
+
+-   **Reinforce organisational integrity and ethical climate**, ensuring alignment between values and daily managerial behavior.
+
+-   **Diagnose workload and performance pressure in Sales**, addressing structural stressors rather than symptoms.
+
+-   **Avoid generic engagement campaigns**; focus interventions on validated drivers.
+
+-   **Implement a simplified engagement dashboard** centred on Loyalty, Well-being, and Ethics.
+
+-   **Embed engagement metrics into strategic accountability**, linking leadership performance to engagement outcomes.
+
+In summary, this case demonstrates how rigorous statistical analysis can translate employee sentiment data into precise, evidence-based HR strategy.
+The organisation now has a clear roadmap to strengthen engagement through leadership, integrity, and structural alignment rather than assumption-driven initiatives.
