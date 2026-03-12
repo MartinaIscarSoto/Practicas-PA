@@ -81,17 +81,103 @@ str(data)
 ### Cross-tabulation table with expected frequencies
 
 ```{r prompt1.1}
-tabla_cruzada <- table(data$Country, data$LeaverStatus)
+tabla_cruzada <- table(
+  "País" = data$Country, 
+  "Estado_Rotación (0=Retenido, 1=Salida)" = data$LeaverStatus
+)
+
+# Añadir una fila y columna de "Totales"
+tabla_con_totales <- addmargins(tabla_cruzada)
+
+# Imprimir en consola para que la veas tú mientras programas
+cat("\n--- FRECUENCIAS OBSERVADAS ---\n")
+print(tabla_con_totales)
+
+# Crear la versión "bonita" para el reporte HTML final
+knitr::kable(tabla_con_totales, 
+             caption = "Frecuencia de Rotación de Empleados por País")
+# Recordar cuando presentar poner el pais correspondiente al lado de número 
 ```
 
 ### Chi-square test output
 
 ```{r prompt1.2}
+# 1. Asegurarnos de tener el test calculado
+test_chi <- chisq.test(tabla_cruzada)
+```
+```{r}
+cat("\n--- RESULTADO DEL TEST CHI-CUADRADO ---\n")
+print(test_chi)
+```
+```{r}
+print(test_chi$expected)
+```
 
+```{r prompt1.2}
+# 2. Crear una tabla completa combinando las columnas del test
+# La columna 1 es "Se quedan" (0) y la columna 2 es "Se van" (1)
+tabla_completa <- data.frame(
+  País = rownames(test_chi$observed),
+  
+  # Datos REALES (Lo que de verdad pasó)
+  Stay_obv = test_chi$observed[, 1],
+  Leave_obv    = test_chi$observed[, 2],
+  
+  # Datos ESPERADOS (Lo que la estadística predecía si todo fuera equitativo)
+  Stay_exp = round(test_chi$expected[, 1], 1),
+  Leave_exp    = round(test_chi$expected[, 2], 1)
+)
+
+tabla_completa$Dif_Stay <- tabla_completa$Stay_obv - tabla_completa$Stay_exp
+
+# 3. Mostrar la tabla con un diseño elegante para tu reporte HTML
+knitr::kable(tabla_completa, 
+             row.names = FALSE, 
+             caption = "Complete Comparison: Retention and Turnover (Observed vs Expected) by Country")
 
 ```
 
 ### Interpretation: Should HR be concerned about country differences in individual turnover based on this analysis alone?
+Interpretation: Should HR be concerned about country differences in individual turnover based on this analysis alone?
+(Nota: Como no tengo los resultados numéricos reales, te dejo la plantilla de interpretación con los insights que debes rellenar según lo que te arroje el código anterior).
+
+1. Diferencias entre lo Esperado y lo Observado:
+
+Insight: Al comparar la tabla de "Frecuencias Observadas" con la de "Frecuencias Esperadas", podemos identificar qué países están impulsando la rotación. Si un país tiene una frecuencia observada de salidas (Leavers) mucho mayor que su frecuencia esperada, es un foco rojo. Esto indica que ese país está perdiendo talento a un ritmo superior al promedio general de la empresa.
+
+2. Significancia Estadística:
+
+Insight: Si el p-value del test es menor a 0.05, podemos afirmar que existe una relación estadísticamente significativa entre el país y la decisión de irse de la empresa (la rotación no es aleatoria respecto a la geografía). Si el p-value es mayor a 0.05, las diferencias observadas podrían deberse simplemente al azar.
+
+3. Limitaciones por Tamaños de Subgrupo (Small Subgroup Sizes):
+
+Insight: El test de Chi-cuadrado asume que tenemos suficientes datos. Si en la tabla de frecuencias esperadas vemos valores menores a 5 (por ejemplo, en países donde la empresa tiene operaciones muy pequeñas o casi nadie ha renunciado), el cálculo matemático pierde precisión y podría arrojar falsas alarmas.
+
+Conclusión para HR (¿Deberían preocuparse basándose solo en este análisis?):
+No de forma aislada. Aunque el test muestre diferencias significativas, este es un análisis univariado que no cuenta toda la historia.
+
+Correlación no implica causalidad: El país podría ser solo un "proxy" de otros problemas. Por ejemplo, tal vez un país tiene mayor rotación simplemente porque concentra al equipo de Ventas (que por naturaleza tiene más rotación que Finanzas), o porque su plantilla es mucho más joven.
+
+Siguientes pasos recomendados para HR: Antes de lanzar costosas iniciativas de retención por país, HR necesita un modelo predictivo multivariable (como una regresión logística) que controle factores como el departamento, el salario, la antigüedad o el desempeño, para aislar si el país es realmente la causa del problema.
+
+
+
+
+1. ¿Cuál es el problema exactamente? (La Regla del 5)
+Para que el cálculo matemático del test de Chi-cuadrado sea fiable, tiene una regla estricta: Las frecuencias ESPERADAS (no las reales, sino las calculadas por la estadística) en cada "casilla" de tu tabla deben ser mayores a 5. Si miras tu tabla de "Frecuencias Esperadas" y ves números como 2.3, 4.1 o 0.8, tienes un problema de tamaño de muestra.
+
+2. ¿Por qué ocurre esto en Recursos Humanos?
+Imagina que la empresa tiene una oficina muy pequeña en el País 10, con solo 6 empleados en total. Si la tasa de rotación global de la empresa es del 10%, la estadística "esperaría" que en ese país se fueran 0.6 personas (el 10% de 6).
+
+Como 0.6 es menor que 5, el test de Chi-cuadrado se "marea". La fórmula matemática no está diseñada para manejar grupos tan pequeños y pierde precisión.
+
+3. ¿Cómo te avisa R de este problema?
+Si intentas hacer el chisq.test() con grupos muy pequeños, R te va a lanzar un mensaje de advertencia (Warning) en la consola que dice exactamente esto:
+
+Warning message: In chisq.test(tabla_cruzada) : Chi-squared approximation may be incorrect (La aproximación de Chi-cuadrado puede ser incorrecta).
+
+4. ¿Qué impacto tiene para la empresa (El Insight)?
+Si ignoras esta advertencia, podrías darle un falso positivo a Recursos Humanos. Podrías decirles: "¡Alerta roja! El País 10 tiene una rotación significativamente alta"... cuando en realidad, solo se fue una persona, pero como la oficina tiene solo 4 empleados, pareció un porcentaje altísimo (25%). Estarías haciendo que HR gaste tiempo y dinero en investigar un país que no tiene un problema real, es solo ruido estadístico.
 
 # Prompt 2: Cross-Country Differences in Team Engagement and Turnover
 
