@@ -1,5 +1,4 @@
 ---
-# this is the Rmarkdown header. Use the YAML syntax. ---YAML block ---.
 title: "Advanced Turnover Modelling and Business Case Development" 
 subtitle: "Groupwork Use Case 3 - People Analytics"
 author: "Ferrán Extremera, Irene Morales, Amalia Varo y Martina Iscar"
@@ -10,25 +9,28 @@ output:
     toc_depth: 3
     toc_float: true
     code_folding: hide
-
-# the following lines tell R to store the output in the subdirectory reports
 knit: (function(inputFile, encoding) { 
       rmarkdown::render(inputFile,
                         encoding=encoding, 
                         output_dir=file.path(dirname(inputFile),"report" )) }) 
+editor_options: 
+  markdown: 
+    wrap: sentence
 ---
 
 # Intro
-Employee turnover is a critical concern for organizations due to its substantial financial and human costs. HR functions frequently report turnover statistics, but descriptive reporting alone may lead to misdiagnosis of problems and poorly targeted interventions.
+
+Employee turnover is a critical concern for organizations due to its substantial financial and human costs.
+HR functions frequently report turnover statistics, but descriptive reporting alone may lead to misdiagnosis of problems and poorly targeted interventions.
 In this use case, you will apply inferential and predictive analytics to understand voluntary employee turnover at both individual and team levels in a multinational organization
 
 # Setup
 
 Within the project directory, create the following folders if they do not already exist:
 
-- **Databases**: to store all data sources provided in Moodle (Excel files).\
-- **data**: to store any ad-hoc data created during the analysis. The native R data format is .rds.\
-- **report**: to store the HTML output file generated when knitting the R Markdown file.
+-   **Databases**: to store all data sources provided in Moodle (Excel files).\
+-   **data**: to store any ad-hoc data created during the analysis. The native R data format is .rds.\
+-   **report**: to store the HTML output file generated when knitting the R Markdown file.
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -42,7 +44,7 @@ library(readxl)
 
 -   Import 'Individual_Turnover.xlsx' into R (definitions of all fields are included in the 'variable key' worksheet within the Excel file).\
 -   Produce a cross-tabulation of Country × Leaver Status.\
--   Conduct a chi-square test of independence to assess whether turnover differs significantly by country. Interpret the results, paying attention to: expected vs observed frequencies; statistical significance;	limitations related to small subgroup sizes.\
+-   Conduct a chi-square test of independence to assess whether turnover differs significantly by country. Interpret the results, paying attention to: expected vs observed frequencies; statistical significance; limitations related to small subgroup sizes.\
 
 ### Deliverables
 
@@ -51,10 +53,12 @@ library(readxl)
 -   Interpretation: Should HR be concerned about country differences in individual turnover based on this analysis alone?
 
 ## Solution
+
 ```{r}
 df1 <- read_excel("Databases/Individual_Turnover.xlsx")
 head(df1)
 ```
+
 ```{r}
 str(df1)
 ```
@@ -62,7 +66,10 @@ str(df1)
 ```{r}
 summary(df1)
 ```
-Hay que tener cuidado, pues la variable Gender y LeaverStatus tienen 2 y 1 valor nulo. Por lo tanto, debemos quitarlos sobretodo por precaución y además al tratarse de como mucho tres filas del dataset frente a las 1653 filas totales, es tan solo una mínima eliminación que tiene como porpósito tener un dataset más puro y anticiparnos a posibles problemas que den estos valores nulos en los modelos usados a lo largo de la práctica.
+
+We need to treat the Gender and LeaverStatus variables carefully, as they have 2 (Gender) and 1(LeverStatus) NaN values.
+Therefore, we must remove them primarily as a precaution.
+Additionally, since it involves at most three rows of the dataset compared to the 1653 total rows, it is just a minimal deletion that aims to have a purer dataset and anticipate possible problems that these null values may cause in the models used throughout the practice.
 
 ```{r}
 data <- df1 %>%
@@ -72,18 +79,20 @@ data <- df1 %>%
 ```{r}
 summary(data)
 ```
-Comprobamos que se han eliminado las filas nulas y tenemos un total de 1650 datos para nuestro análisis.
+
+We verify that the null rows have been removed.
+As a result we have a total of 1650 records for our analysis.
+
 ```{r}
 str(data)
 ```
-
 
 ### Cross-tabulation table with expected frequencies
 
 ```{r prompt1.1}
 tabla_cruzada <- table(
   "País" = data$Country, 
-  "Estado_Rotación (0=Retenido, 1=Salida)" = data$LeaverStatus
+  "Estado_Rotación (0=Stay, 1=Leave)" = data$LeaverStatus
 )
 
 # Añadir una fila y columna de "Totales"
@@ -95,7 +104,7 @@ print(tabla_con_totales)
 
 # Crear la versión "bonita" para el reporte HTML final
 knitr::kable(tabla_con_totales, 
-             caption = "Frecuencia de Rotación de Empleados por País")
+             caption = "Employee Turnover Frequency by Country")
 # Recordar cuando presentar poner el pais correspondiente al lado de número 
 ```
 
@@ -105,79 +114,85 @@ knitr::kable(tabla_con_totales,
 # 1. Asegurarnos de tener el test calculado
 test_chi <- chisq.test(tabla_cruzada)
 ```
+
 ```{r}
 cat("\n--- RESULTADO DEL TEST CHI-CUADRADO ---\n")
 print(test_chi)
 ```
+
 ```{r}
 print(test_chi$expected)
 ```
 
-```{r prompt1.2}
-# 2. Crear una tabla completa combinando las columnas del test
-# La columna 1 es "Se quedan" (0) y la columna 2 es "Se van" (1)
+```{r}
+# 1. Extraer los valores numéricos temporalmente}
+stay_obv <- test_chi$observed[, 1]
+leave_obv <- test_chi$observed[, 2]
+stay_exp <- round(test_chi$expected[, 1], 1)
+leave_exp <- round(test_chi$expected[, 2], 1)
+
+# 2. Calcular la diferencia antes de convertir los números a texto
+dif_stay <- stay_obv - stay_exp
+
+# 3. Crear la tabla final uniendo Observado (Esperado)
 tabla_completa <- data.frame(
-  País = rownames(test_chi$observed),
+  Country = rownames(test_chi$observed),
   
-  # Datos REALES (Lo que de verdad pasó)
-  Stay_obv = test_chi$observed[, 1],
-  Leave_obv    = test_chi$observed[, 2],
+  # Usamos paste0 para unir el número real, un espacio, el paréntesis y el esperado
+  `Stay_Obv_Exp` = paste0(stay_obv, " (", stay_exp, ")"),
+  `Leave_Obv_Exp` = paste0(leave_obv, " (", leave_exp, ")"),
   
-  # Datos ESPERADOS (Lo que la estadística predecía si todo fuera equitativo)
-  Stay_exp = round(test_chi$expected[, 1], 1),
-  Leave_exp    = round(test_chi$expected[, 2], 1)
+  Dif_Stay = dif_stay
 )
 
-tabla_completa$Dif_Stay <- tabla_completa$Stay_obv - tabla_completa$Stay_exp
+# 4. Renombrar las columnas para que queden perfectas en el HTML final
+# (R no deja poner paréntesis en el data.frame directamente de forma fácil)
+colnames(tabla_completa) <- c("Country", "Stay: Obv (Exp)", "Leave: Obv (Exp)", "Dif_Stay")
 
-# 3. Mostrar la tabla con un diseño elegante para tu reporte HTML
+# 5. Mostrar la tabla con un diseño elegante
+# Añadimos align = "c" para que los números queden centrados y más legibles
 knitr::kable(tabla_completa, 
              row.names = FALSE, 
+             align = "c", 
              caption = "Complete Comparison: Retention and Turnover (Observed vs Expected) by Country")
 
 ```
 
+**Test Validity and Limitations (The Warning)** When running the Chi-square test, R triggers a warning indicating that the approximation may be incorrect.
+This happens due to an issue with small subgroup sizes.
+For the Chi-square mathematical calculation to be highly reliable, a strict rule applies: the *expected* frequencies in every cell must be greater than 5.
+As seen in our expected table, countries like Country 2 (4.56) and Country 4 (4.68) fall below this threshold, causing the statistic to lose reliability.
+
+If ignored, this limitation could trigger false alarms for Human Resources, mistaking normal random variations in small offices for genuine retention issues.
+
+To correct this statistically, we could use the **Fisher Exact Test**, which is designed for small subgroups.
+However, because we have a considerable dataset (N=1650 records), computing all possible combinations requires massive memory and might cause an error.
+A more viable statistical alternative is to run a **Monte Carlo Simulation**, which bypasses the strict formula by generating thousands of random scenarios to calculate a highly accurate $p$-value.
+
+**The HR Perspective on the Warning:** From a pure Human Resources standpoint, the best practice is simply to group the data.
+For instance, combining the smallest delegations into a "Rest of the World" category ensures statistical robustness.
+Ultimately, any statistical uncertainty regarding whether a minor branch like Country 4 should have seen 4 or 6 departures is negligible for the broader global strategy.
+The vast majority of the dataset is heavily concentrated in larger countries where the statistical validity is entirely robust.
+Consequently, HR should acknowledge this limitation but can confidently rely on the macro-trends revealed by the table.
+
+**Results Analysis: P-Value and Observed vs. Expected** The Pearson's Chi-squared test yields a $p$-value of 0.1269.
+Since this is greater than the standard 0.05 threshold, the results are **not statistically significant** globally.
+This implies that, overall, the differences in turnover rates across countries could simply be due to random chance rather than a systemic geographical issue.
+
+However, looking at the absolute *Observed vs. Expected* differences, there are significant operational insights for specific branches:
+
+-   **The Positive Outlier (Country 9):** Country 9 is not only the headquarters (accounting for over 1,000 employees), but its retention capacity is exceptionally strong. It retained almost 20 more employees than mathematically expected (`Dif_Stay` = 19.8). The company is saving talent and significant hiring costs in its most important market. HR should investigate what wellness, leadership, or compensation policies are being applied here to export them.
+-   **The Critical Drain (Country 3):** Despite the global $p$-value, Country 3 requires attention. Its `Dif_Stay` is -6.1 (we expected 61 people to stay, but only 55 did). In the turnover column, we expected about 9 resignations, but they actually had 15. For a mid-sized office with a headcount of around 70, nearly doubling the expected number of resignations represents a critical talent drain.
+
 ### Interpretation: Should HR be concerned about country differences in individual turnover based on this analysis alone?
-Interpretation: Should HR be concerned about country differences in individual turnover based on this analysis alone?
-(Nota: Como no tengo los resultados numéricos reales, te dejo la plantilla de interpretación con los insights que debes rellenar según lo que te arroje el código anterior).
 
-1. Diferencias entre lo Esperado y lo Observado:
+**No, not based on this analysis alone.** While the descriptive data shows concerning absolute numbers in branches like Country 3, HR should not launch expensive, country-specific retention initiatives based solely on this test for two main reasons:
 
-Insight: Al comparar la tabla de "Frecuencias Observadas" con la de "Frecuencias Esperadas", podemos identificar qué países están impulsando la rotación. Si un país tiene una frecuencia observada de salidas (Leavers) mucho mayor que su frecuencia esperada, es un foco rojo. Esto indica que ese país está perdiendo talento a un ritmo superior al promedio general de la empresa.
+-   **Lack of Statistical Significance:** The global $p$-value (0.1269) suggests that geography, as a standalone variable, is not a definitive driver of turnover across the whole company.
+-   **Correlation Does Not Imply Causation:** This is a univariate analysis that does not tell the whole story. Country might just be a "proxy" for other underlying issues. For example, Country 3 might have higher turnover simply because it houses the Sales department (which naturally has higher turnover than Finance), or because its workforce has a lower average tenure or salary.
 
-2. Significancia Estadística:
-
-Insight: Si el p-value del test es menor a 0.05, podemos afirmar que existe una relación estadísticamente significativa entre el país y la decisión de irse de la empresa (la rotación no es aleatoria respecto a la geografía). Si el p-value es mayor a 0.05, las diferencias observadas podrían deberse simplemente al azar.
-
-3. Limitaciones por Tamaños de Subgrupo (Small Subgroup Sizes):
-
-Insight: El test de Chi-cuadrado asume que tenemos suficientes datos. Si en la tabla de frecuencias esperadas vemos valores menores a 5 (por ejemplo, en países donde la empresa tiene operaciones muy pequeñas o casi nadie ha renunciado), el cálculo matemático pierde precisión y podría arrojar falsas alarmas.
-
-Conclusión para HR (¿Deberían preocuparse basándose solo en este análisis?):
-No de forma aislada. Aunque el test muestre diferencias significativas, este es un análisis univariado que no cuenta toda la historia.
-
-Correlación no implica causalidad: El país podría ser solo un "proxy" de otros problemas. Por ejemplo, tal vez un país tiene mayor rotación simplemente porque concentra al equipo de Ventas (que por naturaleza tiene más rotación que Finanzas), o porque su plantilla es mucho más joven.
-
-Siguientes pasos recomendados para HR: Antes de lanzar costosas iniciativas de retención por país, HR necesita un modelo predictivo multivariable (como una regresión logística) que controle factores como el departamento, el salario, la antigüedad o el desempeño, para aislar si el país es realmente la causa del problema.
-
-
-
-
-1. ¿Cuál es el problema exactamente? (La Regla del 5)
-Para que el cálculo matemático del test de Chi-cuadrado sea fiable, tiene una regla estricta: Las frecuencias ESPERADAS (no las reales, sino las calculadas por la estadística) en cada "casilla" de tu tabla deben ser mayores a 5. Si miras tu tabla de "Frecuencias Esperadas" y ves números como 2.3, 4.1 o 0.8, tienes un problema de tamaño de muestra.
-
-2. ¿Por qué ocurre esto en Recursos Humanos?
-Imagina que la empresa tiene una oficina muy pequeña en el País 10, con solo 6 empleados en total. Si la tasa de rotación global de la empresa es del 10%, la estadística "esperaría" que en ese país se fueran 0.6 personas (el 10% de 6).
-
-Como 0.6 es menor que 5, el test de Chi-cuadrado se "marea". La fórmula matemática no está diseñada para manejar grupos tan pequeños y pierde precisión.
-
-3. ¿Cómo te avisa R de este problema?
-Si intentas hacer el chisq.test() con grupos muy pequeños, R te va a lanzar un mensaje de advertencia (Warning) en la consola que dice exactamente esto:
-
-Warning message: In chisq.test(tabla_cruzada) : Chi-squared approximation may be incorrect (La aproximación de Chi-cuadrado puede ser incorrecta).
-
-4. ¿Qué impacto tiene para la empresa (El Insight)?
-Si ignoras esta advertencia, podrías darle un falso positivo a Recursos Humanos. Podrías decirles: "¡Alerta roja! El País 10 tiene una rotación significativamente alta"... cuando en realidad, solo se fue una persona, pero como la oficina tiene solo 4 empleados, pareció un porcentaje altísimo (25%). Estarías haciendo que HR gaste tiempo y dinero en investigar un país que no tiene un problema real, es solo ruido estadístico.
+**Next Steps: Preview of promt 2** Before drawing definitive conclusions, HR needs to evolve from descriptive to predictive analytics.
+We must build a multivariate model that controls for factors like department, salary, tenure, and performance score, to isolate whether the country is *truly* the root cause of the turnover problem.
 
 # Prompt 2: Cross-Country Differences in Team Engagement and Turnover
 
@@ -186,7 +201,6 @@ Si ignoras esta advertencia, podrías darle un falso positivo a Recursos Humanos
 -   Import 'Turnover_Team_Data.xlsx' into R (definitions of all fields are included in the 'variable key' worksheet within the Excel file).\
 -   Generate descriptive statistics (N, Mean, SD, Min, Max) for Team engagement and Team turnover rate by country.\
 -   Conduct a one-way ANOVA for each variable: Test the assumption of homogeneity of variances using Levene’s test; Use Welch’s ANOVA if variances are unequal; Perform appropriate post-hoc tests to identify which countries differ.\
-
 
 ### Deliverables
 
