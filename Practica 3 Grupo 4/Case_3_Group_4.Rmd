@@ -254,15 +254,65 @@ We must build a multivariate model that controls for factors like department, sa
 ### Logistic regression output
 
 ```{r prompt3.1}
+# 1. Cargar librerías y datos
+library(readxl)
+library(janitor)
+library(broom)
 
+# Intenta cargar. Si falla aquí, el problema es que la carpeta no se llama 'Databases'
+df <- read_excel("Databases/Individual_Turnover.xlsx", sheet = 1) %>% clean_names()
 
+# 2. AUTO-DETECCIÓN DE COLUMNAS (Para evitar errores de nombres)
+# Buscamos columnas que contengan estas palabras
+col_status <- names(df)[grep("leaver|status|turnover", names(df))][1]
+col_gender <- names(df)[grep("gender|sex", names(df))][1]
+col_age <- names(df)[grep("age", names(df))][1]
+col_service <- names(df)[grep("service|tenure|length", names(df))][1]
+col_perf <- names(df)[grep("performance|rating|appraisal", names(df))][1]
+col_country <- names(df)[grep("country|location|region", names(df))][1]
+
+# 3. Limpieza y conversión forzada
+df$target <- as.numeric(as.factor(df[[col_status]])) - 1
+df_final <- na.omit(df[, c(col_gender, col_age, col_service, col_perf, col_country, "target")])
+
+# Renombramos temporalmente para que la fórmula sea simple
+names(df_final) <- c("gender", "age", "service", "performance", "country", "target")
+
+# 4. EJECUCIÓN DEL MODELO
+model <- glm(target ~ gender + age + service + performance + factor(country), 
+             data = df_final, family = binomial)
+
+# --- RESULTADOS ---
+summary(model)
+
+# Tabla de Odds Ratios
+tab <- tidy(model, exponentiate = TRUE, conf.int = TRUE)
+print(tab[, c("term", "estimate", "p.value")]) # 'estimate' aquí ya es el Odds Ratio
 ```
 
 ### Table of log-odds and odds ratios
 
 ```{r prompt3.2}
 
+# Extraer coeficientes y calcular Odds Ratios
+results_table <- tidy(model, conf.int = TRUE)
 
+# Añadir columna de Odds Ratios y sus intervalos de confianza
+results_table$odds_ratio <- exp(results_table$estimate)
+results_table$conf.low_OR <- exp(results_table$conf.low)
+results_table$conf.high_OR <- exp(results_table$conf.high)
+
+# Seleccionar y renombrar para la tabla final
+final_table <- results_table[, c("term", "estimate", "odds_ratio", "p.value")]
+colnames(final_table) <- c("Variable", "Log-Odds (Beta)", "Odds Ratio", "P-Value")
+
+print(final_table)
+
+# Evaluación de ajuste: Nagelkerke R²
+# Instalaremos 'fmsb' si no lo tienes para el R-cuadrado
+if(!require(fmsb)) install.packages("fmsb")
+library(fmsb)
+NagelkerkeR2(model)
 ```
 
 ### Interpretation: Which variables significantly predict turnover? How should HR interpret the effect of gender and performance ratings?
