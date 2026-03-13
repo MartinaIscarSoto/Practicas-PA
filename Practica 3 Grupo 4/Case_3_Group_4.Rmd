@@ -191,7 +191,7 @@ However, looking at the absolute *Observed vs. Expected* differences, there are 
 -   **Lack of Statistical Significance:** The global $p$-value (0.1269) suggests that geography, as a standalone variable, is not a definitive driver of turnover across the whole company.
 -   **Correlation Does Not Imply Causation:** This is a univariate analysis that does not tell the whole story. Country might just be a "proxy" for other underlying issues. For example, Country 3 might have higher turnover simply because it houses the Sales department (which naturally has higher turnover than Finance), or because its workforce has a lower average tenure or salary.
 
-**Next Steps: Preview of promt 2** Before drawing definitive conclusions, HR needs to evolve from descriptive to predictive analytics.
+**Next Steps (Preview of promt 2)** Before drawing definitive conclusions, HR needs to evolve from descriptive to predictive analytics.
 We must build a multivariate model that controls for factors like department, salary, tenure, and performance score, to isolate whether the country is *truly* the root cause of the turnover problem.
 
 # Prompt 2: Cross-Country Differences in Team Engagement and Turnover
@@ -318,12 +318,97 @@ We must build a multivariate model that controls for factors like department, sa
 
 ### Regression output and Table of standardized coefficients
 
-```{r prompt5.1}
-
-
+```{r}
+library(tidyverse)
+library(broom) # Para limpiar los resultados del modelo
+# install.packages("lm.beta") # Quita el '#' y ejecuta esto en la consola si no lo tienes
+library(lm.beta)
 ```
 
+```{r prompt5.1}
+df5 <- read_excel("Databases/Turnover_Team_Data.xlsx")
+head(df5)
+```
+```{r}
+str(df5)
+```
+
+```{r}
+summary(df5)
+```
+```{r}
+# 3. Estimar el modelo OLS (Regresión Lineal Múltiple)
+modelo_ols <- lm(TeamSeparation ~ Engagement + TeamLeader + SociallyResponsible + 
+                 DriveForPerformance + PerfDevReward + WLB + 
+                 UKdummy + USAdummy + CanadaDummy + SpainDummy, 
+                 data = df5)
+```
+
+```{r}
+# Examinar el ajuste del modelo (Model fit: R-squared y F-test) y coeficientes no estandarizados
+cat("\n--- RESUMEN DEL MODELO (Unstandardized Coefficients & Model Fit) ---\n")
+resumen_modelo <- summary(modelo_ols)
+print(resumen_modelo)
+```
+
+```{r}
+# 5. Calcular los coeficientes ESTANDARIZADOS
+modelo_estandarizado <- lm.beta(modelo_ols)
+```
+
+```{r}
+# 6. Crear una tabla elegante con los coeficientes estandarizados para el entregable
+tabla_std <- tidy(modelo_estandarizado) %>%
+  select(term, estimate) %>%
+  rename(Variable = term, `Standardized Coefficient (Beta)` = estimate) %>%
+  arrange(desc(abs(`Standardized Coefficient (Beta)`))) # Ordenar del más fuerte al más débil
+
+# Mostrar la tabla bonita en el HTML
+knitr::kable(tabla_std, 
+             digits = 4, 
+             caption = "Table of Standardized Coefficients (Ranked by Impact)")
+```
+
+```{r}
+# 1. Estandarizamos SOLO las variables numéricas (dejamos las Dummies en paz)
+df_team_scaled <- df5 %>%
+  mutate(across(c(Engagement, TeamLeader, SociallyResponsible, 
+                  DriveForPerformance, PerfDevReward, WLB), scale))
+
+# 2. Corremos el modelo con los datos estandarizados
+modelo_estandarizado <- lm(TeamSeparation ~ Engagement + TeamLeader + SociallyResponsible + 
+                           DriveForPerformance + PerfDevReward + WLB + 
+                           UKdummy + USAdummy + CanadaDummy, # Quitamos SpainDummy para evitar el NA
+                           data = df_team_scaled)
+
+# 3. Creamos la tabla correcta
+tabla_std_corregida <- tidy(modelo_estandarizado) %>%
+  select(term, estimate, p.value) %>%
+  rename(Variable = term, `Standardized Beta` = estimate, `P-Value` = p.value) %>%
+  filter(Variable != "(Intercept)") %>% # Ocultamos el intercepto que no aporta valor aquí
+  arrange(desc(abs(`Standardized Beta`)))
+
+# 4. Imprimir la tabla bonita
+knitr::kable(tabla_std_corregida, digits = 4, caption = "Standardized Coefficients (True Impact)")
+```
+### Overall model fit and the reference variable
+
+The multiple regression model presents a highly significant overall fit, evidenced by an F-test p-value close to zero ($3.04 \times 10^{-10}$). Furthermore, the adjusted $R^2$ indicates that this set of variables explains approximately 23.3% of the variance in team turnover. Although this percentage might seem low in the hard sciences, in Human Resources analytics and organizational behavior, it represents a quite robust and useful level of fit for decision-making. On the other hand, the singularity message and the null value for the Spain variable is the normal and statistically necessary behavior of the model. When including all the country dummy variables, the software automatically omits one to use it as the base or reference category. Given that the p-values for the remaining countries are greater than 0.05, we can conclude that, when controlling for the other factors, geographic location does not generate statistically significant differences in team turnover.
+
+### The true drivers of turnover
+
+When evaluating the impact of each factor, the focus should be exclusively on the statistically significant variables. In this context, Engagement stands out as the primary protective factor; its negative coefficient demonstrates that higher engagement leads to lower turnover, consolidating it as the main retention tool. Conversely, the most critical finding for Human Resources lies in the Drive for Performance. By presenting a significant positive coefficient, the model warns us of a double-edged sword: increasing the pressure for performance is increasing team separations, pointing to a clear risk of exhaustion or "burnout." It is equally strategic for the department to discover which elements are not influencing the outcome. In this specific case, traditionally valued factors such as team leader ratings, corporate social responsibility policies, or work-life balance do not show a statistically demonstrable impact on the retention of these teams.
+
+### Technical correction and model explainability
+
+Despite the clarity of these findings, there is a technical detail in the standardized coefficients table that must be corrected for the final deliverable. The currently displayed values are identical to the raw coefficients, which happens due to a technical incompatibility when extracting the data with the library used. To obtain a true, standardized ranking of each variable's impact, it is necessary to mathematically scale the numeric columns before running the regression model. Once this detail is corrected, the model is outstanding in terms of explainability for the business context. It is not necessary to refine it by removing the non-significant variables, since, in talent management, demonstrating with empirical data that certain policies are not curbing turnover is just as valuable an insight as identifying the true root causes of the problem.
+
 ### Interpretation: Which team-level factors are most strongly associated with turnover, and how should HR respond?
+Based on the OLS multiple regression model (Adjusted $R^2 = 0.233$, $p < 0.001$), only two team-level factors emerge as statistically significant drivers of turnover: Engagement and Drive for Performance. Notably, geographic location and other heavily discussed HR metrics—such as Work-Life Balance (WLB), Corporate Social Responsibility (CSR), and Team Leader ratings—do not show a statistically significant impact on team separation rates in this specific dataset.
+
+Delving into these core drivers, Engagement acts as the ultimate protective anchor for talent. It presents a highly significant negative coefficient ($p < 0.001$), meaning that as team engagement scores increase, the number of separations significantly decreases. This confirms that employee commitment is the strongest defense the company currently has against turnover. Conversely, Drive for Performance stands out as the primary risk factor, carrying a significant positive coefficient ($p < 0.05$). This serves as the most critical warning sign in the analysis: the harder a team is pushed to perform, the higher their turnover rate becomes. It highlights a clear "burnout" risk, indicating that while driving business results is important, an excessive or unbalanced push for performance is literally driving employees out the door.
+
+To address these findings, Human Resources must implement a targeted, strategic response. First, HR should immediately audit high-pressure teams, specifically identifying those with the highest "Drive for Performance" scores to ensure that expectations are realistic and not creating a toxic, unsustainable environment. Simultaneously, HR needs to prioritize engagement initiatives over generic perks. Since the data shows that WLB and CSR scores do not significantly move the needle on turnover, the department should temporarily reallocate budgets away from broad campaigns and toward core engagement drivers, such as meaningful work, recognition, and internal communication. Finally, it is crucial to redefine management KPIs. HR must work with senior leadership to balance performance metrics with retention goals; if middle managers are exclusively rewarded for driving performance, they will continue to burn out their teams. Moving forward, managers must be evaluated on their ability to hit targets while simultaneously maintaining high team engagement and low turnover.
 
 # Prompt 6: Team-Level Drivers of Employee Turnover
 
