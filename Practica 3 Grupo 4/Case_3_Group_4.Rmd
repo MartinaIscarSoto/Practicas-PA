@@ -282,12 +282,7 @@ names(df_final) <- c("gender", "age", "service", "performance", "country", "targ
 model <- glm(target ~ gender + age + service + performance + factor(country), 
              data = df_final, family = binomial)
 
-# --- RESULTADOS ---
 summary(model)
-
-# Tabla de Odds Ratios
-tab <- tidy(model, exponentiate = TRUE, conf.int = TRUE)
-print(tab[, c("term", "estimate", "p.value")]) # 'estimate' aquí ya es el Odds Ratio
 ```
 
 ### Table of log-odds and odds ratios
