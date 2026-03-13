@@ -1,0 +1,354 @@
+---
+title: "Advanced Turnover Modelling and Business Case Development" 
+subtitle: "Groupwork Use Case 3 - People Analytics"
+author: "Ferrán Extremera, Irene Morales, Amalia Varo y Martina Iscar"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    toc: true
+    toc_depth: 3
+    toc_float: true
+    code_folding: hide
+knit: (function(inputFile, encoding) { 
+      rmarkdown::render(inputFile,
+                        encoding=encoding, 
+                        output_dir=file.path(dirname(inputFile),"report" )) }) 
+editor_options: 
+  markdown: 
+    wrap: sentence
+---
+
+# Intro
+
+Employee turnover is a critical concern for organizations due to its substantial financial and human costs.
+HR functions frequently report turnover statistics, but descriptive reporting alone may lead to misdiagnosis of problems and poorly targeted interventions.
+In this use case, you will apply inferential and predictive analytics to understand voluntary employee turnover at both individual and team levels in a multinational organization
+
+# Setup
+
+Within the project directory, create the following folders if they do not already exist:
+
+-   **Databases**: to store all data sources provided in Moodle (Excel files).\
+-   **data**: to store any ad-hoc data created during the analysis. The native R data format is .rds.\
+-   **report**: to store the HTML output file generated when knitting the R Markdown file.
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse) 
+library(readxl)
+```
+
+# Prompt 1: Estimating differences in turnover by country
+
+### Tasks
+
+-   Import 'Individual_Turnover.xlsx' into R (definitions of all fields are included in the 'variable key' worksheet within the Excel file).\
+-   Produce a cross-tabulation of Country × Leaver Status.\
+-   Conduct a chi-square test of independence to assess whether turnover differs significantly by country. Interpret the results, paying attention to: expected vs observed frequencies; statistical significance; limitations related to small subgroup sizes.\
+
+### Deliverables
+
+-   Cross-tabulation table with expected frequencies.\
+-   Chi-square test output.\
+-   Interpretation: Should HR be concerned about country differences in individual turnover based on this analysis alone?
+
+## Solution
+
+```{r}
+df1 <- read_excel("Databases/Individual_Turnover.xlsx")
+head(df1)
+```
+
+```{r}
+str(df1)
+```
+
+```{r}
+summary(df1)
+```
+
+We need to treat the Gender and LeaverStatus variables carefully, as they have 2 (Gender) and 1(LeverStatus) NaN values.
+Therefore, we must remove them primarily as a precaution.
+Additionally, since it involves at most three rows of the dataset compared to the 1653 total rows, it is just a minimal deletion that aims to have a purer dataset and anticipate possible problems that these null values may cause in the models used throughout the practice.
+
+```{r}
+data <- df1 %>%
+  drop_na(Gender, LeaverStatus)
+```
+
+```{r}
+summary(data)
+```
+
+We verify that the null rows have been removed.
+As a result we have a total of 1650 records for our analysis.
+
+```{r}
+str(data)
+```
+
+### Cross-tabulation table with expected frequencies
+
+```{r prompt1.1}
+tabla_cruzada <- table(
+  "País" = data$Country, 
+  "Estado_Rotación (0=Stay, 1=Leave)" = data$LeaverStatus
+)
+
+# Añadir una fila y columna de "Totales"
+tabla_con_totales <- addmargins(tabla_cruzada)
+
+# Imprimir en consola para que la veas tú mientras programas
+cat("\n--- FRECUENCIAS OBSERVADAS ---\n")
+print(tabla_con_totales)
+
+# Crear la versión "bonita" para el reporte HTML final
+knitr::kable(tabla_con_totales, 
+             caption = "Employee Turnover Frequency by Country")
+# Recordar cuando presentar poner el pais correspondiente al lado de número 
+```
+
+### Chi-square test output
+
+```{r prompt1.2}
+# 1. Asegurarnos de tener el test calculado
+test_chi <- chisq.test(tabla_cruzada)
+```
+
+```{r}
+cat("\n--- RESULTADO DEL TEST CHI-CUADRADO ---\n")
+print(test_chi)
+```
+
+```{r}
+print(test_chi$expected)
+```
+
+```{r}
+# 1. Extraer los valores numéricos temporalmente}
+stay_obv <- test_chi$observed[, 1]
+leave_obv <- test_chi$observed[, 2]
+stay_exp <- round(test_chi$expected[, 1], 1)
+leave_exp <- round(test_chi$expected[, 2], 1)
+
+# 2. Calcular la diferencia antes de convertir los números a texto
+dif_stay <- stay_obv - stay_exp
+
+# 3. Crear la tabla final uniendo Observado (Esperado)
+tabla_completa <- data.frame(
+  Country = rownames(test_chi$observed),
+  
+  # Usamos paste0 para unir el número real, un espacio, el paréntesis y el esperado
+  `Stay_Obv_Exp` = paste0(stay_obv, " (", stay_exp, ")"),
+  `Leave_Obv_Exp` = paste0(leave_obv, " (", leave_exp, ")"),
+  
+  Dif_Stay = dif_stay
+)
+
+# 4. Renombrar las columnas para que queden perfectas en el HTML final
+# (R no deja poner paréntesis en el data.frame directamente de forma fácil)
+colnames(tabla_completa) <- c("Country", "Stay: Obv (Exp)", "Leave: Obv (Exp)", "Dif_Stay")
+
+# 5. Mostrar la tabla con un diseño elegante
+# Añadimos align = "c" para que los números queden centrados y más legibles
+knitr::kable(tabla_completa, 
+             row.names = FALSE, 
+             align = "c", 
+             caption = "Complete Comparison: Retention and Turnover (Observed vs Expected) by Country")
+
+```
+
+**Test Validity and Limitations (The Warning)** When running the Chi-square test, R triggers a warning indicating that the approximation may be incorrect.
+This happens due to an issue with small subgroup sizes.
+For the Chi-square mathematical calculation to be highly reliable, a strict rule applies: the *expected* frequencies in every cell must be greater than 5.
+As seen in our expected table, countries like Country 2 (4.56) and Country 4 (4.68) fall below this threshold, causing the statistic to lose reliability.
+
+If ignored, this limitation could trigger false alarms for Human Resources, mistaking normal random variations in small offices for genuine retention issues.
+
+To correct this statistically, we could use the **Fisher Exact Test**, which is designed for small subgroups.
+However, because we have a considerable dataset (N=1650 records), computing all possible combinations requires massive memory and might cause an error.
+A more viable statistical alternative is to run a **Monte Carlo Simulation**, which bypasses the strict formula by generating thousands of random scenarios to calculate a highly accurate $p$-value.
+
+**The HR Perspective on the Warning:** From a pure Human Resources standpoint, the best practice is simply to group the data.
+For instance, combining the smallest delegations into a "Rest of the World" category ensures statistical robustness.
+Ultimately, any statistical uncertainty regarding whether a minor branch like Country 4 should have seen 4 or 6 departures is negligible for the broader global strategy.
+The vast majority of the dataset is heavily concentrated in larger countries where the statistical validity is entirely robust.
+Consequently, HR should acknowledge this limitation but can confidently rely on the macro-trends revealed by the table.
+
+**Results Analysis: P-Value and Observed vs. Expected** The Pearson's Chi-squared test yields a $p$-value of 0.1269.
+Since this is greater than the standard 0.05 threshold, the results are **not statistically significant** globally.
+This implies that, overall, the differences in turnover rates across countries could simply be due to random chance rather than a systemic geographical issue.
+
+However, looking at the absolute *Observed vs. Expected* differences, there are significant operational insights for specific branches:
+
+-   **The Positive Outlier (Country 9):** Country 9 is not only the headquarters (accounting for over 1,000 employees), but its retention capacity is exceptionally strong. It retained almost 20 more employees than mathematically expected (`Dif_Stay` = 19.8). The company is saving talent and significant hiring costs in its most important market. HR should investigate what wellness, leadership, or compensation policies are being applied here to export them.
+-   **The Critical Drain (Country 3):** Despite the global $p$-value, Country 3 requires attention. Its `Dif_Stay` is -6.1 (we expected 61 people to stay, but only 55 did). In the turnover column, we expected about 9 resignations, but they actually had 15. For a mid-sized office with a headcount of around 70, nearly doubling the expected number of resignations represents a critical talent drain.
+
+### Interpretation: Should HR be concerned about country differences in individual turnover based on this analysis alone?
+
+**No, not based on this analysis alone.** While the descriptive data shows concerning absolute numbers in branches like Country 3, HR should not launch expensive, country-specific retention initiatives based solely on this test for two main reasons:
+
+-   **Lack of Statistical Significance:** The global $p$-value (0.1269) suggests that geography, as a standalone variable, is not a definitive driver of turnover across the whole company.
+-   **Correlation Does Not Imply Causation:** This is a univariate analysis that does not tell the whole story. Country might just be a "proxy" for other underlying issues. For example, Country 3 might have higher turnover simply because it houses the Sales department (which naturally has higher turnover than Finance), or because its workforce has a lower average tenure or salary.
+
+**Next Steps: Preview of promt 2** Before drawing definitive conclusions, HR needs to evolve from descriptive to predictive analytics.
+We must build a multivariate model that controls for factors like department, salary, tenure, and performance score, to isolate whether the country is *truly* the root cause of the turnover problem.
+
+# Prompt 2: Cross-Country Differences in Team Engagement and Turnover
+
+### Tasks
+
+-   Import 'Turnover_Team_Data.xlsx' into R (definitions of all fields are included in the 'variable key' worksheet within the Excel file).\
+-   Generate descriptive statistics (N, Mean, SD, Min, Max) for Team engagement and Team turnover rate by country.\
+-   Conduct a one-way ANOVA for each variable: Test the assumption of homogeneity of variances using Levene’s test; Use Welch’s ANOVA if variances are unequal; Perform appropriate post-hoc tests to identify which countries differ.\
+
+### Deliverables
+
+-   Descriptive statistics tables.\
+-   ANOVA output (including Welch correction if required).\
+-   Post-hoc comparison table
+-   Interpretation: Which country or countries should HR prioritize for further diagnosis, and why?
+
+## Solution
+
+### Descriptive statistics tables
+
+```{r prompt2.1}
+
+
+```
+
+### ANOVA output (including Welch correction if required)
+
+```{r prompt2.2}
+
+
+```
+
+### Post-hoc comparison table
+
+```{r prompt2.3}
+
+
+```
+
+### Interpretation: Which country or countries should HR prioritize for further diagnosis, and why?
+
+# Prompt 3: Individual-Level Predictors of Voluntary Turnover
+
+### Tasks
+
+-   Import 'Individual_Turnover.xlsx' into R (definitions of all fields are included in the 'variable key' worksheet within the Excel file).\
+-   Estimate a logistic regression model predicting leaver status using: Gender; Age; Length of service; Performance appraisal rating; Country (as a categorical variable).\
+-   Evaluate overall model fit using: Likelihood ratio test; Nagelkerke R².\
+-   Interpret coefficients using odds ratios.
+
+### Deliverables
+
+-   Logistic regression output.\
+-   Table of log-odds and odds ratios.\
+-   Interpretation: Which variables significantly predict turnover? How should HR interpret the effect of gender and performance ratings?
+
+## Solution
+
+### Logistic regression output
+
+```{r prompt3.1}
+
+
+```
+
+### Table of log-odds and odds ratios
+
+```{r prompt3.2}
+
+
+```
+
+### Interpretation: Which variables significantly predict turnover? How should HR interpret the effect of gender and performance ratings?
+
+# Prompt 4: Gender Differences in Employee Turnover Over Tenure
+
+### Tasks
+
+-   Import 'Individual_Turnover.xlsx' into R (definitions of all fields are included in the 'variable key' worksheet within the Excel file).\
+-   Conduct a Kaplan–Meier survival analysis using: Length of service as time variable; Leaver status as event indicator; Gender as grouping variable.\
+-   Compare survival curves using a statistical test.\
+-   Visualize survival probabilities over time.
+
+### Deliverables
+
+-   Survival table and summary statistics.\
+-   Survival plot\
+-   Interpretation: At what stages of tenure are gender differences in turnover most pronounced, and what HR processes might this implicate?
+
+## Solution
+
+### Survival table and summary statistics
+
+```{r prompt4.1}
+
+
+```
+
+### Survival plot
+
+```{r prompt4.2}
+
+
+```
+
+### Interpretation: At what stages of tenure are gender differences in turnover most pronounced, and what HR processes might this implicate?
+
+# Prompt 5: Team-Level Drivers of Employee Turnover
+
+### Tasks
+
+-   Import 'Turnover_Team_Data.xlsx' into R (definitions of all fields are included in the 'variable key' worksheet within the Excel file).\
+-   Estimate an OLS multiple regression model predicting team turnover using: Engagement; Team leader rating; CSR; Drive for performance; Performance, development and reward; Work–life balance; Country dummy variables (with one reference category).\
+-   Examine: Model fit (R², F-test).\
+-   Unstandardized and standardized coefficients.
+
+### Deliverables
+
+-   Regression output and Table of standardized coefficients.\
+-   Interpretation: Which team-level factors are most strongly associated with turnover, and how should HR respond?
+
+## Solution
+
+### Regression output and Table of standardized coefficients
+
+```{r prompt5.1}
+
+
+```
+
+### Interpretation: Which team-level factors are most strongly associated with turnover, and how should HR respond?
+
+# Prompt 6: Team-Level Drivers of Employee Turnover
+
+### Tasks
+
+-   Import 'Individual_Turnover.xlsx' into R (definitions of all fields are included in the 'variable key' worksheet within the Excel file).\
+-   Estimate the proportion of individual turnover explained by gender alone using logistic regression.\
+-   Use the Nagelkerke R² to approximate the share of turnover costs attributable to gender.\
+-   Assume a total annual voluntary turnover cost of £4 million. Calculate potential cost savings if gender-related turnover were eliminated or reduced.
+
+### Deliverables
+
+-   Cost calculation.\
+-   Executive-style summary answering: Is there a strong enough business case to justify a targeted retention intervention?
+-   What cautions should HR keep in mind when interpreting these figures?
+
+## Solution
+
+### Cost calculation
+
+```{r prompt6.1}
+
+
+```
+
+### Executive-style summary answering: Is there a strong enough business case to justify a targeted retention intervention?
+
+### What cautions should HR keep in mind when interpreting these figures?
