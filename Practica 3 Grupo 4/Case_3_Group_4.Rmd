@@ -254,18 +254,64 @@ We must build a multivariate model that controls for factors like department, sa
 ### Logistic regression output
 
 ```{r prompt3.1}
+library(readxl)
+library(fmsb)
+library(lmtest)
+library(broom)
+library(readxl)
+df_ind <- read_excel("Databases/Individual_Turnover.xlsx")
 
+# 1. Asegurar que las variables categóricas sean factores
+df_ind$Gender <- as.factor(df_ind$Gender)
+df_ind$Country <- as.factor(df_ind$Country)
 
+# 2. Estimar el modelo de regresión logística
+model_log <- glm(LeaverStatus ~ Gender + Age + LengthOfService + 
+                 AppraisalRating + Country, 
+                 data = df_ind, family = binomial)
+
+# 3. Mostrar el resumen del modelo
+summary(model_log)
+
+# 4. Evaluación del ajuste global
+# Likelihood Ratio Test (comparado con un modelo nulo)
+lrtest(model_log)
+
+# Nagelkerke R2
+NagelkerkeR2(model_log)
 ```
 
 ### Table of log-odds and odds ratios
 
 ```{r prompt3.2}
+# Crear tabla combinada de Log-Odds y Odds Ratios con intervalos de confianza
+model_results <- tidy(model_log, conf.int = TRUE) %>%
+  mutate(
+    odds_ratio = exp(estimate),
+    conf.low_OR = exp(conf.low),
+    conf.high_OR = exp(conf.high)
+  ) %>%
+  select(term, log_odds = estimate, std.error, p.value, odds_ratio, conf.low_OR, conf.high_OR)
 
+knitr::kable(model_results, digits = 3, caption = "Resultados de Regresión Logística: Log-Odds y Odds Ratios")
 
 ```
 
 ### Interpretation: Which variables significantly predict turnover? How should HR interpret the effect of gender and performance ratings?
+
+Regarding the overall model fit, the logistic regression analysis reveals that the predictors included explain approximately 5.4% of the variance in employee turnover, as indicated by the Nagelkerke R\^2.
+While this figure may appear low, it is considered a meaningful and robust finding in People Analytics, where individual stay-or-leave decisions are influenced by a vast array of complex personal and professional factors.
+Furthermore, the likelihood ratio test confirms that the model significantly outperforms a null model.
+
+Among the variables tested, Gender and Performance Appraisal Ratings stand out as the most significant individual-level predictors of turnover.
+Although the analysis shows that turnover rates fluctuate depending on the specific Country, the impact of gender is particularly striking when examined through odds ratios.
+Specifically, after controlling for age, tenure, and performance, the data indicates that women are 1.879 times($1 / 0.532$) more likely to leave the organization than their male counterparts.
+This suggests a critical gender based retention gap that requires immediate HR intervention to investigate potential systemic issues such as career progression barriers or workplace flexibility.
+
+The interpretation of Performance Appraisal Ratings also provides vital insights into the organization's talent health.
+The model demonstrates a strong protective effect of high performance on retention, as employees are 29.5%(1 / 0.772 = 1.295) more likely to stay for each one-point increase in their performance rating.
+From a strategic standpoint, this indicates that the company is successfully retaining its top-tier talent.
+However, the significant disparity in turnover by gender remains the most pressing concern, suggesting that while the "High Performers" are staying, the organization may be losing qualified female talent at a disproportionate rate.
 
 # Prompt 4: Gender Differences in Employee Turnover Over Tenure
 
