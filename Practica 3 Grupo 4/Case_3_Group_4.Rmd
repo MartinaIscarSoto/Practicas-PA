@@ -406,7 +406,13 @@ survdiff(surv_object ~ Gender, data = data4)
 
 
 ```
+##Interpretation of the Kaplan–Meier survival curves
 
+The Kaplan–Meier survival curves show how the probability of remaining in the organisation changes as length of service increases for each gender group. At the beginning of tenure, the two curves are relatively close, which suggests that men and women have fairly similar probabilities of staying during the early years of employment. This means that gender differences in turnover do not appear to be especially strong at the entry or very early career stage.
+
+As tenure increases, the curves begin to separate more clearly. The gap becomes more visible during mid-career, roughly from around 15 to 25 years of service, and this indicates that the retention experience of the two groups becomes less similar over time. In the later stages of tenure, the decline in the male survival curve becomes steeper, meaning that men appear to leave at a higher rate than women at those longer service durations.
+
+Overall, the curves suggest that gender differences in turnover are not constant across the employee lifecycle. Instead, they seem to emerge gradually and become more pronounced as employees move further into their careers. This is important because it suggests that turnover risk may depend not only on gender, but also on the stage of tenure at which employees are being considered.
 ### Survival plot
 
 ```{r prompt4.2}
@@ -420,9 +426,26 @@ ggsurvplot(km_model,
            ylab = "Probability of staying")
 
 ```
+##Interpretation of the survival table and summary statistics
+The survival table provides the numerical detail behind the Kaplan–Meier curves. It shows the number of employees still “at risk” of leaving at different points in time, the number of turnover events observed, and the estimated survival probability. As expected, the number at risk decreases over time, because some employees leave the organisation and others are censored, meaning they are still employed at the end of the observation period.
 
+The steady reduction in survival probabilities confirms that the likelihood of remaining in the organisation falls as tenure increases. This is a normal pattern in survival analysis, since the longer employees are observed, the more opportunity there is for turnover to occur. What is more relevant here is that the table supports the graphical pattern seen in the curves: differences between genders become more noticeable at higher tenure levels.
+
+At the later stages of service, the number of employees still being observed is much smaller, so the estimates become less stable. This means the sharp drops near the end of the graph should be interpreted cautiously. Even so, the overall pattern still supports the conclusion that gender differences in turnover become more evident beyond the early years of service, particularly in the middle and later stages of tenure.
+
+##Interpretation of the log-rank test
+
+The log-rank test is used to compare the survival curves statistically and determine whether the difference between them is large enough to be considered significant. In this case, the result is statistically significant, with χ² = 21.6 and p < 0.001. This means that the survival patterns for men and women are not the same, and that the observed difference is very unlikely to be due to random chance alone.
+
+This is an important result because the visual difference in the curves is supported by formal statistical evidence. In other words, it is not just that the lines look different on the graph; the test confirms that gender is meaningfully associated with different turnover patterns across tenure.
+
+However, this should still be interpreted carefully. Statistical significance tells us that the groups differ, but it does not by itself explain why the difference exists. The result shows that gender is related to survival over tenure, but not which organisational factors are causing that pattern. To answer that, HR would need to consider broader issues such as promotion systems, career opportunities, leadership experiences, flexibility, or retention conditions at later career stages.
 ### Interpretation: At what stages of tenure are gender differences in turnover most pronounced, and what HR processes might this implicate?
+Based on the survival curves and summary results, gender differences in turnover are most pronounced in the mid-to-late stages of tenure rather than at the beginning of employment. In the early years, retention patterns are relatively similar, so there is little evidence of a major gender gap at the start of the employee journey. The divergence becomes clearer in mid-career and is strongest at longer lengths of service, where the male survival curve declines more sharply.
 
+This pattern suggests that the most relevant HR processes are likely to be those that affect employees after they have already spent a substantial period in the organisation. These may include career progression opportunities, access to promotion, professional development, long-term engagement, recognition, and work–life balance support. If employees experience barriers or dissatisfaction in these areas later in their careers, this could increase the likelihood of leaving.
+
+From an HR perspective, the results imply that retention efforts should not focus only on onboarding or early-career support. Instead, the organisation should also review how employees are managed and supported over the longer term. Particular attention may need to be given to whether both genders experience fair and sustainable opportunities for advancement, development, and continued engagement as their tenure increases.
 # Prompt 5: Team-Level Drivers of Employee Turnover
 
 ### Tasks
@@ -597,7 +620,37 @@ cost_explained
 
 
 ```
+##Logistic regression results (Gender effect)
 
+The logistic regression model shows that gender is a statistically significant predictor of voluntary turnover. The coefficient for gender is negative and highly significant (p < 0.001), indicating that the probability of leaving differs between genders.
+
+This suggests that one gender is less likely to leave than the other, holding all else constant. In practical terms, this confirms that gender is associated with different turnover outcomes at the individual level.
+
+##Model fit and Nagelkerke R²
+
+The Nagelkerke R² value is approximately 0.024, meaning that gender alone explains about 2.4% of the variance in turnover.
+
+This indicates that, although gender is statistically significant, it is not a strong predictor on its own. Most of the variation in turnover is driven by other factors not included in this model.
+
+Therefore, gender has a real but limited explanatory power in understanding why employees leave.
+
+##Cost Calculation
+Using the Nagelkerke R² as an approximation, gender-related turnover accounts for about 2.4% of total turnover costs.
+
+Given an annual turnover cost of £4,000,000, this translates into:
+
+£4,000,000 × 0.024 = £96,000 per year
+
+This represents the potential financial impact associated with gender differences in turnover.
 ### Executive-style summary answering: Is there a strong enough business case to justify a targeted retention intervention?
+The analysis shows that gender is a statistically significant factor in predicting employee turnover, but it explains only a small proportion of the overall variance.
 
+Despite the modest explanatory power, the financial implications are still meaningful. Gender-related turnover may account for approximately £96,000 annually, suggesting that there is a moderate business case for targeted retention interventions.
+
+However, given that most turnover is driven by other factors, gender-focused initiatives should be part of a broader, more comprehensive retention strategy rather than a standalone solution.
 ### What cautions should HR keep in mind when interpreting these figures?
+HR should interpret these findings with caution. Although gender is identified as a statistically significant predictor of turnover, it explains only a small proportion of the overall variance (around 2.4%). This indicates that most of the factors driving employee turnover are not captured by this model and are likely related to other variables such as performance, engagement, leadership quality, career opportunities, or work–life balance.
+
+In addition, the analysis demonstrates an association between gender and turnover, but it does not establish a causal relationship. Therefore, it cannot be concluded that gender itself directly causes employees to leave, but rather that it may be linked to underlying organisational or structural factors.
+
+It is also important to recognise that some level of voluntary turnover can be functional and beneficial for the organisation, as it may allow for renewal of talent and improved performance. For this reason, HR should avoid interpreting these results in isolation and instead consider them as part of a broader, more comprehensive analysis of turnover drivers before designing targeted interventions.
