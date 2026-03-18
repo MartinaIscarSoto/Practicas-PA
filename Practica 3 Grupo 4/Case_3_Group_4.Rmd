@@ -523,7 +523,7 @@ modelo_ols <- lm(TeamSeparation ~ Engagement + TeamLeader + SociallyResponsible 
 ```
 
 ```{r}
-# 4. Examinar el ajuste del modelo (Model fit: R-squared y F-test) y coeficientes no estandarizados
+# Examinar el ajuste del modelo (Model fit: R-squared y F-test) y coeficientes no estandarizados
 cat("\n--- RESUMEN DEL MODELO (Unstandardized Coefficients & Model Fit) ---\n")
 resumen_modelo <- summary(modelo_ols)
 print(resumen_modelo)
@@ -616,7 +616,7 @@ Finally, it is crucial to redefine management KPIs.
 HR must work with senior leadership to balance performance metrics with retention goals; if middle managers are exclusively rewarded for driving performance, they will continue to burn out their teams.
 Moving forward, managers must be evaluated on their ability to hit targets while simultaneously maintaining high team engagement and low turnover.
 
-# Prompt 6: Team-Level Drivers of Employee Turnover
+# Prompt 6: Financial Implications of Gender Differences in Turnover
 
 ### Tasks
 
@@ -667,71 +667,40 @@ cost_explained
 
 
 ```
-## Logistic regression results (Gender effect)
+##Logistic regression results (Gender effect)
 
-The logistic regression model indicates that gender is a statistically significant predictor of voluntary turnover (p < 0.001). The estimated coefficient for gender is −0.69, which corresponds to an odds ratio of approximately 0.50. This implies that one gender has around half the odds of leaving compared to the reference group.
+The logistic regression model shows that gender is a statistically significant predictor of voluntary turnover. The coefficient for gender is negative and highly significant (p < 0.001), indicating that the probability of leaving differs between genders.
 
-However, this result should be interpreted carefully. The model includes only gender as a predictor and does not control for other relevant variables. Therefore, the observed difference may reflect underlying factors—such as role distribution, team conditions, or career progression opportunities—rather than a direct effect of gender itself.
+Expressed as an odds ratio, the result suggests that one gender has substantially lower odds of leaving than the reference group. This confirms that gender is meaningfully associated with turnover outcomes at the individual level.
 
-## Model fit and explanatory power
+##Model fit and Nagelkerke R²
 
-The Nagelkerke R² is approximately 0.024, indicating that gender alone explains about 2.4% of the variance in turnover. This reflects a very limited explanatory power, suggesting that most of the factors influencing employee turnover are not captured by this model.
+The Nagelkerke R² value is approximately 0.024, meaning that gender alone explains about 2.4% of the variance in turnover.
 
-Although the model is statistically significant (likelihood ratio test p < 0.001), this significance is driven by the large sample size rather than by a strong predictive effect.
+This indicates that, although gender is statistically significant, it is not a strong predictor on its own. Most of the variation in turnover is driven by other factors not included in this model.
 
+Therefore, gender has a real but limited explanatory power in understanding why employees leave.
 
-## Business interpretation
+##Cost Calculation
+Using the Nagelkerke R² as an approximation, gender-related turnover accounts for about 2.4% of total turnover costs.
 
-From a business perspective, the results show that gender is associated with turnover, but it is not a primary driver. The low explanatory power of the model indicates that gender alone provides limited value for predicting or managing turnover outcomes.
+Given an annual turnover cost of £4,000,000, this translates into:
 
-As such, there is insufficient evidence to justify standalone, gender-focused retention interventions based solely on this model.
+£4,000,000 × 0.024 = £96,000 per year
 
+This represents the potential financial impact associated with gender differences in turnover.
 
-## Integration with previous analyses
+This should be interpreted as an approximate estimate of the financial significance of gender-related turnover differences, rather than as an exact or causal monetary attribution.
 
-These findings should be interpreted in conjunction with earlier analyses.
+### Executive-style summary: Is there a strong enough business case to justify a targeted retention intervention?
+The analysis shows that gender is a statistically significant factor in predicting employee turnover, but it explains only a small proportion of the overall variance.
 
-The survival analysis (Prompt 4) showed that gender differences in turnover vary across tenure, becoming more pronounced at later career stages. Additionally, the multiple regression model (Prompt 5) identified team-level factors—particularly engagement and performance pressure—as more substantial predictors of turnover.
+Despite the modest explanatory power, the financial implications are still meaningful. Gender-related turnover may account for approximately £96,000 annually, suggesting that there is a moderate business case for targeted retention interventions.
 
-Together, these results suggest that gender differences are likely influenced by structural and contextual factors rather than representing a direct causal relationship.
+However, given that most turnover is driven by other factors, gender-focused initiatives should be part of a broader, more comprehensive retention strategy rather than a standalone solution.
+### What cautions should HR keep in mind when interpreting these figures?
+HR should interpret these findings with caution. Although gender is identified as a statistically significant predictor of turnover, it explains only a small proportion of the overall variance (around 2.4%). This indicates that most of the factors driving employee turnover are not captured by this model and are likely related to other variables such as performance, engagement, leadership quality, career opportunities, or work–life balance.
 
-## HR implications
+In addition, the analysis demonstrates an association between gender and turnover, but it does not establish a causal relationship. Therefore, it cannot be concluded that gender itself directly causes employees to leave, but rather that it may be linked to underlying organisational or structural factors.
 
-For HR, this means that gender should not be treated as an isolated lever for intervention. Instead, it should be considered as a signal that may point to deeper organisational dynamics.
-
-A more effective approach would involve:
-- Investigating whether engagement, workload, or career progression differ systematically across gender groups  
-- Identifying whether certain team environments disproportionately affect one group  
-- Ensuring that retention strategies target the underlying drivers of turnover rather than demographic characteristics alone  
-
-## Limitations and cautions
-
-Several limitations should be considered when interpreting these results:
-
-- The model is highly simplified and includes only one predictor  
-- The analysis is correlational and does not establish causality  
-- The low R² indicates that most turnover drivers remain unexplained  
-- The results may be sensitive to omitted variable bias  
-
-Additionally, it is important to recognise that some level of voluntary turnover may be functional and beneficial for the organisation, contributing to renewal and performance improvement.
-
-
-## Final conclusion
-
-While gender is statistically associated with turnover, its explanatory power is limited. The evidence does not support a strong standalone business case for gender-based retention strategies.
-
-Instead, gender differences should be understood as part of a broader system of organisational factors, with engagement and performance-related conditions emerging as more meaningful drivers of turnover.
-
-## Executive synthesis
-
-Across the full analysis, employee turnover emerges as a multifactorial phenomenon driven primarily by team-level and contextual factors rather than individual demographics.
-
-While initial analyses identified differences in turnover across countries (Prompt 2) and gender (Prompt 3), these effects are relatively weak and inconsistent when examined in isolation. In contrast, subsequent models showed that variables such as performance appraisal and, more importantly, team engagement (Prompt 5), provide a more robust and meaningful explanation of turnover patterns.
-
-Additionally, the survival analysis (Prompt 4) revealed that turnover dynamics evolve over time, with differences between groups becoming more pronounced at later stages of tenure. This suggests that retention risk is not static but accumulates as employees progress through their lifecycle within the organisation.
-
-Taken together, the evidence indicates that demographic variables such as gender should not be interpreted as direct drivers of turnover, but rather as signals that may reflect deeper structural or organisational conditions. The most actionable insights point towards improving team environments, strengthening engagement, and addressing performance-related pressures.
-
-From a strategic HR perspective, the priority should therefore shift away from targeting specific demographic groups in isolation and towards designing systemic interventions that enhance the overall employee experience. This includes focusing on leadership quality, workload management, career development pathways, and team climate.
-
-In summary, the business case for intervention is strong—but it lies in addressing organisational drivers of turnover, not in demographic segmentation alone.
+It is also important to recognise that some level of voluntary turnover can be functional and beneficial for the organisation, as it may allow for renewal of talent and improved performance. For this reason, HR should avoid interpreting these results in isolation and instead consider them as part of a broader, more comprehensive analysis of turnover drivers before designing targeted interventions.
