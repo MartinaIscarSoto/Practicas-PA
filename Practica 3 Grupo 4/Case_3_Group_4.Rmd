@@ -381,6 +381,17 @@ However, the significant disparity in turnover by gender remains the most pressi
 ### Survival table and summary statistics
 
 ```{r prompt4.1}
+library(readxl)
+library(survival)
+library(survminer)
+
+df4 <- read_excel("Databases/Individual_Turnover.xlsx")
+data4<- df4 %>% drop_na(Gender, LeaverStatus)
+surv_object <- Surv(time = data4$LengthOfService,
+                    event = data4$LeaverStatus)
+km_model <- survfit(surv_object ~ Gender, data = data4)
+summary(km_model)
+survdiff(surv_object ~ Gender, data = data4)
 
 
 ```
@@ -388,7 +399,14 @@ However, the significant disparity in turnover by gender remains the most pressi
 ### Survival plot
 
 ```{r prompt4.2}
-
+ggsurvplot(km_model,
+           data = data,
+           pval = TRUE,
+           risk.table = FALSE,
+           legend.title = "Gender",
+           legend.labs = c("Male","Female"),
+           xlab = "Years of service",
+           ylab = "Probability of staying")
 
 ```
 
@@ -553,6 +571,18 @@ Moving forward, managers must be evaluated on their ability to hit targets while
 ### Cost calculation
 
 ```{r prompt6.1}
+# Logistic regression with gender only
+model_gender <- glm(LeaverStatus ~ Gender, data = data4, family = binomial)
+
+summary(model_gender)
+library(rcompanion)
+
+nagelkerke(model_gender)
+total_cost <- 4000000
+R2_gender <- 0.024
+
+cost_explained <- total_cost * R2_gender
+cost_explained
 
 
 ```
