@@ -214,25 +214,73 @@ We must build a multivariate model that controls for factors like department, sa
 ### Descriptive statistics tables
 
 ```{r prompt2.1}
-
-
+df2 <- read_excel("Databases/Turnover_Team_Data.xlsx")
+str(df2)
+head(df2)
+df2$Country <- as.factor(df2$Country)
+levels(df2$Country)
 ```
+
+
+```{r prompt2.1}
+library(dplyr)
+
+df2 %>%
+group_by(Country) %>%
+summarise(
+N = n(),
+Eng_mean = mean(Engagement),
+Eng_sd = sd(Engagement),
+Eng_min = min(Engagement),
+Eng_max = max(Engagement),
+Turn_mean = mean(TeamSeparation),
+Turn_sd = sd(TeamSeparation),
+Turn_min = min(TeamSeparation),
+Turn_max = max(TeamSeparation)
+)
+```
+The dataset contains information on 212 teams across multiple countries. Each observation represents a team and includes variables related to team size, employee engagement, leadership quality, organizational culture, and turnover rates. The key variables for this analysis are team engagement and team turnover (TeamSeparation), while country is used as the grouping variable to test for cross-country differences.
 
 ### ANOVA output (including Welch correction if required)
 
 ```{r prompt2.2}
+library(car)
 
-
+#To see if we use normal ANOVA or Welch ANOVA
+leveneTest(Engagement ~ Country, data = df2)
+leveneTest(TeamSeparation ~ Country, data = df2)
 ```
+Levene’s test was conducted to examine the assumption of homogeneity of variance across countries. The results were significant for both engagement (F = 10.805, p < 0.001) and team turnover (F = 5.368, p = 0.001), indicating that the assumption of equal variances was violated.
+Consequently, Welch’s ANOVA was used instead of the standard ANOVA, as it does not assume equal variances across groups.
+
+```{r prompt2.2}
+oneway.test(Engagement ~ Country, data = df2)
+oneway.test(TeamSeparation ~ Country, data = df2)
+```
+Welch’s ANOVA was conducted to examine whether engagement levels differ across countries. The results show a significant effect of country on engagement, F(3, 93.48) = 29.256, p < 0.001, indicating that engagement levels vary significantly between countries.
+Welch’s ANOVA was also conducted to test whether team turnover differs across countries. The results indicate a significant effect of country on team turnover, F(3, 98.76) = 3.446, p = 0.020.
 
 ### Post-hoc comparison table
 
 ```{r prompt2.3}
-
-
+install.packages("rstatix")
 ```
 
+
+```{r prompt2.3}
+library(rstatix)
+
+games_howell_test(df2, Engagement ~ Country)
+games_howell_test(df2, TeamSeparation ~ Country)
+```
+Post-hoc Games-Howell comparisons were conducted to identify which countries differed significantly. 
+For engagement, Spain showed significantly lower engagement scores compared with the UK, US, and Canada. No significant differences were observed among the UK, US, and Canada.
+For team turnover, Spain showed significantly higher turnover rates compared with the UK and the US. However, the difference between Spain and Canada was not statistically significant.
+
 ### Interpretation: Which country or countries should HR prioritize for further diagnosis, and why?
+The results indicate that Spain should be prioritised for further diagnosis. Teams in Spain exhibit significantly lower engagement levels compared with the UK, US, and Canada, and also show higher team turnover rates. This combination suggests that underlying organisational or cultural factors may be affecting employee engagement and contributing to higher turnover in Spain. 
+Consequently, HR should investigate potential drivers such as leadership practices, workload, work–life balance, or organisational culture in this country.
+
 
 # Prompt 3: Individual-Level Predictors of Voluntary Turnover
 
