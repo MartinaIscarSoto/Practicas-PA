@@ -401,7 +401,37 @@ cost_explained
 
 
 ```
+##Logistic regression results (Gender effect)
 
+The logistic regression model shows that gender is a statistically significant predictor of voluntary turnover. The coefficient for gender is negative and highly significant (p < 0.001), indicating that the probability of leaving differs between genders.
+
+This suggests that one gender is less likely to leave than the other, holding all else constant. In practical terms, this confirms that gender is associated with different turnover outcomes at the individual level.
+
+##Model fit and Nagelkerke R²
+
+The Nagelkerke R² value is approximately 0.024, meaning that gender alone explains about 2.4% of the variance in turnover.
+
+This indicates that, although gender is statistically significant, it is not a strong predictor on its own. Most of the variation in turnover is driven by other factors not included in this model.
+
+Therefore, gender has a real but limited explanatory power in understanding why employees leave.
+
+##Cost Calculation
+Using the Nagelkerke R² as an approximation, gender-related turnover accounts for about 2.4% of total turnover costs.
+
+Given an annual turnover cost of £4,000,000, this translates into:
+
+£4,000,000 × 0.024 = £96,000 per year
+
+This represents the potential financial impact associated with gender differences in turnover.
 ### Executive-style summary answering: Is there a strong enough business case to justify a targeted retention intervention?
+The analysis shows that gender is a statistically significant factor in predicting employee turnover, but it explains only a small proportion of the overall variance.
 
+Despite the modest explanatory power, the financial implications are still meaningful. Gender-related turnover may account for approximately £96,000 annually, suggesting that there is a moderate business case for targeted retention interventions.
+
+However, given that most turnover is driven by other factors, gender-focused initiatives should be part of a broader, more comprehensive retention strategy rather than a standalone solution.
 ### What cautions should HR keep in mind when interpreting these figures?
+HR should interpret these findings with caution. Although gender is identified as a statistically significant predictor of turnover, it explains only a small proportion of the overall variance (around 2.4%). This indicates that most of the factors driving employee turnover are not captured by this model and are likely related to other variables such as performance, engagement, leadership quality, career opportunities, or work–life balance.
+
+In addition, the analysis demonstrates an association between gender and turnover, but it does not establish a causal relationship. Therefore, it cannot be concluded that gender itself directly causes employees to leave, but rather that it may be linked to underlying organisational or structural factors.
+
+It is also important to recognise that some level of voluntary turnover can be functional and beneficial for the organisation, as it may allow for renewal of talent and improved performance. For this reason, HR should avoid interpreting these results in isolation and instead consider them as part of a broader, more comprehensive analysis of turnover drivers before designing targeted interventions.
