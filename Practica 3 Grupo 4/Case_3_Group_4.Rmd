@@ -721,3 +721,17 @@ Additionally, it is important to recognise that some level of voluntary turnover
 While gender is statistically associated with turnover, its explanatory power is limited. The evidence does not support a strong standalone business case for gender-based retention strategies.
 
 Instead, gender differences should be understood as part of a broader system of organisational factors, with engagement and performance-related conditions emerging as more meaningful drivers of turnover.
+
+## Executive synthesis
+
+Across the full analysis, employee turnover emerges as a multifactorial phenomenon driven primarily by team-level and contextual factors rather than individual demographics.
+
+While initial analyses identified differences in turnover across countries (Prompt 2) and gender (Prompt 3), these effects are relatively weak and inconsistent when examined in isolation. In contrast, subsequent models showed that variables such as performance appraisal and, more importantly, team engagement (Prompt 5), provide a more robust and meaningful explanation of turnover patterns.
+
+Additionally, the survival analysis (Prompt 4) revealed that turnover dynamics evolve over time, with differences between groups becoming more pronounced at later stages of tenure. This suggests that retention risk is not static but accumulates as employees progress through their lifecycle within the organisation.
+
+Taken together, the evidence indicates that demographic variables such as gender should not be interpreted as direct drivers of turnover, but rather as signals that may reflect deeper structural or organisational conditions. The most actionable insights point towards improving team environments, strengthening engagement, and addressing performance-related pressures.
+
+From a strategic HR perspective, the priority should therefore shift away from targeting specific demographic groups in isolation and towards designing systemic interventions that enhance the overall employee experience. This includes focusing on leadership quality, workload management, career development pathways, and team climate.
+
+In summary, the business case for intervention is strong—but it lies in addressing organisational drivers of turnover, not in demographic segmentation alone.
