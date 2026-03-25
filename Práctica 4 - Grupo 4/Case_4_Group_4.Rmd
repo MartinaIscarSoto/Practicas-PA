@@ -1,0 +1,270 @@
+---
+# this is the Rmarkdown header. Use the YAML syntax. ---YAML block ---.
+title: "Predicting Employee Performance" 
+subtitle: "Groupwork Use Case 4 - People Analytics"
+author: "Substitute Group_X by your Group number in the name of the .Rmd file"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    toc: true
+    toc_depth: 3
+    toc_float: true
+    code_folding: hide
+
+# the following lines tell R to store the output in the subdirectory reports
+knit: (function(inputFile, encoding) { 
+      rmarkdown::render(inputFile,
+                        encoding=encoding, 
+                        output_dir=file.path(dirname(inputFile),"report" )) }) 
+---
+
+# Intro
+
+In this workshop, you will explore multiple models to predict individual, team and organizational performance. You will apply multiple regression, stepwise regression, and dummy variable techniques to performance data from various sectors. Your goal is to derive actionable insights about what drives performance and how organizations can use these insights ethically and strategically.
+
+# Setup
+
+Within the project directory, create the following folders if they do not already exist:
+
+- **Databases**: to store all data sources provided in Moodle (Excel files).\
+- **data**: to store any ad-hoc data created during the analysis. The native R data format is .rds.\
+- **report**: to store the HTML output file generated when knitting the R Markdown file.
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse) 
+```
+
+# Prompt 1: Predicting Customer Loyalty (Financial Services)
+
+### Tasks
+
+-   Import 'customer_satisfaction.xlsx' into R (definitions of all fields are included in the 'variable key' worksheet within the Excel file).\
+-   Estimate a multiple regression model with Custloyalty as the dependent variable. Predictors: Sat1–Sat4 and SexOfSalesperson.\
+-   Interpret R², F-statistic and beta coefficients.\
+-   Recommend areas for sales improvement.\
+
+### Deliverables
+
+-   Model output and standardized coefficients.\
+-   Strategic recommendation for salesperson development
+
+## Solution
+
+### Model output and standardized coefficients
+
+```{r prompt1.1}
+
+
+```
+
+### Strategic recommendation for salesperson development
+
+
+# Prompt 2: Predicting Customer Reinvestment (Financial Services)
+
+### Tasks
+
+-   Import 'customer_satisfaction.xlsx' into R (definitions of all fields are included in the 'variable key' worksheet within the Excel file).\
+-   Replicate Prompt 1 using InvestMore as the dependent variable.\
+-   Compare results and R².\
+-   Discuss implications for upselling and cross-selling strategy.\
+
+
+### Deliverables
+
+-   Model summary and interpretation.\
+-   Recommendations on customer retention strategies.\
+
+## Solution
+
+### Model summary and interpretation
+
+```{r prompt2.1}
+
+
+```
+
+### Recommendations on customer retention strategies
+
+
+# Prompt 3: Linking Employee Engagement to Customer Loyalty
+
+### Tasks
+
+-   Import 'aggregate_sales_customer_loyalty.xlsx' into R (definitions of all fields are included in the 'variable key' worksheet within the Excel file).\
+-   Predict average customer loyalty per salesperson. Predictors: qEng1, qEng2, qMan1, Talent2014, Sex, Age, Manager.\
+-   Evaluate significance and limitations.\
+-   Discuss engagement-performance links.
+
+### Deliverables
+
+-   Regression output and interpretation.\
+-   Organizational insight and caveats.\
+
+## Solution
+
+### Regression output and interpretation
+
+```{r prompt3.1}
+
+
+```
+
+### Organizational insight and caveats
+
+
+# Prompt 4: Predicting Individual Performance Ratings (Manufacturing)
+
+### Tasks
+
+-   Import 'perf_2014_to_2015_sick_2014.xlsx' into R (definitions of all fields are included in the 'variable key' worksheet within the Excel file).\
+-   Predict 2015 performance using 2014 predictors. Variables: POS2014, DistJust2014, ProcJust2014, JOBSAT2014, ValueFit2014, JobStrain2014, SickDays2014.\
+-   Interpret R² and beta values.\
+-   Discuss what drives performance improvements.
+
+### Deliverables
+
+-   Model summary and insights.\
+-   HR recommendations based on findings.\
+
+
+## Solution
+
+### Model summary and insights
+
+```{r prompt4.1}
+
+
+```
+
+### HR recommendations based on findings
+
+# Prompt 5: Stepwise Regression for Performance Prediction
+
+### Tasks
+
+-   Import 'perf_2014_to_2015_sick_2014.xlsx' into R (definitions of all fields are included in the 'variable key' worksheet within the Excel file).\
+-   Use stepwise regression to select significant predictors.\
+-   Compare model fit with Prompt 4.\
+-   Evaluate parsimony and implications for policy.
+
+### Deliverables
+
+-   Stepwise model output.\
+-   Strategic use of simpler models in HR.\
+
+## Solution
+
+### Stepwise model output
+
+```{r prompt5.1}
+
+
+```
+
+### Strategic use of simpler models in HR
+
+# Prompt 6: Controlling for Prior Performance Ratings
+
+### Tasks
+
+-   Import 'perf_2014_to_2015_sick_2014.xlsx' into R (definitions of all fields are included in the 'variable key' worksheet within the Excel file).\
+-   Include 2014 performance rating as a predictor.\
+-   Identify whether other variables still predict 2015 performance.\
+-   Explain improvement prediction logic.
+
+### Deliverables
+
+-   Output with adjusted R² and key drivers.\
+-   Change-focused HR insight.\
+
+## Solution
+
+### Output with adjusted R² and key drivers
+
+```{r prompt6.1}
+
+
+```
+
+### Change-focused HR insight
+
+
+# Prompt 7: Predicting Sickness Absence
+
+### Tasks
+
+-   Import 'perf_2014_to_2015_sick_2014.xlsx' into R (definitions of all fields are included in the 'variable key' worksheet within the Excel file).\
+-   Switch dependent variable to SickDays2014.\
+-   Use attitude variables as predictors.\
+-   Analyze non-significant results and discuss potential.
+
+### Deliverables
+
+-   Regression output.\
+-   Interpretation and potential data limitations.\
+
+## Solution
+
+### Regression output
+
+```{r prompt7.1}
+
+
+```
+
+### Interpretation and potential data limitations
+
+
+# Prompt 8: Exploring Performance Patterns by Demographics
+
+### Tasks
+
+-   Import 'MI_data_perf.xlsx' into R (definitions of all fields are included in the 'variable key' worksheet within the Excel file).\
+-   Predict performance rating using SalaryBenchmark, Gender, AgeCat, TenureCat and Country dummies.\
+-   Highlight impact of gender and country.\
+-   Identify signs of bias in appraisal systems.
+
+### Deliverables
+
+-   Regression output.\
+-   Recommendations to improve fairness in performance evaluation.\
+
+## Solution
+
+### Regression output
+
+```{r prompt8.1}
+
+
+```
+
+### Recommendations to improve fairness in performance evaluation
+
+
+# Prompt 9: Predicting Checkout Performance by Demographics
+
+### Tasks
+
+-   Import 'supermarket_checkout.xlsx' into R (definitions of all fields are included in the 'variable key' worksheet within the Excel file).\
+-   Predict ScanPminute using Gender, education, tenure, store, and age.\
+-   Run model with age dummies to improve fit.\
+-   Discuss age-related productivity insights.\
+-   Address ethical concerns in applying the findings.
+
+### Deliverables
+
+-   Two models (with and without dummies).\
+-   Strategic and ethical recommendations for workforce planning.\
+
+## Solution
+
+### Two models (with and without dummies)
+
+```{r prompt9.1}
+
+
+```
+
+### Strategic and ethical recommendations for workforce planning
