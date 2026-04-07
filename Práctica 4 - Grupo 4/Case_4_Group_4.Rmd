@@ -104,7 +104,8 @@ Finally, the model indicates that customer loyalty is slightly higher when the s
 ### Model summary and interpretation
 
 ```{r prompt2.1}
-
+model2 <- lm(INvestMore ~ Sat1 + Sat2 + Sat3 + Sat4 + SexOfSalesperson, data = df1)
+summary(model2)
 
 ```
 
@@ -155,11 +156,11 @@ Finally, the model indicates that customer loyalty is slightly higher when the s
 
 ```{r prompt4.1}
 # Importar datos [cite: 31]
-df_perf <- read_excel("Databases/perf_2014_to_2015_sick_2014.xlsx")
+df_4 <- read_excel("Databases/perf_2014_to_2015_sick_2014.xlsx")
 
 # Modelo con predictores de actitud y salud [cite: 33]
 model4 <- lm(PerformanceRating2015 ~ POS2014 + DistJust2014 + ProcJust2014 + JOBSAT2014 + 
-               ValueFit2014 + JobStrain2014 + SickDays2014, data = df_perf)
+               ValueFit2014 + JobStrain2014 + SickDays2014, data = df_4)
 
 summary(model4)
 
@@ -214,7 +215,9 @@ summary(model5_step)
 
 ```{r prompt6.1}
 
-
+model6 <- lm(PerformanceRating2015 ~ PerformanceRating2014 + POS2014 + DistJust2014 + ProcJust2014 + 
+               JOBSAT2014 + ValueFit2014 + JobStrain2014 + SickDays2014, data = df_4)
+summary(model6)
 ```
 
 ### Change-focused HR insight
