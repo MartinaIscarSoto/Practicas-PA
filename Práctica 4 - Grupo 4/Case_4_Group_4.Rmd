@@ -26,11 +26,14 @@ In this workshop, you will explore multiple models to predict individual, team a
 
 Within the project directory, create the following folders if they do not already exist:
 
-- **Databases**: to store all data sources provided in Moodle (Excel files).\
-- **data**: to store any ad-hoc data created during the analysis. The native R data format is .rds.\
-- **report**: to store the HTML output file generated when knitting the R Markdown file.
+-   **Databases**: to store all data sources provided in Moodle (Excel files).\
+-   **data**: to store any ad-hoc data created during the analysis. The native R data format is .rds.\
+-   **report**: to store the HTML output file generated when knitting the R Markdown file.
 
 ```{r setup, include=FALSE}
+install.packages("tidyverse")
+install.packages("readxl")
+install.packages("lm.beta")
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse) 
 ```
@@ -54,12 +57,21 @@ library(tidyverse)
 ### Model output and standardized coefficients
 
 ```{r prompt1.1}
+library(readxl)
+library(lm.beta)
 
+# Carga de datos
+df1 <- read_excel("Databases/customer_satisfaction.xlsx")
 
+# Modelo
+model1 <- lm(Custloyalty ~ Sat1 + Sat2 + Sat3 + Sat4 + SexOfSalesperson, data = df1)
+summary(model1)
+
+# Coeficientes estandarizados
+lm.beta(model1)
 ```
 
 ### Strategic recommendation for salesperson development
-
 
 # Prompt 2: Predicting Customer Reinvestment (Financial Services)
 
@@ -69,7 +81,6 @@ library(tidyverse)
 -   Replicate Prompt 1 using InvestMore as the dependent variable.\
 -   Compare results and R².\
 -   Discuss implications for upselling and cross-selling strategy.\
-
 
 ### Deliverables
 
@@ -86,7 +97,6 @@ library(tidyverse)
 ```
 
 ### Recommendations on customer retention strategies
-
 
 # Prompt 3: Linking Employee Engagement to Customer Loyalty
 
@@ -113,7 +123,6 @@ library(tidyverse)
 
 ### Organizational insight and caveats
 
-
 # Prompt 4: Predicting Individual Performance Ratings (Manufacturing)
 
 ### Tasks
@@ -128,13 +137,19 @@ library(tidyverse)
 -   Model summary and insights.\
 -   HR recommendations based on findings.\
 
-
 ## Solution
 
 ### Model summary and insights
 
 ```{r prompt4.1}
+# Importar datos [cite: 31]
+df_perf <- read_excel("Databases/perf_2014_to_2015_sick_2014.xlsx")
 
+# Modelo con predictores de actitud y salud [cite: 33]
+model4 <- lm(PerformanceRating2015 ~ POS2014 + DistJust2014 + ProcJust2014 + JOBSAT2014 + 
+               ValueFit2014 + JobStrain2014 + SickDays2014, data = df_perf)
+
+summary(model4)
 
 ```
 
@@ -159,8 +174,10 @@ library(tidyverse)
 ### Stepwise model output
 
 ```{r prompt5.1}
+library(MASS)
 
-
+model5_step <- stepAIC(model4, direction = "both")
+summary(model5_step)
 ```
 
 ### Strategic use of simpler models in HR
@@ -190,7 +207,6 @@ library(tidyverse)
 
 ### Change-focused HR insight
 
-
 # Prompt 7: Predicting Sickness Absence
 
 ### Tasks
@@ -215,7 +231,6 @@ library(tidyverse)
 ```
 
 ### Interpretation and potential data limitations
-
 
 # Prompt 8: Exploring Performance Patterns by Demographics
 
@@ -242,7 +257,6 @@ library(tidyverse)
 
 ### Recommendations to improve fairness in performance evaluation
 
-
 # Prompt 9: Predicting Checkout Performance by Demographics
 
 ### Tasks
@@ -263,8 +277,22 @@ library(tidyverse)
 ### Two models (with and without dummies)
 
 ```{r prompt9.1}
+library(readxl)
 
+# Importar los datos del supermercado
+df_checkout <- read_excel("Databases/supermarket_checkout.xlsx")
 
+# MODELO 1: Sin dummies (Predecir ScanPminute usando la edad como tendencia lineal)
+# Usamos 'AgeVariable' asumiendo que es la edad en formato numérico continuo
+model9_sin_dummies <- lm(ScanPminute ~ Gender + educ + Weeks + Store + AgeVariable, data = df_checkout)
+
+# MODELO 2: Con dummies de edad para mejorar el ajuste
+# Usamos 'factor(AgeCAT)' para que R cree las dummies automáticamente usando las categorías de edad
+model9_con_dummies <- lm(ScanPminute ~ Gender + educ + Weeks + Store + factor(AgeCAT), data = df_checkout)
+
+# Resultados
+summary(model9_sin_dummies)
+summary(model9_con_dummies)
 ```
 
 ### Strategic and ethical recommendations for workforce planning
