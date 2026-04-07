@@ -195,6 +195,14 @@ summary(model5_step)
 
 ### Strategic use of simpler models in HR
 
+When comparing this stepwise model to the previous model, we observe the principle of parsimony in action. The stepwise regression algorithm automatically removed four non-significant predictors (JOBSAT, ValueFit, DistJust and ProcJust), leaving only three key variables: POS2014, JobStrain2014, and SickDays2014. Despite having fewer variables, the adjusted R\^2 slightly increased from 0.0675 to 0.0692. This means our simpler model is mathematically more efficient, explaining the variance in performance just as well by cutting out the statistical noise.
+
+This has an impact on HR strategies. If HR only needs to measure three variables instead of seven to predict performance, they can deploy much shorter employee surveys. This improves response rates and saves employees time.
+
+In addition, a simpler model provides management with actionable, targeted goals. Instead of trying to improve every aspect of the employee experience at once, HR leadership can channel their budget into just two main areas: implementing programs that increase Perceived Organizations Support and redesigning roles to reduce Job Strain.
+
+Lastly, it is much easier to explain a simple, three variable model to non-technical stakeholders and business leaders than complex model with multiple conflicting or insignificant metrics.
+
 # Prompt 6: Controlling for Prior Performance Ratings
 
 ### Tasks
