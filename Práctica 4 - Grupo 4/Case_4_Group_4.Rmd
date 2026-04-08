@@ -109,7 +109,85 @@ summary(model2)
 
 ```
 
+### Statistical Analysis & Interpretation
+
+-   $R^2$ value is **0.1704**. This indicates that only **17%** of the variance in a customer's intent to "Invest More" is explained by the model.
+
+-   **Comparison with Prompt 1:** This is significantly lower than the $R^2$ for Customer Loyalty (32.6%). This suggests that while satisfaction with a salesperson influences **loyalty** (emotional connection), the decision to **invest more money** is likely driven by external factors not in this model, such as interest rates, personal income, or product performance.
+
+-   **F-statistic:** 72.53 ($p < 2.2e-16$). Despite the lower $R^2$, the model is still statistically significant, meaning the predictors as a group do have a reliable relationship with the intent to reinvest.
+
+### **Significant Drivers (p \< 0.05)**
+
+-   **Sat1:** Understanding Your Needs (The "Consultant" Driver)
+
+    -   **Statistical Meaning:** With a coefficient of **0.175**, this is the strongest predictor of increased investment.
+
+        This measures **active listening and empathy**. Customers are most likely to increase their financial commitment when they feel the salesperson isn't just selling a product, but is accurately diagnosing their specific financial situation.
+
+-   **Sat3: Having a Recommendation (The "Guidance" Driver)**
+
+    -   **Statistical Meaning:** This is also highly significant (Coefficient **0.139**).
+
+        This measures **decisiveness and value-add**. It’s not enough to just understand the customer (Sat1); the salesperson must provide a clear "call to action" or a specific path forward. Customers invest more when they are given a clear direction rather than a list of overwhelming options.
+
+### **Non-Significant Drivers (p \> 0.05)**
+
+-   **Sat2: Confidence (The "Persona" Driver)**
+
+    -   **Statistical Meaning:** No significant impact on reinvestment.
+
+        Appearing confident does not translate into more capital from the client. This suggests that "surface-level" sales charisma is less important than the actual substance of the advice given.
+
+-   **Sat4: Knowledgeable (The "Expertise" Driver)**
+
+    -   **Statistical Meaning:** No significant impact.
+
+        This is a surprising but common finding in Financial Services. While a salesperson must be competent, "being knowledgeable" is often viewed as a **baseline requirement**. High knowledge alone doesn't inspire a customer to double their investment if the salesperson fails to apply that knowledge to the customer's specific needs (Sat1).
+
+-   **SexOfSalesperson:**
+
+    -   **Statistical Meaning:** Not significant ($p = 0.651$).
+
+        The gender of the salesperson has no bearing on the volume of capital a customer decides to reinvest.
+
 ### Recommendations on customer retention strategies
+
+Based on the regression analysis of customer behavior, the organization’s strategy must transition from providing **Information** to delivering **Actionable Insight**. While the current sales force is perceived as knowledgeable, technical expertise alone is not driving capital growth. To move customers from "uncertainty" to "doubling investment," the following four strategies are recommended:
+
+#### 1. Re-Focusing Sales Training:
+
+The data indicates that **Knowledge (Sat4)** is not a significant predictor of increased investment, whereas **Understanding Needs (Sat1)** is a primary driver. This suggests that customers view technical knowledge as a baseline requirement, not a reason to increase their financial commitment.
+
+-   **Strategy:** HR should pivot training away from memorization of product manuals.
+
+-   **Action:** Start workshops focused on **Active Listening**. We want our team to spend more time asking smart questions and less time reading from a script.
+
+#### 2. Implementation of a "Structured Recommendation" Protocol
+
+**Sat3 (Having a Recommendation)** emerged as a statistically significant driver of reinvestment ($p < 0.001$). Customers are more likely to commit more capital when they are provided with a clear path forward rather than a menu of options.
+
+-   **Strategy:** Empower the sales force to move beyond "informed service" into "bold advisory."
+
+<!-- -->
+
+-   **Action:** Establish a **"Next Best Action"** protocol. Every customer interaction must conclude with a specific, tailored recommendation. This way, by closing the gap between "what we offer" and "what you should do," the firm can capture the "Not Sure" segment of the customer base (CustomerLoyalty).
+
+#### 3. Leveraging Loyalty as a Lead Indicator for Wallet-Share
+
+The model for **Customer Loyalty (**$R^2 = 0.33$) is substantially stronger than the model for **Increased Investment (**$R^2 = 0.17$). This suggests that while salespeople have a high degree of influence over whether a customer stays with the firm, external market factors play a larger role in how much they invest. It is much easier for our team to make a customer **loyal** than it is to convince them to **double their money**. We should use "Friendliness" and "Understanding" to keep them in the door first
+
+-   **Strategy:** Build the relationship first. Once the customer trusts us (Loyalty), they are much more open to our recommendations for bigger investments.
+
+-   **Action:** Focus retention efforts on **Empathy and Needs-Matching** to secure loyalty first. Once a high "Loyalty Score" is achieved, trigger an automated or personal outreach focused on the "Recommendation" (Sat3) to bridge the gap from retention to upselling.
+
+#### 4. Evidence-Based Recruitment and Persona Optimization
+
+The analysis proves that **Confidence (Sat2)** and **Gender (SexOfSalesperson)** are statistically irrelevant to the customer's decision to invest more. The "traditional" high-confidence, high-pressure sales persona does not correlate with actual business growth in this sector.
+
+-   **Strategy:** Broaden the recruitment profile to prioritize behavioral competencies over sales stereotypes.
+
+-   **Action:** Adjust hiring criteria to look for people who are naturally good at empathy and analytical thinking. The ideal candidate is not necessarily the most "confident" in the room, but the one most capable of synthesizing client data into a coherent, persuasive recommendation.
 
 # Prompt 3: Linking Employee Engagement to Customer Loyalty
 
@@ -228,7 +306,39 @@ model6 <- lm(PerformanceRating2015 ~ PerformanceRating2014 + POS2014 + DistJust2
 summary(model6)
 ```
 
+-   **Model Fit:** The Adjusted $R^2$ is **0.2027**. This is a significant improvement from the model in Prompt 4 (which was only \~0.06). By including 2014 performance, we now explain about **20.3%** of the variance in 2015 performance.
+
+-   **The Power of Stability:** **PerformanceRating2014** is the strongest predictor ($Estimate = 0.370$, $p < 0.001$). This confirms that the best predictor of future performance is past performance.
+
+-   **Key Drivers of "Change":** Even after controlling for how well someone performed last year, two variables remain significant:
+
+    1.  **JobStrain2014 (**$p = 0.0107$): Interestingly, job strain has a positive coefficient (0.171). This suggests that in this manufacturing context, higher pressure is associated with higher performance ratings, possibly indicating a "high-performance/high-stress" culture.
+
+    2.  **SickDays2014 (**$p = 0.0357$): This has a negative impact. For every extra sick day taken in 2014, 2015 performance is expected to drop by 0.016 units, even if the employee was a high performer previously.
+
 ### Change-focused HR insight
+
+#### 1. Understanding "Performance Momentum"
+
+In HR analytics, adding a prior-year baseline changes the question from *"Who is a high performer?"* to **"What causes an employee's performance to improve or decline?"** Because past performance is so dominant, HR should focus less on variables that became non-significant (like Job Satisfaction or Value Fit) when trying to predict *short-term* performance changes. Those factors might matter for long-term retention, but they aren't the primary drivers of year-over-year performance swings in this dataset.
+
+#### 2. The Health-Performance Lingering Effect
+
+The significance of **SickDays2014** is a critical warning sign. It shows that health issues have a "carry-over" effect. An employee's illness last year predicts a decline in performance this year, regardless of their past talent level.
+
+-   **Strategy:** HR should view sick leave not just as a temporary absence, but as a lead indicator of future performance risk. "Well-being" programs should be framed as "Performance Protection" investments.
+
+#### 3. The Risk of the "Strain" Culture
+
+The model shows that **Job Strain** is linked to higher performance. While this might look "good" on a spreadsheet (higher stress = higher output), it is a dangerous management strategy.
+
+-   **Caveat:** If high performance is only achievable through high strain, the organization is likely heading toward burnout. HR must investigate if these high performers are also the ones taking more sick days. If so, the "gain" in performance from strain is being cancelled out by the "loss" in performance from health issues.
+
+#### 4. Precision Coaching
+
+By using this model, HR can identify "Outliers"—employees whose 2015 performance was much higher or lower than their 2014 baseline would suggest.
+
+-   **Action:** Instead of universal training, HR can target interventions. For example, if an employee’s performance dropped despite low sick days and low strain, managers can look into other "non-model" factors like a change in leadership or personal issues.
 
 # Prompt 7: Predicting Sickness Absence
 
