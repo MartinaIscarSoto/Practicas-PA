@@ -2,7 +2,7 @@
 # this is the Rmarkdown header. Use the YAML syntax. ---YAML block ---.
 title: "Predicting Employee Performance" 
 subtitle: "Groupwork Use Case 4 - People Analytics"
-author: "Substitute Group_X by your Group number in the name of the .Rmd file"
+author: "Ferrán Extremera, Irene Morales, Amalia Varo y Martina Iscar"
 date: "`r Sys.Date()`"
 output: 
   html_document:
@@ -31,11 +31,14 @@ Within the project directory, create the following folders if they do not alread
 -   **report**: to store the HTML output file generated when knitting the R Markdown file.
 
 ```{r setup, include=FALSE}
-install.packages("tidyverse")
-install.packages("readxl")
-install.packages("lm.beta")
+if (!require("tidyverse")) install.packages("tidyverse")
+if (!require("readxl")) install.packages("readxl")
+if (!require("lm.beta")) install.packages("lm.beta")
+
 knitr::opts_chunk$set(echo = TRUE)
-library(tidyverse) 
+library(tidyverse)
+library(readxl)
+library(lm.beta)
 ```
 
 # Prompt 1: Predicting Customer Loyalty (Financial Services)
@@ -71,11 +74,11 @@ summary(model1)
 lm.beta(model1)
 ```
 
-The R\^2 is 0.3257, which means that approximately 32.6% of the variance in customer loyalty is explained by this model. While there are other unknown factors influencing loyalty, capturing 33% of the variance with just 4 satisfaction metrics and the sex of the salesperson is meaningful in business.
+The $R^2$ is $0.3257$, which means that approximately $32.6%$ of the variance in customer loyalty is explained by this model. While there are other unknown factors influencing loyalty, capturing $33%$ of the variance with just 4 satisfaction metrics and the sex of the salesperson is meaningful in business.
 
-To continue, we can see that the F-statistic is 176.7 with a p-value\<2.2e-6. This means that the overall regression model is highly significant as a model.
+To continue, we can see that the F-statistic is $176.7$ with a $p-value<2.2e-6$. This means that the overall regression model is highly significant as a model.
 
-If we look at the beta coefficients we can see that Sat1 is 0.306, with a p-value\<2e-16 and Sat3 is 0.290, with a p-value\<2.2e-16. They are the most significant independent variables of the model. On the other hand, Sat2 is -0.0295 and Sat4 is 0.0475, which are not statistically significant at the 5% level, meaning changes in these areas do not clearly impact loyalty. Lastly, SexOfSalesperson is significant (p-value = 0.025), but it has a very weak effect size (beta= -0.043) compared to the significant satisfaction variables.
+If we look at the beta coefficients we can see that Sat1 is $0.306$, with a $p-value<2e-16$ and Sat3 is $0.290$, with a $p-value<2.2e-16$. They are the most significant independent variables of the model. On the other hand, Sat2 is $-0.0295$ and Sat4 is $0.0475$, which are not statistically significant at the $p-value = 0.025$), but it has a very weak effect size ($beta= -0.043$) compared to the significant satisfaction variables.
 
 ### Strategic recommendation for salesperson development
 
@@ -168,9 +171,6 @@ The data indicates that **Knowledge (Sat4)** is not a significant predictor of i
 **Sat3 (Having a Recommendation)** emerged as a statistically significant driver of reinvestment ($p < 0.001$). Customers are more likely to commit more capital when they are provided with a clear path forward rather than a menu of options.
 
 -   **Strategy:** Empower the sales force to move beyond "informed service" into "bold advisory."
-
-<!-- -->
-
 -   **Action:** Establish a **"Next Best Action"** protocol. Every customer interaction must conclude with a specific, tailored recommendation. This way, by closing the gap between "what we offer" and "what you should do," the firm can capture the "Not Sure" segment of the customer base (CustomerLoyalty).
 
 #### 3. Leveraging Loyalty as a Lead Indicator for Wallet-Share
@@ -282,26 +282,23 @@ plot(model_p3)
 par(mfrow = c(1, 1))
 
 ```
+
 A multiple linear regression was conducted to examine whether employee engagement and related employee characteristics predict average customer loyalty per salesperson. The dependent variable was customer loyalty (custloyalty_mean), and the predictors were q_Eng1, q_Eng2, q_Man1, Talent2014, Sex, Age, and Manager. After deletion of missing values, the analysis was based on 305 observations.
 
-Overall, the model was not statistically significant at the 5% level, F(7, 297) = 1.89, p = .070. The model explained only a small proportion of the variance in customer loyalty, with R^2 = .043 and adjusted R^2 = .020. In practical terms, this means the selected employee variables account for about 4.3% of the observed differences in average customer loyalty, which is weak explanatory power.
+Overall, the model was not statistically significant at the 5% level, F(7, 297) = 1.89, p = .070. The model explained only a small proportion of the variance in customer loyalty, with R\^2 = .043 and adjusted R\^2 = .020. In practical terms, this means the selected employee variables account for about 4.3% of the observed differences in average customer loyalty, which is weak explanatory power.
 
 At the individual predictor level, only qEng2 was a statistically significant predictor of customer loyalty, B = 0.141, SE = 0.051, t = 2.78, p = .006, 95% CI [0.041, 0.241]. This indicates that, holding the other variables constant, a one-unit increase in qEng2 is associated with an increase of about 0.14 points in average customer loyalty. This is the only variable for which the confidence interval does not cross zero.
 
 All other predictors were non-significant:
 
-q_Eng1: B = -0.011, p = .832
-q_Man1: B = -0.048, p = .271
-Talent2014: B = 0.007, p = .959
-Sex: B = -0.047, p = .677
-Age: B = -0.004, p = .530
-Manager: B = 0.195, p = .131
+q_Eng1: B = -0.011, p = .832 q_Man1: B = -0.048, p = .271 Talent2014: B = 0.007, p = .959 Sex: B = -0.047, p = .677 Age: B = -0.004, p = .530 Manager: B = 0.195, p = .131
 
 So, based on this model, there is no reliable evidence that q_Eng1, q_Man1, Talent2014, Sex, Age, or Manager uniquely predict customer loyalty once the other variables are controlled for. Manager status shows a positive coefficient, but it is not statistically significant, so it should not be presented as a real effect.
 
 The diagnostics do not suggest major technical problems with the model. Multicollinearity appears low, as all VIF values are close to 1 (roughly 1.04 to 1.54), so the predictors are not excessively overlapping. The Breusch–Pagan test is non-significant, p = .790, which suggests no evidence of heteroskedasticity. The Durbin–Watson statistic is 1.84 with p = .13, so there is no evidence of problematic autocorrelation. The residual plots are broadly acceptable, although the Q-Q plot shows some deviation in the tails and there are a few potentially unusual observations. That is not horrible, but it does mean normality is not perfect.
 
 ### Organizational insight and caveats
+
 The main finding is narrow: among the selected predictors, only q_Eng2 shows a significant positive association with customer loyalty. That gives limited support to the idea that employee engagement is linked to customer-facing performance. But the support is weak overall, because the full model is not statistically significant at the conventional 5% level and explains very little variance.
 
 That means the engagement–performance link should be discussed carefully. The safe conclusion is not “employee engagement drives customer loyalty” in a broad sense. The safe conclusion is: one specific engagement-related measure, q_Eng2, is positively associated with customer loyalty, but the broader set of engagement, management, demographic, and talent variables does not provide a strong overall prediction of customer loyalty in this model.
@@ -424,37 +421,39 @@ model6 <- lm(PerformanceRating2015 ~ PerformanceRating2014 + POS2014 + DistJust2
 summary(model6)
 ```
 
--   **Model Fit:** The Adjusted $R^2$ is **0.2027**. This is a significant improvement from the model in Prompt 4 (which was only \~0.06). By including 2014 performance, we now explain about **20.3%** of the variance in 2015 performance.
+The Adjusted $R^2$ is **0.2027**. This is a significant improvement from the model in Prompt 4 (which was only \~0.06). By including 2014 performance, we now explain about **20.3%** of the variance in 2015 performance.
 
--   **The Power of Stability:** **PerformanceRating2014** is the strongest predictor ($Estimate = 0.370$, $p < 0.001$). This confirms that the best predictor of future performance is past performance.
+**PerformanceRating2014** is the strongest predictor ($Estimate = 0.370$, $p < 0.001$). This confirms that the best predictor of future performance is past performance.
 
--   **Key Drivers of "Change":** Even after controlling for how well someone performed last year, two variables remain significant:
+**Key Drivers:** Even after controlling for how well someone performed last year, two variables remain significant:
 
-    1.  **JobStrain2014 (**$p = 0.0107$): Interestingly, job strain has a positive coefficient (0.171). This suggests that in this manufacturing context, higher pressure is associated with higher performance ratings, possibly indicating a "high-performance/high-stress" culture.
+1.  **JobStrain2014 (**$p = 0.0107$): Interestingly, job strain has a positive coefficient (0.171). This suggests that in this manufacturing context, higher pressure is associated with higher performance ratings, possibly indicating a "high-performance/high-stress" culture.
 
-    2.  **SickDays2014 (**$p = 0.0357$): This has a negative impact. For every extra sick day taken in 2014, 2015 performance is expected to drop by 0.016 units, even if the employee was a high performer previously.
+2.  **SickDays2014 (**$p = 0.0357$): This has a negative impact. For every extra sick day taken in 2014, 2015 performance is expected to drop by 0.016 units, even if the employee was a high performer previously.
 
 ### Change-focused HR insight
 
+There are 4 main points to the change in focus in HR based on the insight.
+
 #### 1. Understanding "Performance Momentum"
 
-In HR analytics, adding a prior-year baseline changes the question from *"Who is a high performer?"* to **"What causes an employee's performance to improve or decline?"** Because past performance is so dominant, HR should focus less on variables that became non-significant (like Job Satisfaction or Value Fit) when trying to predict *short-term* performance changes. Those factors might matter for long-term retention, but they aren't the primary drivers of year-over-year performance swings in this dataset.
+In HR analytics, adding a prior-year baseline changes the question from "Who is a high performer?" to **"What causes an employee's performance to improve or decline?"** Because past performance is so dominant, HR should focus less on variables that became non-significant (like Job Satisfaction or Value Fit) when trying to predict *short-term* performance changes. Those factors might matter for long-term retention, but they aren't the primary drivers of year-over-year performance swings in this dataset.
 
-#### 2. The Health-Performance Lingering Effect
+#### 2. The Health-Performance Effect
 
-The significance of **SickDays2014** is a critical warning sign. It shows that health issues have a "carry-over" effect. An employee's illness last year predicts a decline in performance this year, regardless of their past talent level.
+The significance of **SickDays2014** is a critical warning sign. It shows that health issues have a lingering effect. An employee's illness last year predicts a decline in performance this year, regardless of their past talent level.
 
 -   **Strategy:** HR should view sick leave not just as a temporary absence, but as a lead indicator of future performance risk. "Well-being" programs should be framed as "Performance Protection" investments.
 
 #### 3. The Risk of the "Strain" Culture
 
-The model shows that **Job Strain** is linked to higher performance. While this might look "good" on a spreadsheet (higher stress = higher output), it is a dangerous management strategy.
+The model shows that **Job Strain** is linked to higher performance. It is a dangerous management strategy.
 
--   **Caveat:** If high performance is only achievable through high strain, the organization is likely heading toward burnout. HR must investigate if these high performers are also the ones taking more sick days. If so, the "gain" in performance from strain is being cancelled out by the "loss" in performance from health issues.
+-   If high performance is only achievable through high strain, the organization is likely heading toward burnout. HR must investigate if these high performers are also the ones taking more sick days. If so, the "gain" in performance from strain is being cancelled out by the "loss" in performance from health issues.
 
 #### 4. Precision Coaching
 
-By using this model, HR can identify "Outliers"—employees whose 2015 performance was much higher or lower than their 2014 baseline would suggest.
+By using this model, HR can identify employees whose 2015 performance was much higher or lower than their 2014 baseline would suggest.
 
 -   **Action:** Instead of universal training, HR can target interventions. For example, if an employee’s performance dropped despite low sick days and low strain, managers can look into other "non-model" factors like a change in leadership or personal issues.
 
@@ -495,7 +494,7 @@ summary(df_7)
 
 # 2) Keep only variables needed for Prompt 7
 p7 <- df_7 %>%
-  select(
+  dplyr::select( # <--- Forzamos a usar dplyr
     sick_days2014,
     pos2014,
     dist_just2014,
@@ -536,27 +535,25 @@ plot(model_p7)
 par(mfrow = c(1, 1))
 
 ```
+
 A multiple linear regression was conducted to examine whether employee attitude variables predict sickness absence in 2014. The dependent variable was sick_days2014, and the predictors were pos2014, dist_just2014, proc_just2014, jobsat2014, value_fit2014, and job_strain2014. After listwise deletion of missing values, the analysis was based on 272 observations.
 
 Overall, the model was not statistically significant at the 5% level, F(6, 265) = 2.05, p = .060. It explained only a small proportion of the variance in sickness absence, with R² = .044 and adjusted R² = .023. In practical terms, the predictors account for about 4.4% of the variation in sick days, which is weak explanatory power.
 
 At the individual predictor level, two variables were statistically significant:
 
-POS2014: B = 1.811, SE = 0.860, t = 2.11, p = .036, 95% CI [0.119, 3.503]
-JobStrain2014: B = 0.928, SE = 0.470, t = 1.97, p = .049, 95% CI [0.002, 1.854]
+POS2014: B = 1.811, SE = 0.860, t = 2.11, p = .036, 95% CI [0.119, 3.503] JobStrain2014: B = 0.928, SE = 0.470, t = 1.97, p = .049, 95% CI [0.002, 1.854]
 
 Holding the other variables constant, higher POS2014 scores were associated with more sick days, and higher JobStrain2014 scores were also associated with more sick days. The result for job strain is conceptually plausible. The result for perceived organizational support is less intuitive and should be interpreted cautiously, especially given the weakness of the overall model.
 
 The remaining predictors were not significant:
 
-DistJust2014: B = 0.150, p = .820
-ProcJust2014: B = -1.180, p = .202
-JOBSAT2014: B = -1.110, p = .100
-ValueFit2014: B = 1.045, p = .170
+DistJust2014: B = 0.150, p = .820 ProcJust2014: B = -1.180, p = .202 JOBSAT2014: B = -1.110, p = .100 ValueFit2014: B = 1.045, p = .170
 
 So there is no strong evidence that distributive justice, procedural justice, job satisfaction, or value fit uniquely predict sickness absence in this model.
 
 ### Interpretation and potential data limitations
+
 The main conclusion is that the model is weak and only marginal overall. Even though POS2014 and JobStrain2014 are individually significant at the 5% level, the overall regression misses conventional significance and the explained variance is very low. That means the safe interpretation is not that attitudes strongly predict absence. The safe interpretation is narrower: there is limited evidence that some attitude variables may be associated with sickness absence, but the model as a whole does not provide strong predictive power.
 
 The result for job strain is the most defensible substantively. A positive coefficient suggests that employees with higher job strain tend to have more sick days, which is consistent with the idea that strain may contribute to absenteeism. By contrast, the positive effect for perceived organizational support is harder to explain theoretically and may reflect noise, omitted variables, suppression effects, or instability in the model rather than a meaningful organizational pattern.
@@ -571,14 +568,7 @@ Second, there is substantial missing data. The original file has 626 observation
 
 Third, sickness absence is influenced by many factors not included in the model, such as:
 
-physical or mental health,
-chronic conditions,
-family responsibilities,
-job type and physical demands,
-workplace safety,
-absence policy,
-manager behavior,
-seasonality or acute illness.
+physical or mental health, chronic conditions, family responsibilities, job type and physical demands, workplace safety, absence policy, manager behavior, seasonality or acute illness.
 
 So low explanatory power is not surprising.
 

@@ -151,7 +151,7 @@ Conclusions of 3-factor selection:
 
 \- Clean Structure: Your variables group perfectly by their naming convention (Eng vs. pos), showing excellent convergent and discriminant validity.
 
- - High Explained Variance: Together, the first two factors (MR1 and MR2) explain 65.3% of the total variance in your data, which is a very respectable result for social science research.
+-   High Explained Variance: Together, the first two factors (MR1 and MR2) explain 65.3% of the total variance in your data, which is a very respectable result for social science research.
 
 After realizing the 3-factor model should be discarded, we do the 2-factor EFA:
 
@@ -187,8 +187,7 @@ The Parallel Analysis compares the actual data against a random simulation to en
 
 <!-- -->
 
--   **We also did the Inter-Factor Correlation (0.258):** This is the most critical finding.
-    It proves that Identity and Support are separate tracks: Loving the company mission (Identity) does not guarantee the employee feels cared for (Support). 
+-   **We also did the Inter-Factor Correlation (0.258):** This is the most critical finding. It proves that Identity and Support are separate tracks: Loving the company mission (Identity) does not guarantee the employee feels cared for (Support). 
 
 The Factor Loadings revealed the strength of the "affinity" between each question and its parent factor. 
 
@@ -256,9 +255,7 @@ The "Sacrifice" Trap: When Identity dominates Support, culture often becomes one
 
 **Immediate HR Mitigation Strategy:**
 
--   To target MR1 improvements.
-    The primary HR goal should be Culture-Building.
-    The company should double down on **mission-driven storytelling** and **brand ambassadorship**.
+-   To target MR1 improvements. The primary HR goal should be Culture-Building. The company should double down on **mission-driven storytelling** and **brand ambassadorship**.
 
 <!-- -->
 
