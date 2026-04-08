@@ -71,19 +71,19 @@ summary(model1)
 lm.beta(model1)
 ```
 
-The R\^2 is 0.3257, which means that approximately 32.6% of the variance in customer loyalty is explained by this model. While there are other unknown factors influencing loyalty, capturing a 33% of the variance with just 4 satisfaction metrics and the sex of the sales person is meaningful in business.
+The R\^2 is 0.3257, which means that approximately 32.6% of the variance in customer loyalty is explained by this model. While there are other unknown factors influencing loyalty, capturing 33% of the variance with just 4 satisfaction metrics and the sex of the salesperson is meaningful in business.
 
-To continue, we can see that F-statistic is 176.7 with a p-value\<2.2e-6. This means that the overall regression model is highly significant as a model.
+To continue, we can see that the F-statistic is 176.7 with a p-value\<2.2e-6. This means that the overall regression model is highly significant as a model.
 
-If we look at the beta coefficientes we can see that Sat1 is 0.306, with a p_value\<2e-16 and Sat3 is 0.290, with a p_value\<2.2e-6. They are the most significant independent variables of the model. On the other hand, Sat2 is -0.0295 and Sat4 is 0.0475, which are not statistically significant at the 5% level, meaning changes in these areas do not clearly impact loyalty. Lastly, SexOfSalesperson is significant (p_value = 0.025) than Sat2 and Sat3 but not as Sat1 and Sat3. In addition, it has a very weak effect size (beta = -0.043) compared to the satisfaction variables.
+If we look at the beta coefficients we can see that Sat1 is 0.306, with a p-value\<2e-16 and Sat3 is 0.290, with a p-value\<2.2e-16. They are the most significant independent variables of the model. On the other hand, Sat2 is -0.0295 and Sat4 is 0.0475, which are not statistically significant at the 5% level, meaning changes in these areas do not clearly impact loyalty. Lastly, SexOfSalesperson is significant (p-value = 0.025), but it has a very weak effect size (beta= -0.043) compared to the significant satisfaction variables.
 
 ### Strategic recommendation for salesperson development
 
-Based on the model, we observe that having a salesperson who understrands the customer's needs and is friendly are the variables that most positively affect customer loyalty. In other words, the more friendly and able to understand customer needs the employees are, the more customers the company will be able to grow and retain customers.
+Based on the model, we observe that having a salesperson who understands the customer's needs and is friendly are the variables that most positively affect customer loyalty. In other words, the more friendly and able to understand customer needs the employees are, the more the company will be able to grow and retain its customer base.
 
 On the other hand, whether the salesperson seems very confident or whether they are highly knowledgeable does not have a statistically significant impact on loyalty. While seeming overly confident even showed a slight negative trend, it is not a defining factor. Therefore, we recommend that the company should not focus resources on developing pure technical knowledge, but rather prioritize active listening, empathy and a welcoming attitude.
 
-Finally, the model indicates that customer loyalty is slightly higher when the salesperson is female rather than male. To leverage this insight, the company could implement mentoring program where top-performing salespeople share their best practices so that the entire sales force can learn from the company's most successful employees.
+Finally, the model indicates that customer loyalty is slightly higher when the salesperson is female rather than male. To leverage this insight, the company could implement a mentoring program where top-performing salespeople share their best practices so that the entire sales force can learn from the company's most successful employees.
 
 # Prompt 2: Predicting Customer Reinvestment (Financial Services)
 
@@ -195,13 +195,13 @@ summary(model5_step)
 
 ### Strategic use of simpler models in HR
 
-When comparing this stepwise model to the previous model, we observe the principle of parsimony in action. The stepwise regression algorithm automatically removed four non-significant predictors (JOBSAT, ValueFit, DistJust and ProcJust), leaving only three key variables: POS2014, JobStrain2014, and SickDays2014. Despite having fewer variables, the adjusted R\^2 slightly increased from 0.0675 to 0.0692. This means our simpler model is mathematically more efficient, explaining the variance in performance just as well by cutting out the statistical noise.
+When comparing this stepwise model to the previous model, we observe the principle of model efficiency. The stepwise regression algorithm automatically removed four non-significant predictors (JOBSAT, ValueFit, DistJust and ProcJust), leaving only three key variables: POS2014, JobStrain2014, and SickDays2014. Despite having fewer variables, the adjusted R\^2 slightly increased from 0.0675 to 0.0692. This means our simpler model is mathematically more efficient, explaining the variance in performance just as well by cutting out the statistical noise.
 
 This has an impact on HR strategies. If HR only needs to measure three variables instead of seven to predict performance, they can deploy much shorter employee surveys. This improves response rates and saves employees time.
 
-In addition, a simpler model provides management with actionable, targeted goals. Instead of trying to improve every aspect of the employee experience at once, HR leadership can channel their budget into just two main areas: implementing programs that increase Perceived Organizations Support and redesigning roles to reduce Job Strain.
+In addition, a simpler model provides management with actionable, targeted goals. Instead of trying to improve every aspect of the employee experience at once, HR leadership can channel their budget into just two main areas: implementing programs that increase Perceived Organizational Support and redesigning roles to reduce Job Strain.
 
-Lastly, it is much easier to explain a simple, three variable model to non-technical stakeholders and business leaders than complex model with multiple conflicting or insignificant metrics.
+Lastly, it is much easier to explain a simple, three-variable model to non-technical stakeholders and business leaders than a complex model with multiple conflicting or insignificant metrics.
 
 # Prompt 6: Controlling for Prior Performance Ratings
 
@@ -306,12 +306,11 @@ library(readxl)
 df_checkout <- read_excel("Databases/supermarket_checkout.xlsx")
 
 # MODELO 1: Sin dummies (Predecir ScanPminute usando la edad como tendencia lineal)
-# Usamos 'AgeVariable' asumiendo que es la edad en formato numérico continuo
 model9_sin_dummies <- lm(ScanPminute ~ Gender + educ + Weeks + Store + AgeVariable, data = df_checkout)
 
-# MODELO 2: Con dummies de edad para mejorar el ajuste
-# Usamos 'factor(AgeCAT)' para que R cree las dummies automáticamente usando las categorías de edad
-model9_con_dummies <- lm(ScanPminute ~ Gender + educ + Weeks + Store + factor(AgeCAT), data = df_checkout)
+# MODELO 2: Con dummies de edad (Usando las columnas que ya vienen en el Excel)
+# Dejamos fuera 'age1' para que sirva como nuestra categoría de referencia base
+model9_con_dummies <- lm(ScanPminute ~ Gender + educ + Weeks + Store + age2 + age3 + age4 + age5 + age6 + age7 + age8 + age9 + age10, data = df_checkout)
 
 # Resultados
 summary(model9_sin_dummies)
@@ -319,3 +318,17 @@ summary(model9_con_dummies)
 ```
 
 ### Strategic and ethical recommendations for workforce planning
+
+When comparing both models, it is clear that Model 2 is significantly better. Its adjusted R\^2 is 0.3832 compared to 0.2485 in Model 1, demonstrating that the age variable does not have a linear relationship with productivity. By adding age brackets, we see that while a linear age variable was not significant, specific age categories are highly significant. Productivity peaks mid-career, specifically for employees in the age4 and age6, who show the highest increases in items scanned per minute (+7.944 and +7.313) compared to the youngest cohort. Interestingly, the oldest cohort (age10) is not significant, meaning their scanning speed is statistically comparable to the youngest entry-level cashiers.
+
+Regarding other variables, weeks positively impacts productivity, while higher education levels slightly decrease scanning speed (which could indicate overqualification or lower job engagement). Finally, gender is a significant factor, with women scanning approximately 2.76 more items per minute than men.
+
+-   Ethical recommendations: management must not use these findings to filter out male candidates, exclusively hire middle-age workers, or segregate demographics into different supermarket roles. Using demographics to restrict hiring or influence job placement violates equal opportunity employment laws and introduces systemic bias. Performance should always be evaluated on an individual basis, not predicted by demographic group membership.
+
+-   Strategic recommendations:
+
+    -   Instead of restricting hiring, the company should identify the specific techniques that make the middle-aged and female faster. By identifying these efficient behaviors, the company can standardize these methods and integrate them into the core onboarding program for all new hires.
+
+    -   The performance gap could be related to the physical design of the checkout counter. HR and Operations should investigate if the current scanner height or bagging area reach inadvertently favors certain physical profiles. Improving workstation ergonomics could naturally boost the speed of all cashiers and reduce fatigue.
+
+    -   To manage the store effectively, management should use performance data to balance shifts. Pairing high-efficiency mid-career cashiers with developing staff during peak hours ensures that customer wait times remain low, bottlenecks are avoided, and slower employees have opportunities for on-the-job observational learning.
