@@ -208,11 +208,109 @@ The analysis proves that **Confidence (Sat2)** and **Gender (SexOfSalesperson)**
 ### Regression output and interpretation
 
 ```{r prompt3.1}
+# Packages
+library(readxl)
+library(dplyr)
+library(janitor)
+library(broom)
+library(car)
+library(lmtest)
 
+# 1) Import data
+sales <- read_excel("Databases/aggregate_sales_customer_loyalty.xlsx", sheet = "data") %>%
+  clean_names()
+
+# Quick checks
+names(sales)
+str(sales)
+summary(sales)
+
+# 2) Keep only variables needed for Prompt 3
+p3 <- sales %>%
+  select(
+    custloyalty_mean,
+    q_eng1,
+    q_eng2,
+    q_man1,
+    talent2014,
+    sex,
+    age,
+    manager
+  )
+
+# 3) Recode categorical variables if needed
+# Sex is almost certainly categorical
+p3 <- p3 %>%
+  mutate(
+    sex = as.factor(sex)
+  )
+
+# Manager may be coded as 0/1 or Yes/No; treat as factor if it is categorical
+if (length(unique(na.omit(p3$manager))) <= 5) {
+  p3 <- p3 %>% mutate(manager = as.factor(manager))
+}
+
+# 4) Remove missing values in model variables
+p3 <- p3 %>% na.omit()
+
+# Check sample size used
+nrow(p3)
+
+# 5) Fit regression model
+model_p3 <- lm(
+  custloyalty_mean ~ q_eng1 + q_eng2 + q_man1 + talent2014 + sex + age + manager,
+  data = p3
+)
+
+# 6) Main regression output
+summary(model_p3)
+
+# 7) Coefficient table with confidence intervals
+tidy(model_p3, conf.int = TRUE)
+
+# 8) Overall model fit
+glance(model_p3)
+
+# 9) Diagnostics relevant for limitations
+vif(model_p3)                 # multicollinearity
+bptest(model_p3)              # heteroskedasticity
+durbinWatsonTest(model_p3)    # autocorrelation check
+
+# 10) Standard diagnostic plots
+par(mfrow = c(2, 2))
+plot(model_p3)
+par(mfrow = c(1, 1))
 
 ```
+A multiple linear regression was conducted to examine whether employee engagement and related employee characteristics predict average customer loyalty per salesperson. The dependent variable was customer loyalty (custloyalty_mean), and the predictors were q_Eng1, q_Eng2, q_Man1, Talent2014, Sex, Age, and Manager. After deletion of missing values, the analysis was based on 305 observations.
+
+Overall, the model was not statistically significant at the 5% level, F(7, 297) = 1.89, p = .070. The model explained only a small proportion of the variance in customer loyalty, with R^2 = .043 and adjusted R^2 = .020. In practical terms, this means the selected employee variables account for about 4.3% of the observed differences in average customer loyalty, which is weak explanatory power.
+
+At the individual predictor level, only qEng2 was a statistically significant predictor of customer loyalty, B = 0.141, SE = 0.051, t = 2.78, p = .006, 95% CI [0.041, 0.241]. This indicates that, holding the other variables constant, a one-unit increase in qEng2 is associated with an increase of about 0.14 points in average customer loyalty. This is the only variable for which the confidence interval does not cross zero.
+
+All other predictors were non-significant:
+
+q_Eng1: B = -0.011, p = .832
+q_Man1: B = -0.048, p = .271
+Talent2014: B = 0.007, p = .959
+Sex: B = -0.047, p = .677
+Age: B = -0.004, p = .530
+Manager: B = 0.195, p = .131
+
+So, based on this model, there is no reliable evidence that q_Eng1, q_Man1, Talent2014, Sex, Age, or Manager uniquely predict customer loyalty once the other variables are controlled for. Manager status shows a positive coefficient, but it is not statistically significant, so it should not be presented as a real effect.
+
+The diagnostics do not suggest major technical problems with the model. Multicollinearity appears low, as all VIF values are close to 1 (roughly 1.04 to 1.54), so the predictors are not excessively overlapping. The Breusch–Pagan test is non-significant, p = .790, which suggests no evidence of heteroskedasticity. The Durbin–Watson statistic is 1.84 with p = .13, so there is no evidence of problematic autocorrelation. The residual plots are broadly acceptable, although the Q-Q plot shows some deviation in the tails and there are a few potentially unusual observations. That is not horrible, but it does mean normality is not perfect.
 
 ### Organizational insight and caveats
+The main finding is narrow: among the selected predictors, only q_Eng2 shows a significant positive association with customer loyalty. That gives limited support to the idea that employee engagement is linked to customer-facing performance. But the support is weak overall, because the full model is not statistically significant at the conventional 5% level and explains very little variance.
+
+That means the engagement–performance link should be discussed carefully. The safe conclusion is not “employee engagement drives customer loyalty” in a broad sense. The safe conclusion is: one specific engagement-related measure, q_Eng2, is positively associated with customer loyalty, but the broader set of engagement, management, demographic, and talent variables does not provide a strong overall prediction of customer loyalty in this model.
+
+Organizationally, this suggests two things. First, there may be some value in paying attention to the aspect captured by q_Eng2, because it is the only variable that stands out. Second, customer loyalty is likely influenced much more strongly by other factors not included here, such as customer mix, territory, salesperson skill, service quality, prior client relationship strength, or direct customer experience variables. So this model does not justify strong HR interventions based solely on these results.
+
+The biggest limitation is the amount of missing data. The original dataset has 574 rows, but the regression uses only 305, meaning a large share of cases was dropped. That is not a minor detail. It raises the possibility that the usable sample is not fully representative of the full dataset, and it reduces statistical power. Also, this is an observational cross-sectional regression, so it cannot establish causality. Even for q_Eng2, the result is an association, not proof that improving that engagement dimension would necessarily increase customer loyalty.
+
+Overall, the analysis provides only limited evidence of an engagement–performance link: q_Eng2 is positively related to customer loyalty, but the model as a whole is weak, most predictors are non-significant, and the findings should be interpreted cautiously due to low explanatory power and substantial missing data.
 
 # Prompt 4: Predicting Individual Performance Ratings (Manufacturing)
 
@@ -379,11 +477,112 @@ By using this model, HR can identify "Outliers"—employees whose 2015 performan
 ### Regression output
 
 ```{r prompt7.1}
+library(readxl)
+library(dplyr)
+library(janitor)
+library(broom)
+library(car)
+library(lmtest)
 
+# 1) Import data
+df_7 <- read_excel("Databases/perf_2014_to_2015_sick_2014.xlsx", sheet = "data") %>%
+  clean_names()
+
+# Quick checks
+names(df_7)
+str(df_7)
+summary(df_7)
+
+# 2) Keep only variables needed for Prompt 7
+p7 <- df_7 %>%
+  select(
+    sick_days2014,
+    pos2014,
+    dist_just2014,
+    proc_just2014,
+    jobsat2014,
+    value_fit2014,
+    job_strain2014
+  ) %>%
+  na.omit()
+
+# Check sample size used
+nrow(p7)
+
+# 3) Fit regression model
+model_p7 <- lm(
+  sick_days2014 ~ pos2014 + dist_just2014 + proc_just2014 +
+    jobsat2014 + value_fit2014 + job_strain2014,
+  data = p7
+)
+
+# 4) Main regression output
+summary(model_p7)
+
+# 5) Coefficient table with confidence intervals
+tidy(model_p7, conf.int = TRUE)
+
+# 6) Overall model fit
+glance(model_p7)
+
+# 7) Diagnostics
+vif(model_p7)
+bptest(model_p7)
+durbinWatsonTest(model_p7)
+
+# 8) Diagnostic plots
+par(mfrow = c(2, 2))
+plot(model_p7)
+par(mfrow = c(1, 1))
 
 ```
+A multiple linear regression was conducted to examine whether employee attitude variables predict sickness absence in 2014. The dependent variable was sick_days2014, and the predictors were pos2014, dist_just2014, proc_just2014, jobsat2014, value_fit2014, and job_strain2014. After listwise deletion of missing values, the analysis was based on 272 observations.
+
+Overall, the model was not statistically significant at the 5% level, F(6, 265) = 2.05, p = .060. It explained only a small proportion of the variance in sickness absence, with R² = .044 and adjusted R² = .023. In practical terms, the predictors account for about 4.4% of the variation in sick days, which is weak explanatory power.
+
+At the individual predictor level, two variables were statistically significant:
+
+POS2014: B = 1.811, SE = 0.860, t = 2.11, p = .036, 95% CI [0.119, 3.503]
+JobStrain2014: B = 0.928, SE = 0.470, t = 1.97, p = .049, 95% CI [0.002, 1.854]
+
+Holding the other variables constant, higher POS2014 scores were associated with more sick days, and higher JobStrain2014 scores were also associated with more sick days. The result for job strain is conceptually plausible. The result for perceived organizational support is less intuitive and should be interpreted cautiously, especially given the weakness of the overall model.
+
+The remaining predictors were not significant:
+
+DistJust2014: B = 0.150, p = .820
+ProcJust2014: B = -1.180, p = .202
+JOBSAT2014: B = -1.110, p = .100
+ValueFit2014: B = 1.045, p = .170
+
+So there is no strong evidence that distributive justice, procedural justice, job satisfaction, or value fit uniquely predict sickness absence in this model.
 
 ### Interpretation and potential data limitations
+The main conclusion is that the model is weak and only marginal overall. Even though POS2014 and JobStrain2014 are individually significant at the 5% level, the overall regression misses conventional significance and the explained variance is very low. That means the safe interpretation is not that attitudes strongly predict absence. The safe interpretation is narrower: there is limited evidence that some attitude variables may be associated with sickness absence, but the model as a whole does not provide strong predictive power.
+
+The result for job strain is the most defensible substantively. A positive coefficient suggests that employees with higher job strain tend to have more sick days, which is consistent with the idea that strain may contribute to absenteeism. By contrast, the positive effect for perceived organizational support is harder to explain theoretically and may reflect noise, omitted variables, suppression effects, or instability in the model rather than a meaningful organizational pattern.
+
+The non-significant results are important. They suggest that, in this dataset, justice perceptions, job satisfaction, and value fit do not show strong unique links with sickness absence once the variables are entered together. That does not prove these attitudes are irrelevant in general. It only shows that they are not strong standalone predictors here.
+
+There are several important limitations.
+
+First, the outcome variable is a poor fit for ordinary linear regression. sick_days2014 is highly skewed: the median is 0, the upper tail is extreme, and the maximum is 182 days. The residual plots clearly show strong non-normality, visible right-tail outliers, and influential observations. So even though the Breusch–Pagan test is non-significant (p = .318) and the Durbin–Watson result is fine (DW = 2.03, p = .932), the diagnostic plots indicate that the OLS assumptions are not well met. This matters more than the formal tests here.
+
+Second, there is substantial missing data. The original file has 626 observations, but the model uses only 272 (due to elimination of na values). That is a major loss of data and may reduce power and distort representativeness.
+
+Third, sickness absence is influenced by many factors not included in the model, such as:
+
+physical or mental health,
+chronic conditions,
+family responsibilities,
+job type and physical demands,
+workplace safety,
+absence policy,
+manager behavior,
+seasonality or acute illness.
+
+So low explanatory power is not surprising.
+
+Overall, Prompt 7 provides only limited evidence that attitude variables predict sickness absence. Job strain shows a small positive association with sick days, and POS2014 is also positive, but the model is weak overall, explains very little variance, and is affected by substantial missing data and a highly skewed dependent variable. The results should therefore be interpreted cautiously, and sickness absence is likely to require different predictors and possibly a different modeling approach.
 
 # Prompt 8: Exploring Performance Patterns by Demographics
 
