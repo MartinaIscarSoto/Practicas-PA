@@ -306,12 +306,11 @@ library(readxl)
 df_checkout <- read_excel("Databases/supermarket_checkout.xlsx")
 
 # MODELO 1: Sin dummies (Predecir ScanPminute usando la edad como tendencia lineal)
-# Usamos 'AgeVariable' asumiendo que es la edad en formato numérico continuo
 model9_sin_dummies <- lm(ScanPminute ~ Gender + educ + Weeks + Store + AgeVariable, data = df_checkout)
 
-# MODELO 2: Con dummies de edad para mejorar el ajuste
-# Usamos 'factor(AgeCAT)' para que R cree las dummies automáticamente usando las categorías de edad
-model9_con_dummies <- lm(ScanPminute ~ Gender + educ + Weeks + Store + factor(AgeCAT), data = df_checkout)
+# MODELO 2: Con dummies de edad (Usando las columnas que ya vienen en el Excel)
+# Dejamos fuera 'age1' para que sirva como nuestra categoría de referencia base
+model9_con_dummies <- lm(ScanPminute ~ Gender + educ + Weeks + Store + age2 + age3 + age4 + age5 + age6 + age7 + age8 + age9 + age10, data = df_checkout)
 
 # Resultados
 summary(model9_sin_dummies)
