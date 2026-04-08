@@ -244,7 +244,27 @@ summary(model4)
 
 ```
 
+The multiple regression model was used to predict employee performance in 2015 based on several 2014 predictors, including organizational support, justice perceptions, job attitudes, and health indicators.
+
+Overall, the model is statistically significant (F = 3.278, p = 0.0025), indicating that the set of predictors jointly explains variation in employee performance. However, the explanatory power of the model is relatively low, with an R² of 0.097 (Adjusted R² = 0.068). This means that only about 9.7% of the variance in performance is explained by the included variables, suggesting that other important factors influencing performance are not captured in this model.
+
+### Key predictors
+
+Among the predictors, only two variables are statistically significant:
+
+JobStrain2014 (β = 0.247, p \< 0.001) This variable shows a strong positive relationship with performance. This suggests that employees experiencing higher levels of job strain tend to perform better. This may reflect a context where pressure or challenging work environments drive higher productivity. SickDays2014 (β = -0.018, p = 0.033) Sick days have a significant negative effect on performance. Employees with higher absenteeism tend to have lower performance ratings, which aligns with expectations.
+
 ### HR recommendations based on findings
+
+The results suggest that performance is more strongly associated with behavioral and health-related factors (strain and absenteeism) than with attitudinal variables in this context. This may indicate that immediate performance outcomes are driven more by operational conditions than by employee perceptions.
+
+However, the relatively low R² highlights that performance is a complex construct influenced by many additional variables not included in the model (e.g., leadership, skills, team dynamics). \### HR recommendations based on findings
+
+The results suggest that job strain and absenteeism are the main drivers of performance. While job strain is positively associated with performance, it should be managed carefully, as excessive pressure may lead to burnout. Organizations should aim to maintain an optimal level of challenge without harming employee wellbeing.
+
+The negative effect of sick days highlights the importance of reducing absenteeism. Investing in employee health, wellbeing programs, and flexible working arrangements can help improve attendance and, consequently, performance.
+
+Although attitudinal variables such as job satisfaction and organizational support are not significant in this model, they should not be ignored, as they may influence performance indirectly over time. Finally, the low explanatory power of the model indicates that additional factors, such as leadership or skills, should be considered in future analyses.
 
 # Prompt 5: Stepwise Regression for Performance Prediction
 
@@ -384,11 +404,35 @@ By using this model, HR can identify "Outliers"—employees whose 2015 performan
 ### Regression output
 
 ```{r prompt8.1}
+#
+library(readxl)
 
+df_8 <- read_excel("Databases/MI_data_perf.xlsx", sheet = "data")
 
+df_8$Gender <- as.factor(df_8$Gender)
+df_8$AgeCat <- as.factor(df_8$AgeCat)
+df_8$TenureCat <- as.factor(df_8$TenureCat)
+df_8$CountryCode <- as.factor(df_8$CountryCode)
+
+model8 <- lm(Perf ~ SalaryBenchmark + Gender + AgeCat + TenureCat + CountryCode,
+             data = df_8)
+
+summary(model8)
 ```
 
+The regression analysis shows that several factors significantly influence employee performance ratings. Salary benchmark has a positive and highly significant effect, indicating that employees with higher relative pay tend to receive better evaluations. This may reflect actual productivity differences, but it could also suggest bias in favor of higher-paid employees.
+
+A key finding is the strong and significant effect of gender. One gender systematically receives lower performance ratings than the reference group, which raises clear concerns about potential gender bias in the appraisal system. Similarly, most age categories show negative and significant coefficients, suggesting that certain age groups are rated lower, which may indicate age-related bias rather than true performance differences.
+
+Tenure, on the other hand, has a positive effect, meaning that employees with longer tenure tend to receive higher ratings. While this could reflect experience, it may also point to a tendency to favor more senior employees. In addition, country differences are large and highly significant, indicating that performance ratings vary substantially across locations. This suggests a lack of consistency in evaluation standards across countries.
+
+Overall, the results indicate that performance ratings are not solely driven by objective factors, but are also influenced by demographic characteristics. This provides strong evidence of potential bias in the performance appraisal system.
+
 ### Recommendations to improve fairness in performance evaluation
+
+To improve fairness in performance evaluation, organizations should ensure that appraisal systems are based on objective and standardized criteria rather than demographic characteristics. Clear evaluation guidelines and consistent rating frameworks should be implemented across all countries to reduce inconsistencies between locations. In addition, managers should receive training to recognize and mitigate unconscious bias, particularly regarding gender and age.
+
+It is also important to regularly audit performance ratings to detect systematic differences across demographic groups and take corrective action when needed. Finally, incorporating multiple sources of evaluation, such as peer reviews or data-driven performance metrics, can help reduce subjectivity and improve the overall reliability and fairness of the appraisal process.
 
 # Prompt 9: Predicting Checkout Performance by Demographics
 
