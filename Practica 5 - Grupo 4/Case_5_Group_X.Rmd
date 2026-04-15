@@ -26,9 +26,9 @@ In this final workshop, you will apply analytics techniques to recruitment and s
 
 Within the project directory, create the following folders if they do not already exist:
 
-- **Databases**: to store all data sources provided in Moodle (Excel files).\
-- **data**: to store any ad-hoc data created during the analysis. The native R data format is .rds.\
-- **report**: to store the HTML output file generated when knitting the R Markdown file.
+-   **Databases**: to store all data sources provided in Moodle (Excel files).\
+-   **data**: to store any ad-hoc data created during the analysis. The native R data format is .rds.\
+-   **report**: to store the HTML output file generated when knitting the R Markdown file.
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -108,7 +108,6 @@ freq_joined
 
 ### Initial diagnosis: Where in the pipeline are UG or female applicants being lost?
 
-
 # Prompt 2: Testing for Bias in Shortlisting and Offers
 
 ### Tasks
@@ -116,7 +115,6 @@ freq_joined
 -   Import 'recruitment_applicants_2023.xlsx' into R (definitions of all fields are included in the 'variable key' worksheet within the Excel file).\
 -   Use cross-tabulation and chi-square tests to compare: Gender × Shortlisted; UG × Shortlisted; Gender × Offer; UG × Offer.\
 -   Identify significant imbalances.\
-
 
 ### Deliverables
 
@@ -128,12 +126,69 @@ freq_joined
 ### Chi-square test results with interpretation
 
 ```{r prompt2.1}
+library(readxl)
+df2 <- read_excel("Databases/recruitment_applicants_2023.xlsx")
+```
 
+```{r}
+names(df2)
+```
 
+```{r}
+str(df2)
+```
+
+```{r prompt2.2}
+# Quick checks
+summary(df2)
+```
+
+```{r prompt2.3}
+# 2. Recodificar las variables relevantes para que las tablas sean legibles
+df2 <- df2 %>%
+  mutate(
+    Gender = factor(Gender, levels = c(1, 2), labels = c("Male", "Female")),
+    UGyn = factor(UGyn, levels = c(1, 2), labels = c("Yes", "No")),
+    ShortlistedNY = factor(ShortlistedNY, levels = c(0, 1), labels = c("Rejected", "Shortlisted")),
+    OfferNY = factor(OfferNY, levels = c(0, 1), labels = c("No Offer", "Made Offer"))
+  )
+```
+
+```{r prompt2.4}
+# 3. Generar Tablas Cruzadas y Pruebas Chi-cuadrado
+
+# Gender × Shortlisted
+cat("\n--- Gender x Shortlisted ---\n")
+tab_gen_short <- table(df2$Gender, df2$ShortlistedNY)
+print(tab_gen_short)
+print(chisq.test(tab_gen_short))
+```
+
+```{r prompt2.5}
+# UG × Shortlisted
+cat("\n--- UG (Underrepresented Group) x Shortlisted ---\n")
+tab_ug_short <- table(df2$UGyn, df2$ShortlistedNY)
+print(tab_ug_short)
+print(chisq.test(tab_ug_short))
+```
+
+```{r prompt2.6}
+# Gender × Offer
+cat("\n--- Gender x Offer ---\n")
+tab_gen_offer <- table(df2$Gender, df2$OfferNY)
+print(tab_gen_offer)
+print(chisq.test(tab_gen_offer))
+```
+
+```{r prompt2.7}
+# UG × Offer
+cat("\n--- UG (Underrepresented Group) x Offer ---\n")
+tab_ug_offer <- table(df2$UGyn, df2$OfferNY)
+print(tab_ug_offer)
+print(chisq.test(tab_ug_offer))
 ```
 
 ### Summary: Are the recruitment decisions fair and unbiased?
-
 
 # Prompt 3: Predicting Shortlisting Using Demographics
 
@@ -168,7 +223,6 @@ freq_joined
 
 ### Recommendations to improve fairness in shortlisting
 
-
 # Prompt 4: Validating Selection Tools Using Performance Ratings
 
 ### Tasks
@@ -182,7 +236,6 @@ freq_joined
 
 -   Regression summary with top predictors.\
 -   Evaluation of selection validity: Which tools truly predict performance?\
-
 
 ## Solution
 
