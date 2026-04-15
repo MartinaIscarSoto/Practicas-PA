@@ -1,0 +1,677 @@
+---
+# this is the Rmarkdown header. Use the YAML syntax. ---YAML block ---.
+title: "Predicting Employee Performance" 
+subtitle: "Groupwork Use Case 4 - People Analytics"
+author: "Ferrán Extremera, Irene Morales, Amalia Varo y Martina Iscar"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    toc: true
+    toc_depth: 3
+    toc_float: true
+    code_folding: hide
+
+# the following lines tell R to store the output in the subdirectory reports
+knit: (function(inputFile, encoding) { 
+      rmarkdown::render(inputFile,
+                        encoding=encoding, 
+                        output_dir=file.path(dirname(inputFile),"report" )) }) 
+---
+
+# Intro
+
+In this workshop, you will explore multiple models to predict individual, team and organizational performance. You will apply multiple regression, stepwise regression, and dummy variable techniques to performance data from various sectors. Your goal is to derive actionable insights about what drives performance and how organizations can use these insights ethically and strategically.
+
+# Setup
+
+Within the project directory, create the following folders if they do not already exist:
+
+-   **Databases**: to store all data sources provided in Moodle (Excel files).\
+-   **data**: to store any ad-hoc data created during the analysis. The native R data format is .rds.\
+-   **report**: to store the HTML output file generated when knitting the R Markdown file.
+
+```{r setup, include=FALSE}
+if (!require("tidyverse")) install.packages("tidyverse")
+if (!require("readxl")) install.packages("readxl")
+if (!require("lm.beta")) install.packages("lm.beta")
+
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(readxl)
+library(lm.beta)
+```
+
+# Prompt 1: Predicting Customer Loyalty (Financial Services)
+
+### Tasks
+
+-   Import 'customer_satisfaction.xlsx' into R (definitions of all fields are included in the 'variable key' worksheet within the Excel file).\
+-   Estimate a multiple regression model with Custloyalty as the dependent variable. Predictors: Sat1–Sat4 and SexOfSalesperson.\
+-   Interpret R², F-statistic and beta coefficients.\
+-   Recommend areas for sales improvement.\
+
+### Deliverables
+
+-   Model output and standardized coefficients.\
+-   Strategic recommendation for salesperson development
+
+## Solution
+
+### Model output and standardized coefficients
+
+```{r prompt1.1}
+library(readxl)
+library(lm.beta)
+
+# Carga de datos
+df1 <- read_excel("Databases/customer_satisfaction.xlsx")
+
+# Modelo
+model1 <- lm(Custloyalty ~ Sat1 + Sat2 + Sat3 + Sat4 + SexOfSalesperson, data = df1)
+summary(model1)
+
+# Coeficientes estandarizados
+lm.beta(model1)
+```
+
+The $R^2$ is $0.3257$, which means that approximately $32.6%$ of the variance in customer loyalty is explained by this model. While there are other unknown factors influencing loyalty, capturing $33%$ of the variance with just 4 satisfaction metrics and the sex of the salesperson is meaningful in business.
+
+To continue, we can see that the F-statistic is $176.7$ with a $p-value<2.2e-6$. This means that the overall regression model is highly significant as a model.
+
+If we look at the beta coefficients we can see that Sat1 is $0.306$, with a $p-value<2e-16$ and Sat3 is $0.290$, with a $p-value<2.2e-16$. They are the most significant independent variables of the model. On the other hand, Sat2 is $-0.0295$ and Sat4 is $0.0475$, which are not statistically significant at the $p-value = 0.025$), but it has a very weak effect size ($beta= -0.043$) compared to the significant satisfaction variables.
+
+### Strategic recommendation for salesperson development
+
+Based on the model, we observe that having a salesperson who understands the customer's needs and is friendly are the variables that most positively affect customer loyalty. In other words, the more friendly and able to understand customer needs the employees are, the more the company will be able to grow and retain its customer base.
+
+On the other hand, whether the salesperson seems very confident or whether they are highly knowledgeable does not have a statistically significant impact on loyalty. While seeming overly confident even showed a slight negative trend, it is not a defining factor. Therefore, we recommend that the company should not focus resources on developing pure technical knowledge, but rather prioritize active listening, empathy and a welcoming attitude.
+
+Finally, the model indicates that customer loyalty is slightly higher when the salesperson is female rather than male. To leverage this insight, the company could implement a mentoring program where top-performing salespeople share their best practices so that the entire sales force can learn from the company's most successful employees.
+
+# Prompt 2: Predicting Customer Reinvestment (Financial Services)
+
+### Tasks
+
+-   Import 'customer_satisfaction.xlsx' into R (definitions of all fields are included in the 'variable key' worksheet within the Excel file).\
+-   Replicate Prompt 1 using InvestMore as the dependent variable.\
+-   Compare results and R².\
+-   Discuss implications for upselling and cross-selling strategy.\
+
+### Deliverables
+
+-   Model summary and interpretation.\
+-   Recommendations on customer retention strategies.\
+
+## Solution
+
+### Model summary and interpretation
+
+```{r prompt2.1}
+model2 <- lm(INvestMore ~ Sat1 + Sat2 + Sat3 + Sat4 + SexOfSalesperson, data = df1)
+summary(model2)
+
+```
+
+### Statistical Analysis & Interpretation
+
+-   $R^2$ value is **0.1704**. This indicates that only **17%** of the variance in a customer's intent to "Invest More" is explained by the model.
+
+-   **Comparison with Prompt 1:** This is significantly lower than the $R^2$ for Customer Loyalty (32.6%). This suggests that while satisfaction with a salesperson influences **loyalty** (emotional connection), the decision to **invest more money** is likely driven by external factors not in this model, such as interest rates, personal income, or product performance.
+
+-   **F-statistic:** 72.53 ($p < 2.2e-16$). Despite the lower $R^2$, the model is still statistically significant, meaning the predictors as a group do have a reliable relationship with the intent to reinvest.
+
+### **Significant Drivers (p \< 0.05)**
+
+-   **Sat1:** Understanding Your Needs (The "Consultant" Driver)
+
+    -   **Statistical Meaning:** With a coefficient of **0.175**, this is the strongest predictor of increased investment.
+
+        This measures **active listening and empathy**. Customers are most likely to increase their financial commitment when they feel the salesperson isn't just selling a product, but is accurately diagnosing their specific financial situation.
+
+-   **Sat3: Having a Recommendation (The "Guidance" Driver)**
+
+    -   **Statistical Meaning:** This is also highly significant (Coefficient **0.139**).
+
+        This measures **decisiveness and value-add**. It’s not enough to just understand the customer (Sat1); the salesperson must provide a clear "call to action" or a specific path forward. Customers invest more when they are given a clear direction rather than a list of overwhelming options.
+
+### **Non-Significant Drivers (p \> 0.05)**
+
+-   **Sat2: Confidence (The "Persona" Driver)**
+
+    -   **Statistical Meaning:** No significant impact on reinvestment.
+
+        Appearing confident does not translate into more capital from the client. This suggests that "surface-level" sales charisma is less important than the actual substance of the advice given.
+
+-   **Sat4: Knowledgeable (The "Expertise" Driver)**
+
+    -   **Statistical Meaning:** No significant impact.
+
+        This is a surprising but common finding in Financial Services. While a salesperson must be competent, "being knowledgeable" is often viewed as a **baseline requirement**. High knowledge alone doesn't inspire a customer to double their investment if the salesperson fails to apply that knowledge to the customer's specific needs (Sat1).
+
+-   **SexOfSalesperson:**
+
+    -   **Statistical Meaning:** Not significant ($p = 0.651$).
+
+        The gender of the salesperson has no bearing on the volume of capital a customer decides to reinvest.
+
+### Recommendations on customer retention strategies
+
+Based on the regression analysis of customer behavior, the organization’s strategy must transition from providing **Information** to delivering **Actionable Insight**. While the current sales force is perceived as knowledgeable, technical expertise alone is not driving capital growth. To move customers from "uncertainty" to "doubling investment," the following four strategies are recommended:
+
+#### 1. Re-Focusing Sales Training:
+
+The data indicates that **Knowledge (Sat4)** is not a significant predictor of increased investment, whereas **Understanding Needs (Sat1)** is a primary driver. This suggests that customers view technical knowledge as a baseline requirement, not a reason to increase their financial commitment.
+
+-   **Strategy:** HR should pivot training away from memorization of product manuals.
+
+-   **Action:** Start workshops focused on **Active Listening**. We want our team to spend more time asking smart questions and less time reading from a script.
+
+#### 2. Implementation of a "Structured Recommendation" Protocol
+
+**Sat3 (Having a Recommendation)** emerged as a statistically significant driver of reinvestment ($p < 0.001$). Customers are more likely to commit more capital when they are provided with a clear path forward rather than a menu of options.
+
+-   **Strategy:** Empower the sales force to move beyond "informed service" into "bold advisory."
+-   **Action:** Establish a **"Next Best Action"** protocol. Every customer interaction must conclude with a specific, tailored recommendation. This way, by closing the gap between "what we offer" and "what you should do," the firm can capture the "Not Sure" segment of the customer base (CustomerLoyalty).
+
+#### 3. Leveraging Loyalty as a Lead Indicator for Wallet-Share
+
+The model for **Customer Loyalty (**$R^2 = 0.33$) is substantially stronger than the model for **Increased Investment (**$R^2 = 0.17$). This suggests that while salespeople have a high degree of influence over whether a customer stays with the firm, external market factors play a larger role in how much they invest. It is much easier for our team to make a customer **loyal** than it is to convince them to **double their money**. We should use "Friendliness" and "Understanding" to keep them in the door first
+
+-   **Strategy:** Build the relationship first. Once the customer trusts us (Loyalty), they are much more open to our recommendations for bigger investments.
+
+-   **Action:** Focus retention efforts on **Empathy and Needs-Matching** to secure loyalty first. Once a high "Loyalty Score" is achieved, trigger an automated or personal outreach focused on the "Recommendation" (Sat3) to bridge the gap from retention to upselling.
+
+#### 4. Evidence-Based Recruitment and Persona Optimization
+
+The analysis proves that **Confidence (Sat2)** and **Gender (SexOfSalesperson)** are statistically irrelevant to the customer's decision to invest more. The "traditional" high-confidence, high-pressure sales persona does not correlate with actual business growth in this sector.
+
+-   **Strategy:** Broaden the recruitment profile to prioritize behavioral competencies over sales stereotypes.
+
+-   **Action:** Adjust hiring criteria to look for people who are naturally good at empathy and analytical thinking. The ideal candidate is not necessarily the most "confident" in the room, but the one most capable of synthesizing client data into a coherent, persuasive recommendation.
+
+# Prompt 3: Linking Employee Engagement to Customer Loyalty
+
+### Tasks
+
+-   Import 'aggregate_sales_customer_loyalty.xlsx' into R (definitions of all fields are included in the 'variable key' worksheet within the Excel file).\
+-   Predict average customer loyalty per salesperson. Predictors: qEng1, qEng2, qMan1, Talent2014, Sex, Age, Manager.\
+-   Evaluate significance and limitations.\
+-   Discuss engagement-performance links.
+
+### Deliverables
+
+-   Regression output and interpretation.\
+-   Organizational insight and caveats.\
+
+## Solution
+
+### Regression output and interpretation
+
+```{r prompt3.1}
+# Packages
+library(readxl)
+library(dplyr)
+library(janitor)
+library(broom)
+library(car)
+library(lmtest)
+
+# 1) Import data
+sales <- read_excel("Databases/aggregate_sales_customer_loyalty.xlsx", sheet = "data") %>%
+  clean_names()
+
+# Quick checks
+names(sales)
+str(sales)
+summary(sales)
+
+# 2) Keep only variables needed for Prompt 3
+p3 <- sales %>%
+  select(
+    custloyalty_mean,
+    q_eng1,
+    q_eng2,
+    q_man1,
+    talent2014,
+    sex,
+    age,
+    manager
+  )
+
+# 3) Recode categorical variables if needed
+# Sex is almost certainly categorical
+p3 <- p3 %>%
+  mutate(
+    sex = as.factor(sex)
+  )
+
+# Manager may be coded as 0/1 or Yes/No; treat as factor if it is categorical
+if (length(unique(na.omit(p3$manager))) <= 5) {
+  p3 <- p3 %>% mutate(manager = as.factor(manager))
+}
+
+# 4) Remove missing values in model variables
+p3 <- p3 %>% na.omit()
+
+# Check sample size used
+nrow(p3)
+
+# 5) Fit regression model
+model_p3 <- lm(
+  custloyalty_mean ~ q_eng1 + q_eng2 + q_man1 + talent2014 + sex + age + manager,
+  data = p3
+)
+
+# 6) Main regression output
+summary(model_p3)
+
+# 7) Coefficient table with confidence intervals
+tidy(model_p3, conf.int = TRUE)
+
+# 8) Overall model fit
+glance(model_p3)
+
+# 9) Diagnostics relevant for limitations
+vif(model_p3)                 # multicollinearity
+bptest(model_p3)              # heteroskedasticity
+durbinWatsonTest(model_p3)    # autocorrelation check
+
+# 10) Standard diagnostic plots
+par(mfrow = c(2, 2))
+plot(model_p3)
+par(mfrow = c(1, 1))
+
+```
+
+A multiple linear regression was conducted to examine whether employee engagement and related employee characteristics predict average customer loyalty per salesperson. The dependent variable was customer loyalty (custloyalty_mean), and the predictors were q_Eng1, q_Eng2, q_Man1, Talent2014, Sex, Age, and Manager. After deletion of missing values, the analysis was based on 305 observations.
+
+Overall, the model was not statistically significant at the 5% level, F(7, 297) = 1.89, p = .070. The model explained only a small proportion of the variance in customer loyalty, with R\^2 = .043 and adjusted R\^2 = .020. In practical terms, this means the selected employee variables account for about 4.3% of the observed differences in average customer loyalty, which is weak explanatory power.
+
+At the individual predictor level, only qEng2 was a statistically significant predictor of customer loyalty, B = 0.141, SE = 0.051, t = 2.78, p = .006, 95% CI [0.041, 0.241]. This indicates that, holding the other variables constant, a one-unit increase in qEng2 is associated with an increase of about 0.14 points in average customer loyalty. This is the only variable for which the confidence interval does not cross zero.
+
+All other predictors were non-significant:
+
+q_Eng1: B = -0.011, p = .832 q_Man1: B = -0.048, p = .271 Talent2014: B = 0.007, p = .959 Sex: B = -0.047, p = .677 Age: B = -0.004, p = .530 Manager: B = 0.195, p = .131
+
+So, based on this model, there is no reliable evidence that q_Eng1, q_Man1, Talent2014, Sex, Age, or Manager uniquely predict customer loyalty once the other variables are controlled for. Manager status shows a positive coefficient, but it is not statistically significant, so it should not be presented as a real effect.
+
+The diagnostics do not suggest major technical problems with the model. Multicollinearity appears low, as all VIF values are close to 1 (roughly 1.04 to 1.54), so the predictors are not excessively overlapping. The Breusch–Pagan test is non-significant, p = .790, which suggests no evidence of heteroskedasticity. The Durbin–Watson statistic is 1.84 with p = .13, so there is no evidence of problematic autocorrelation. The residual plots are broadly acceptable, although the Q-Q plot shows some deviation in the tails and there are a few potentially unusual observations. That is not horrible, but it does mean normality is not perfect.
+
+### Organizational insight and caveats
+
+The main finding is narrow: among the selected predictors, only q_Eng2 shows a significant positive association with customer loyalty. That gives limited support to the idea that employee engagement is linked to customer-facing performance. But the support is weak overall, because the full model is not statistically significant at the conventional 5% level and explains very little variance.
+
+That means the engagement–performance link should be discussed carefully. The safe conclusion is not “employee engagement drives customer loyalty” in a broad sense. The safe conclusion is: one specific engagement-related measure, q_Eng2, is positively associated with customer loyalty, but the broader set of engagement, management, demographic, and talent variables does not provide a strong overall prediction of customer loyalty in this model.
+
+Organizationally, this suggests two things. First, there may be some value in paying attention to the aspect captured by q_Eng2, because it is the only variable that stands out. Second, customer loyalty is likely influenced much more strongly by other factors not included here, such as customer mix, territory, salesperson skill, service quality, prior client relationship strength, or direct customer experience variables. So this model does not justify strong HR interventions based solely on these results.
+
+The biggest limitation is the amount of missing data. The original dataset has 574 rows, but the regression uses only 305, meaning a large share of cases was dropped. That is not a minor detail. It raises the possibility that the usable sample is not fully representative of the full dataset, and it reduces statistical power. Also, this is an observational cross-sectional regression, so it cannot establish causality. Even for q_Eng2, the result is an association, not proof that improving that engagement dimension would necessarily increase customer loyalty.
+
+Overall, the analysis provides only limited evidence of an engagement–performance link: q_Eng2 is positively related to customer loyalty, but the model as a whole is weak, most predictors are non-significant, and the findings should be interpreted cautiously due to low explanatory power and substantial missing data.
+
+# Prompt 4: Predicting Individual Performance Ratings (Manufacturing)
+
+### Tasks
+
+-   Import 'perf_2014_to_2015_sick_2014.xlsx' into R (definitions of all fields are included in the 'variable key' worksheet within the Excel file).\
+-   Predict 2015 performance using 2014 predictors. Variables: POS2014, DistJust2014, ProcJust2014, JOBSAT2014, ValueFit2014, JobStrain2014, SickDays2014.\
+-   Interpret R² and beta values.\
+-   Discuss what drives performance improvements.
+
+### Deliverables
+
+-   Model summary and insights.\
+-   HR recommendations based on findings.\
+
+## Solution
+
+### Model summary and insights
+
+```{r prompt4.1}
+# Importar datos [cite: 31]
+df_4 <- read_excel("Databases/perf_2014_to_2015_sick_2014.xlsx")
+
+# Modelo con predictores de actitud y salud [cite: 33]
+model4 <- lm(PerformanceRating2015 ~ POS2014 + DistJust2014 + ProcJust2014 + JOBSAT2014 + 
+               ValueFit2014 + JobStrain2014 + SickDays2014, data = df_4)
+
+summary(model4)
+
+```
+
+The multiple regression model was used to predict employee performance in 2015 based on several 2014 predictors, including organizational support, justice perceptions, job attitudes, and health indicators.
+
+Overall, the model is statistically significant (F = 3.278, p = 0.0025), indicating that the set of predictors jointly explains variation in employee performance. However, the explanatory power of the model is relatively low, with an R² of 0.097 (Adjusted R² = 0.068). This means that only about 9.7% of the variance in performance is explained by the included variables, suggesting that other important factors influencing performance are not captured in this model.
+
+### Key predictors
+
+Among the predictors, only two variables are statistically significant:
+
+JobStrain2014 (β = 0.247, p \< 0.001) This variable shows a strong positive relationship with performance. This suggests that employees experiencing higher levels of job strain tend to perform better. This may reflect a context where pressure or challenging work environments drive higher productivity. SickDays2014 (β = -0.018, p = 0.033) Sick days have a significant negative effect on performance. Employees with higher absenteeism tend to have lower performance ratings, which aligns with expectations.
+
+### HR recommendations based on findings
+
+The results suggest that performance is more strongly associated with behavioral and health-related factors (strain and absenteeism) than with attitudinal variables in this context. This may indicate that immediate performance outcomes are driven more by operational conditions than by employee perceptions.
+
+However, the relatively low R² highlights that performance is a complex construct influenced by many additional variables not included in the model (e.g., leadership, skills, team dynamics). \### HR recommendations based on findings
+
+The results suggest that job strain and absenteeism are the main drivers of performance. While job strain is positively associated with performance, it should be managed carefully, as excessive pressure may lead to burnout. Organizations should aim to maintain an optimal level of challenge without harming employee wellbeing.
+
+The negative effect of sick days highlights the importance of reducing absenteeism. Investing in employee health, wellbeing programs, and flexible working arrangements can help improve attendance and, consequently, performance.
+
+Although attitudinal variables such as job satisfaction and organizational support are not significant in this model, they should not be ignored, as they may influence performance indirectly over time. Finally, the low explanatory power of the model indicates that additional factors, such as leadership or skills, should be considered in future analyses.
+
+# Prompt 5: Stepwise Regression for Performance Prediction
+
+### Tasks
+
+-   Import 'perf_2014_to_2015_sick_2014.xlsx' into R (definitions of all fields are included in the 'variable key' worksheet within the Excel file).\
+-   Use stepwise regression to select significant predictors.\
+-   Compare model fit with Prompt 4.\
+-   Evaluate parsimony and implications for policy.
+
+### Deliverables
+
+-   Stepwise model output.\
+-   Strategic use of simpler models in HR.\
+
+## Solution
+
+### Stepwise model output
+
+```{r prompt5.1}
+library(MASS)
+
+model5_step <- stepAIC(model4, direction = "both")
+summary(model5_step)
+```
+
+### Strategic use of simpler models in HR
+
+When comparing this stepwise model to the previous model, we observe the principle of model efficiency. The stepwise regression algorithm automatically removed four non-significant predictors (JOBSAT, ValueFit, DistJust and ProcJust), leaving only three key variables: POS2014, JobStrain2014, and SickDays2014. Despite having fewer variables, the adjusted R\^2 slightly increased from 0.0675 to 0.0692. This means our simpler model is mathematically more efficient, explaining the variance in performance just as well by cutting out the statistical noise.
+
+This has an impact on HR strategies. If HR only needs to measure three variables instead of seven to predict performance, they can deploy much shorter employee surveys. This improves response rates and saves employees time.
+
+In addition, a simpler model provides management with actionable, targeted goals. Instead of trying to improve every aspect of the employee experience at once, HR leadership can channel their budget into just two main areas: implementing programs that increase Perceived Organizational Support and redesigning roles to reduce Job Strain.
+
+Lastly, it is much easier to explain a simple, three-variable model to non-technical stakeholders and business leaders than a complex model with multiple conflicting or insignificant metrics.
+
+# Prompt 6: Controlling for Prior Performance Ratings
+
+### Tasks
+
+-   Import 'perf_2014_to_2015_sick_2014.xlsx' into R (definitions of all fields are included in the 'variable key' worksheet within the Excel file).\
+-   Include 2014 performance rating as a predictor.\
+-   Identify whether other variables still predict 2015 performance.\
+-   Explain improvement prediction logic.
+
+### Deliverables
+
+-   Output with adjusted R² and key drivers.\
+-   Change-focused HR insight.\
+
+## Solution
+
+### Output with adjusted R² and key drivers
+
+```{r prompt6.1}
+
+model6 <- lm(PerformanceRating2015 ~ PerformanceRating2014 + POS2014 + DistJust2014 + ProcJust2014 + 
+               JOBSAT2014 + ValueFit2014 + JobStrain2014 + SickDays2014, data = df_4)
+summary(model6)
+```
+
+The Adjusted $R^2$ is **0.2027**. This is a significant improvement from the model in Prompt 4 (which was only \~0.06). By including 2014 performance, we now explain about **20.3%** of the variance in 2015 performance.
+
+**PerformanceRating2014** is the strongest predictor ($Estimate = 0.370$, $p < 0.001$). This confirms that the best predictor of future performance is past performance.
+
+**Key Drivers:** Even after controlling for how well someone performed last year, two variables remain significant:
+
+1.  **JobStrain2014 (**$p = 0.0107$): Interestingly, job strain has a positive coefficient (0.171). This suggests that in this manufacturing context, higher pressure is associated with higher performance ratings, possibly indicating a "high-performance/high-stress" culture.
+
+2.  **SickDays2014 (**$p = 0.0357$): This has a negative impact. For every extra sick day taken in 2014, 2015 performance is expected to drop by 0.016 units, even if the employee was a high performer previously.
+
+### Change-focused HR insight
+
+There are 4 main points to the change in focus in HR based on the insight.
+
+#### 1. Understanding "Performance Momentum"
+
+In HR analytics, adding a prior-year baseline changes the question from "Who is a high performer?" to **"What causes an employee's performance to improve or decline?"** Because past performance is so dominant, HR should focus less on variables that became non-significant (like Job Satisfaction or Value Fit) when trying to predict *short-term* performance changes. Those factors might matter for long-term retention, but they aren't the primary drivers of year-over-year performance swings in this dataset.
+
+#### 2. The Health-Performance Effect
+
+The significance of **SickDays2014** is a critical warning sign. It shows that health issues have a lingering effect. An employee's illness last year predicts a decline in performance this year, regardless of their past talent level.
+
+-   **Strategy:** HR should view sick leave not just as a temporary absence, but as a lead indicator of future performance risk. "Well-being" programs should be framed as "Performance Protection" investments.
+
+#### 3. The Risk of the "Strain" Culture
+
+The model shows that **Job Strain** is linked to higher performance. It is a dangerous management strategy.
+
+-   If high performance is only achievable through high strain, the organization is likely heading toward burnout. HR must investigate if these high performers are also the ones taking more sick days. If so, the "gain" in performance from strain is being cancelled out by the "loss" in performance from health issues.
+
+#### 4. Precision Coaching
+
+By using this model, HR can identify employees whose 2015 performance was much higher or lower than their 2014 baseline would suggest.
+
+-   **Action:** Instead of universal training, HR can target interventions. For example, if an employee’s performance dropped despite low sick days and low strain, managers can look into other "non-model" factors like a change in leadership or personal issues.
+
+# Prompt 7: Predicting Sickness Absence
+
+### Tasks
+
+-   Import 'perf_2014_to_2015_sick_2014.xlsx' into R (definitions of all fields are included in the 'variable key' worksheet within the Excel file).\
+-   Switch dependent variable to SickDays2014.\
+-   Use attitude variables as predictors.\
+-   Analyze non-significant results and discuss potential.
+
+### Deliverables
+
+-   Regression output.\
+-   Interpretation and potential data limitations.\
+
+## Solution
+
+### Regression output
+
+```{r prompt7.1}
+library(readxl)
+library(dplyr)
+library(janitor)
+library(broom)
+library(car)
+library(lmtest)
+
+# 1) Import data
+df_7 <- read_excel("Databases/perf_2014_to_2015_sick_2014.xlsx", sheet = "data") %>%
+  clean_names()
+
+# Quick checks
+names(df_7)
+str(df_7)
+summary(df_7)
+
+# 2) Keep only variables needed for Prompt 7
+p7 <- df_7 %>%
+  dplyr::select( # <--- Forzamos a usar dplyr
+    sick_days2014,
+    pos2014,
+    dist_just2014,
+    proc_just2014,
+    jobsat2014,
+    value_fit2014,
+    job_strain2014
+  ) %>%
+  na.omit()
+
+# Check sample size used
+nrow(p7)
+
+# 3) Fit regression model
+model_p7 <- lm(
+  sick_days2014 ~ pos2014 + dist_just2014 + proc_just2014 +
+    jobsat2014 + value_fit2014 + job_strain2014,
+  data = p7
+)
+
+# 4) Main regression output
+summary(model_p7)
+
+# 5) Coefficient table with confidence intervals
+tidy(model_p7, conf.int = TRUE)
+
+# 6) Overall model fit
+glance(model_p7)
+
+# 7) Diagnostics
+vif(model_p7)
+bptest(model_p7)
+durbinWatsonTest(model_p7)
+
+# 8) Diagnostic plots
+par(mfrow = c(2, 2))
+plot(model_p7)
+par(mfrow = c(1, 1))
+
+```
+
+A multiple linear regression was conducted to examine whether employee attitude variables predict sickness absence in 2014. The dependent variable was sick_days2014, and the predictors were pos2014, dist_just2014, proc_just2014, jobsat2014, value_fit2014, and job_strain2014. After listwise deletion of missing values, the analysis was based on 272 observations.
+
+Overall, the model was not statistically significant at the 5% level, F(6, 265) = 2.05, p = .060. It explained only a small proportion of the variance in sickness absence, with R² = .044 and adjusted R² = .023. In practical terms, the predictors account for about 4.4% of the variation in sick days, which is weak explanatory power.
+
+At the individual predictor level, two variables were statistically significant:
+
+POS2014: B = 1.811, SE = 0.860, t = 2.11, p = .036, 95% CI [0.119, 3.503] JobStrain2014: B = 0.928, SE = 0.470, t = 1.97, p = .049, 95% CI [0.002, 1.854]
+
+Holding the other variables constant, higher POS2014 scores were associated with more sick days, and higher JobStrain2014 scores were also associated with more sick days. The result for job strain is conceptually plausible. The result for perceived organizational support is less intuitive and should be interpreted cautiously, especially given the weakness of the overall model.
+
+The remaining predictors were not significant:
+
+DistJust2014: B = 0.150, p = .820 ProcJust2014: B = -1.180, p = .202 JOBSAT2014: B = -1.110, p = .100 ValueFit2014: B = 1.045, p = .170
+
+So there is no strong evidence that distributive justice, procedural justice, job satisfaction, or value fit uniquely predict sickness absence in this model.
+
+### Interpretation and potential data limitations
+
+The main conclusion is that the model is weak and only marginal overall. Even though POS2014 and JobStrain2014 are individually significant at the 5% level, the overall regression misses conventional significance and the explained variance is very low. That means the safe interpretation is not that attitudes strongly predict absence. The safe interpretation is narrower: there is limited evidence that some attitude variables may be associated with sickness absence, but the model as a whole does not provide strong predictive power.
+
+The result for job strain is the most defensible substantively. A positive coefficient suggests that employees with higher job strain tend to have more sick days, which is consistent with the idea that strain may contribute to absenteeism. By contrast, the positive effect for perceived organizational support is harder to explain theoretically and may reflect noise, omitted variables, suppression effects, or instability in the model rather than a meaningful organizational pattern.
+
+The non-significant results are important. They suggest that, in this dataset, justice perceptions, job satisfaction, and value fit do not show strong unique links with sickness absence once the variables are entered together. That does not prove these attitudes are irrelevant in general. It only shows that they are not strong standalone predictors here.
+
+There are several important limitations.
+
+First, the outcome variable is a poor fit for ordinary linear regression. sick_days2014 is highly skewed: the median is 0, the upper tail is extreme, and the maximum is 182 days. The residual plots clearly show strong non-normality, visible right-tail outliers, and influential observations. So even though the Breusch–Pagan test is non-significant (p = .318) and the Durbin–Watson result is fine (DW = 2.03, p = .932), the diagnostic plots indicate that the OLS assumptions are not well met. This matters more than the formal tests here.
+
+Second, there is substantial missing data. The original file has 626 observations, but the model uses only 272 (due to elimination of na values). That is a major loss of data and may reduce power and distort representativeness.
+
+Third, sickness absence is influenced by many factors not included in the model, such as:
+
+physical or mental health, chronic conditions, family responsibilities, job type and physical demands, workplace safety, absence policy, manager behavior, seasonality or acute illness.
+
+So low explanatory power is not surprising.
+
+Overall, Prompt 7 provides only limited evidence that attitude variables predict sickness absence. Job strain shows a small positive association with sick days, and POS2014 is also positive, but the model is weak overall, explains very little variance, and is affected by substantial missing data and a highly skewed dependent variable. The results should therefore be interpreted cautiously, and sickness absence is likely to require different predictors and possibly a different modeling approach.
+
+# Prompt 8: Exploring Performance Patterns by Demographics
+
+### Tasks
+
+-   Import 'MI_data_perf.xlsx' into R (definitions of all fields are included in the 'variable key' worksheet within the Excel file).\
+-   Predict performance rating using SalaryBenchmark, Gender, AgeCat, TenureCat and Country dummies.\
+-   Highlight impact of gender and country.\
+-   Identify signs of bias in appraisal systems.
+
+### Deliverables
+
+-   Regression output.\
+-   Recommendations to improve fairness in performance evaluation.\
+
+## Solution
+
+### Regression output
+
+```{r prompt8.1}
+#
+library(readxl)
+
+df_8 <- read_excel("Databases/MI_data_perf.xlsx", sheet = "data")
+
+df_8$Gender <- as.factor(df_8$Gender)
+df_8$AgeCat <- as.factor(df_8$AgeCat)
+df_8$TenureCat <- as.factor(df_8$TenureCat)
+df_8$CountryCode <- as.factor(df_8$CountryCode)
+
+model8 <- lm(Perf ~ SalaryBenchmark + Gender + AgeCat + TenureCat + CountryCode,
+             data = df_8)
+
+summary(model8)
+```
+
+The regression analysis shows that several factors significantly influence employee performance ratings. Salary benchmark has a positive and highly significant effect, indicating that employees with higher relative pay tend to receive better evaluations. This may reflect actual productivity differences, but it could also suggest bias in favor of higher-paid employees.
+
+A key finding is the strong and significant effect of gender. One gender systematically receives lower performance ratings than the reference group, which raises clear concerns about potential gender bias in the appraisal system. Similarly, most age categories show negative and significant coefficients, suggesting that certain age groups are rated lower, which may indicate age-related bias rather than true performance differences.
+
+Tenure, on the other hand, has a positive effect, meaning that employees with longer tenure tend to receive higher ratings. While this could reflect experience, it may also point to a tendency to favor more senior employees. In addition, country differences are large and highly significant, indicating that performance ratings vary substantially across locations. This suggests a lack of consistency in evaluation standards across countries.
+
+Overall, the results indicate that performance ratings are not solely driven by objective factors, but are also influenced by demographic characteristics. This provides strong evidence of potential bias in the performance appraisal system.
+
+### Recommendations to improve fairness in performance evaluation
+
+To improve fairness in performance evaluation, organizations should ensure that appraisal systems are based on objective and standardized criteria rather than demographic characteristics. Clear evaluation guidelines and consistent rating frameworks should be implemented across all countries to reduce inconsistencies between locations. In addition, managers should receive training to recognize and mitigate unconscious bias, particularly regarding gender and age.
+
+It is also important to regularly audit performance ratings to detect systematic differences across demographic groups and take corrective action when needed. Finally, incorporating multiple sources of evaluation, such as peer reviews or data-driven performance metrics, can help reduce subjectivity and improve the overall reliability and fairness of the appraisal process.
+
+# Prompt 9: Predicting Checkout Performance by Demographics
+
+### Tasks
+
+-   Import 'supermarket_checkout.xlsx' into R (definitions of all fields are included in the 'variable key' worksheet within the Excel file).\
+-   Predict ScanPminute using Gender, education, tenure, store, and age.\
+-   Run model with age dummies to improve fit.\
+-   Discuss age-related productivity insights.\
+-   Address ethical concerns in applying the findings.
+
+### Deliverables
+
+-   Two models (with and without dummies).\
+-   Strategic and ethical recommendations for workforce planning.\
+
+## Solution
+
+### Two models (with and without dummies)
+
+```{r prompt9.1}
+library(readxl)
+
+# Importar los datos del supermercado
+df_checkout <- read_excel("Databases/supermarket_checkout.xlsx")
+
+# MODELO 1: Sin dummies (Predecir ScanPminute usando la edad como tendencia lineal)
+model9_sin_dummies <- lm(ScanPminute ~ Gender + educ + Weeks + Store + AgeVariable, data = df_checkout)
+
+# MODELO 2: Con dummies de edad (Usando las columnas que ya vienen en el Excel)
+# Dejamos fuera 'age1' para que sirva como nuestra categoría de referencia base
+model9_con_dummies <- lm(ScanPminute ~ Gender + educ + Weeks + Store + age2 + age3 + age4 + age5 + age6 + age7 + age8 + age9 + age10, data = df_checkout)
+
+# Resultados
+summary(model9_sin_dummies)
+summary(model9_con_dummies)
+```
+
+### Strategic and ethical recommendations for workforce planning
+
+When comparing both models, it is clear that Model 2 is significantly better. Its adjusted R\^2 is 0.3832 compared to 0.2485 in Model 1, demonstrating that the age variable does not have a linear relationship with productivity. By adding age brackets, we see that while a linear age variable was not significant, specific age categories are highly significant. Productivity peaks mid-career, specifically for employees in the age4 and age6, who show the highest increases in items scanned per minute (+7.944 and +7.313) compared to the youngest cohort. Interestingly, the oldest cohort (age10) is not significant, meaning their scanning speed is statistically comparable to the youngest entry-level cashiers.
+
+Regarding other variables, weeks positively impacts productivity, while higher education levels slightly decrease scanning speed (which could indicate overqualification or lower job engagement). Finally, gender is a significant factor, with women scanning approximately 2.76 more items per minute than men.
+
+-   Ethical recommendations: management must not use these findings to filter out male candidates, exclusively hire middle-age workers, or segregate demographics into different supermarket roles. Using demographics to restrict hiring or influence job placement violates equal opportunity employment laws and introduces systemic bias. Performance should always be evaluated on an individual basis, not predicted by demographic group membership.
+
+-   Strategic recommendations:
+
+    -   Instead of restricting hiring, the company should identify the specific techniques that make the middle-aged and female faster. By identifying these efficient behaviors, the company can standardize these methods and integrate them into the core onboarding program for all new hires.
+
+    -   The performance gap could be related to the physical design of the checkout counter. HR and Operations should investigate if the current scanner height or bagging area reach inadvertently favors certain physical profiles. Improving workstation ergonomics could naturally boost the speed of all cashiers and reduce fatigue.
+
+    -   To manage the store effectively, management should use performance data to balance shifts. Pairing high-efficiency mid-career cashiers with developing staff during peak hours ensures that customer wait times remain low, bottlenecks are avoided, and slower employees have opportunities for on-the-job observational learning.

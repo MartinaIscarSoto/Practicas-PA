@@ -1,0 +1,706 @@
+---
+title: "Advanced Turnover Modelling and Business Case Development" 
+subtitle: "Groupwork Use Case 3 - People Analytics"
+author: "Ferrán Extremera, Irene Morales, Amalia Varo y Martina Iscar"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    toc: true
+    toc_depth: 3
+    toc_float: true
+    code_folding: hide
+knit: (function(inputFile, encoding) { 
+      rmarkdown::render(inputFile,
+                        encoding=encoding, 
+                        output_dir=file.path(dirname(inputFile),"report" )) }) 
+editor_options: 
+  markdown: 
+    wrap: sentence
+---
+
+# Intro
+
+Employee turnover is a critical concern for organizations due to its substantial financial and human costs.
+HR functions frequently report turnover statistics, but descriptive reporting alone may lead to misdiagnosis of problems and poorly targeted interventions.
+In this use case, you will apply inferential and predictive analytics to understand voluntary employee turnover at both individual and team levels in a multinational organization
+
+# Setup
+
+Within the project directory, create the following folders if they do not already exist:
+
+-   **Databases**: to store all data sources provided in Moodle (Excel files).\
+-   **data**: to store any ad-hoc data created during the analysis. The native R data format is .rds.\
+-   **report**: to store the HTML output file generated when knitting the R Markdown file.
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse) 
+library(readxl)
+```
+
+# Prompt 1: Estimating differences in turnover by country
+
+### Tasks
+
+-   Import 'Individual_Turnover.xlsx' into R (definitions of all fields are included in the 'variable key' worksheet within the Excel file).\
+-   Produce a cross-tabulation of Country × Leaver Status.\
+-   Conduct a chi-square test of independence to assess whether turnover differs significantly by country. Interpret the results, paying attention to: expected vs observed frequencies; statistical significance; limitations related to small subgroup sizes.\
+
+### Deliverables
+
+-   Cross-tabulation table with expected frequencies.\
+-   Chi-square test output.\
+-   Interpretation: Should HR be concerned about country differences in individual turnover based on this analysis alone?
+
+## Solution
+
+```{r}
+df1 <- read_excel("Databases/Individual_Turnover.xlsx")
+head(df1)
+```
+
+```{r}
+str(df1)
+```
+
+```{r}
+summary(df1)
+```
+
+We need to treat the Gender and LeaverStatus variables carefully, as they have 2 (Gender) and 1(LeverStatus) NaN values.
+Therefore, we must remove them primarily as a precaution.
+Additionally, since it involves at most three rows of the dataset compared to the 1653 total rows, it is just a minimal deletion that aims to have a purer dataset and anticipate possible problems that these null values may cause in the models used throughout the practice.
+
+```{r}
+data <- df1 %>%
+  drop_na(Gender, LeaverStatus)
+```
+
+```{r}
+summary(data)
+```
+
+We verify that the null rows have been removed.
+As a result we have a total of 1650 records for our analysis.
+
+```{r}
+str(data)
+```
+
+### Cross-tabulation table with expected frequencies
+
+```{r prompt1.1}
+tabla_cruzada <- table(
+  "País" = data$Country, 
+  "Estado_Rotación (0=Stay, 1=Leave)" = data$LeaverStatus
+)
+
+# Añadir una fila y columna de "Totales"
+tabla_con_totales <- addmargins(tabla_cruzada)
+
+# Imprimir en consola para que la veas tú mientras programas
+cat("\n--- FRECUENCIAS OBSERVADAS ---\n")
+print(tabla_con_totales)
+
+# Crear la versión "bonita" para el reporte HTML final
+knitr::kable(tabla_con_totales, 
+             caption = "Employee Turnover Frequency by Country")
+# Recordar cuando presentar poner el pais correspondiente al lado de número 
+```
+
+### Chi-square test output
+
+```{r prompt1.2}
+# 1. Asegurarnos de tener el test calculado
+test_chi <- chisq.test(tabla_cruzada)
+```
+
+```{r}
+cat("\n--- RESULTADO DEL TEST CHI-CUADRADO ---\n")
+print(test_chi)
+```
+
+```{r}
+print(test_chi$expected)
+```
+
+```{r}
+# 1. Extraer los valores numéricos temporalmente}
+stay_obv <- test_chi$observed[, 1]
+leave_obv <- test_chi$observed[, 2]
+stay_exp <- round(test_chi$expected[, 1], 1)
+leave_exp <- round(test_chi$expected[, 2], 1)
+
+# 2. Calcular la diferencia antes de convertir los números a texto
+dif_stay <- stay_obv - stay_exp
+
+# 3. Crear la tabla final uniendo Observado (Esperado)
+tabla_completa <- data.frame(
+  Country = rownames(test_chi$observed),
+  
+  # Usamos paste0 para unir el número real, un espacio, el paréntesis y el esperado
+  `Stay_Obv_Exp` = paste0(stay_obv, " (", stay_exp, ")"),
+  `Leave_Obv_Exp` = paste0(leave_obv, " (", leave_exp, ")"),
+  
+  Dif_Stay = dif_stay
+)
+
+# 4. Renombrar las columnas para que queden perfectas en el HTML final
+# (R no deja poner paréntesis en el data.frame directamente de forma fácil)
+colnames(tabla_completa) <- c("Country", "Stay: Obv (Exp)", "Leave: Obv (Exp)", "Dif_Stay")
+
+# 5. Mostrar la tabla con un diseño elegante
+# Añadimos align = "c" para que los números queden centrados y más legibles
+knitr::kable(tabla_completa, 
+             row.names = FALSE, 
+             align = "c", 
+             caption = "Complete Comparison: Retention and Turnover (Observed vs Expected) by Country")
+
+```
+
+**Test Validity and Limitations (The Warning)** When running the Chi-square test, R triggers a warning indicating that the approximation may be incorrect.
+This happens due to an issue with small subgroup sizes.
+For the Chi-square mathematical calculation to be highly reliable, a strict rule applies: the *expected* frequencies in every cell must be greater than 5.
+As seen in our expected table, countries like Country 2 (4.56) and Country 4 (4.68) fall below this threshold, causing the statistic to lose reliability.
+
+If ignored, this limitation could trigger false alarms for Human Resources, mistaking normal random variations in small offices for genuine retention issues.
+
+To correct this statistically, we could use the **Fisher Exact Test**, which is designed for small subgroups.
+However, because we have a considerable dataset (N=1650 records), computing all possible combinations requires massive memory and might cause an error.
+A more viable statistical alternative is to run a **Monte Carlo Simulation**, which bypasses the strict formula by generating thousands of random scenarios to calculate a highly accurate $p$-value.
+
+**The HR Perspective on the Warning:** From a pure Human Resources standpoint, the best practice is simply to group the data.
+For instance, combining the smallest delegations into a "Rest of the World" category ensures statistical robustness.
+Ultimately, any statistical uncertainty regarding whether a minor branch like Country 4 should have seen 4 or 6 departures is negligible for the broader global strategy.
+The vast majority of the dataset is heavily concentrated in larger countries where the statistical validity is entirely robust.
+Consequently, HR should acknowledge this limitation but can confidently rely on the macro-trends revealed by the table.
+
+**Results Analysis: P-Value and Observed vs. Expected** The Pearson's Chi-squared test yields a $p$-value of 0.1269.
+Since this is greater than the standard 0.05 threshold, the results are **not statistically significant** globally.
+This implies that, overall, the differences in turnover rates across countries could simply be due to random chance rather than a systemic geographical issue.
+
+However, looking at the absolute *Observed vs. Expected* differences, there are significant operational insights for specific branches:
+
+-   **The Positive Outlier (Country 9):** Country 9 is not only the headquarters (accounting for over 1,000 employees), but its retention capacity is exceptionally strong. It retained almost 20 more employees than mathematically expected (`Dif_Stay` = 19.8). The company is saving talent and significant hiring costs in its most important market. HR should investigate what wellness, leadership, or compensation policies are being applied here to export them.
+-   **The Critical Drain (Country 3):** Despite the global $p$-value, Country 3 requires attention. Its `Dif_Stay` is -6.1 (we expected 61 people to stay, but only 55 did). In the turnover column, we expected about 9 resignations, but they actually had 15. For a mid-sized office with a headcount of around 70, nearly doubling the expected number of resignations represents a critical talent drain.
+
+### Interpretation: Should HR be concerned about country differences in individual turnover based on this analysis alone?
+
+**No, not based on this analysis alone.** While the descriptive data shows concerning absolute numbers in branches like Country 3, HR should not launch expensive, country-specific retention initiatives based solely on this test for two main reasons:
+
+-   **Lack of Statistical Significance:** The global $p$-value (0.1269) suggests that geography, as a standalone variable, is not a definitive driver of turnover across the whole company.
+-   **Correlation Does Not Imply Causation:** This is a univariate analysis that does not tell the whole story. Country might just be a "proxy" for other underlying issues. For example, Country 3 might have higher turnover simply because it houses the Sales department (which naturally has higher turnover than Finance), or because its workforce has a lower average tenure or salary.
+
+**Next Steps (Preview of promt 2)** Before drawing definitive conclusions, HR needs to evolve from descriptive to predictive analytics.
+We must build a multivariate model that controls for factors like department, salary, tenure, and performance score, to isolate whether the country is *truly* the root cause of the turnover problem.
+
+# Prompt 2: Cross-Country Differences in Team Engagement and Turnover
+
+### Tasks
+
+-   Import 'Turnover_Team_Data.xlsx' into R (definitions of all fields are included in the 'variable key' worksheet within the Excel file).\
+-   Generate descriptive statistics (N, Mean, SD, Min, Max) for Team engagement and Team turnover rate by country.\
+-   Conduct a one-way ANOVA for each variable: Test the assumption of homogeneity of variances using Levene’s test; Use Welch’s ANOVA if variances are unequal; Perform appropriate post-hoc tests to identify which countries differ.\
+
+### Deliverables
+
+-   Descriptive statistics tables.\
+-   ANOVA output (including Welch correction if required).\
+-   Post-hoc comparison table
+-   Interpretation: Which country or countries should HR prioritize for further diagnosis, and why?
+
+## Solution
+
+### Descriptive statistics tables
+
+```{r prompt2.1}
+df2 <- read_excel("Databases/Turnover_Team_Data.xlsx")
+str(df2)
+head(df2)
+df2$Country <- as.factor(df2$Country)
+levels(df2$Country)
+```
+
+```{r}
+library(dplyr)
+
+df2 %>%
+group_by(Country) %>%
+summarise(
+N = n(),
+Eng_mean = mean(Engagement),
+Eng_sd = sd(Engagement),
+Eng_min = min(Engagement),
+Eng_max = max(Engagement),
+Turn_mean = mean(TeamSeparation),
+Turn_sd = sd(TeamSeparation),
+Turn_min = min(TeamSeparation),
+Turn_max = max(TeamSeparation)
+)
+```
+
+The dataset contains information on 212 teams across multiple countries.
+Each observation represents a team and includes variables related to team size, employee engagement, leadership quality, organizational culture, and turnover rates.
+The key variables for this analysis are team engagement and team turnover (TeamSeparation), while country is used as the grouping variable to test for cross-country differences.
+
+### ANOVA output (including Welch correction if required)
+
+```{r prompt2.2}
+library(car)
+
+#To see if we use normal ANOVA or Welch ANOVA
+leveneTest(Engagement ~ Country, data = df2)
+leveneTest(TeamSeparation ~ Country, data = df2)
+```
+
+Levene’s test was conducted to examine the assumption of homogeneity of variance across countries.
+The results were significant for both engagement (F = 10.805, p \< 0.001) and team turnover (F = 5.368, p = 0.001), indicating that the assumption of equal variances was violated.
+Consequently, Welch’s ANOVA was used instead of the standard ANOVA, as it does not assume equal variances across groups.
+
+```{r prompt2.2.2}
+oneway.test(Engagement ~ Country, data = df2)
+oneway.test(TeamSeparation ~ Country, data = df2)
+```
+
+Welch’s ANOVA was conducted to examine whether engagement levels differ across countries.
+The results show a significant effect of country on engagement, F(3, 93.48) = 29.256, p \< 0.001, indicating that engagement levels vary significantly between countries.
+Welch’s ANOVA was also conducted to test whether team turnover differs across countries.
+The results indicate a significant effect of country on team turnover, F(3, 98.76) = 3.446, p = 0.020.
+This indicates that country is an important factor associated with differences in both engagement and turnover at the team level.
+
+### Post-hoc comparison table
+
+```{r prompt2.3}
+library(rstatix)
+
+games_howell_test(df2, Engagement ~ Country)
+games_howell_test(df2, TeamSeparation ~ Country)
+```
+
+Post-hoc Games-Howell comparisons were conducted to identify which countries differed significantly.
+Spain consistently shows lower engagement compared to all other countries, while differences among the UK, US, and Canada are not statistically significant.
+
+For team turnover, Spain showed significantly higher turnover rates compared with the UK and the US.
+However, the difference between Spain and Canada was not statistically significant.
+
+### Interpretation: Which country or countries should HR prioritize for further diagnosis, and why?
+
+Spain clearly emerges as the priority country for further diagnosis.
+
+The results show that Spanish teams have substantially lower engagement levels compared to other countries, with differences of up to 13–17 points relative to the UK and Canada. These are not only statistically significant but also practically meaningful differences.
+
+At the same time, Spain also exhibits higher turnover rates, particularly when compared to the UK and the US. Although not all pairwise comparisons are significant, the overall pattern is consistent with a less favourable employee experience.
+
+We must remember that this analysis is descriptive and does not establish causality. However, the coexistence of low engagement and higher turnover suggests that Spain may face structural or managerial challenges that are not present to the same extent in other countries.
+
+From an HR perspective, Spain should be prioritised for deeper diagnostic analysis, focusing on identifying specific drivers (e.g., leadership effectiveness, workload distribution, or work–life balance) rather than applying generic interventions.
+
+# Prompt 3: Individual-Level Predictors of Voluntary Turnover
+
+### Tasks
+
+-   Import 'Individual_Turnover.xlsx' into R (definitions of all fields are included in the 'variable key' worksheet within the Excel file).\
+-   Estimate a logistic regression model predicting leaver status using: Gender; Age; Length of service; Performance appraisal rating; Country (as a categorical variable).\
+-   Evaluate overall model fit using: Likelihood ratio test; Nagelkerke R².\
+-   Interpret coefficients using odds ratios.
+
+### Deliverables
+
+-   Logistic regression output.\
+-   Table of log-odds and odds ratios.\
+-   Interpretation: Which variables significantly predict turnover? How should HR interpret the effect of gender and performance ratings?
+
+## Solution
+
+### Logistic regression output
+
+```{r}
+library(readxl)
+library(fmsb)
+library(lmtest)
+library(broom)
+library(readxl)
+```
+
+
+```{r prompt3.1}
+df_ind <- read_excel("Databases/Individual_Turnover.xlsx")
+```
+
+
+```{r}
+# 1. Crear un dataframe limpio solo con las variables del modelo
+df_log <- df_ind %>%
+  dplyr::select(LeaverStatus, Gender, Age, LengthOfService, AppraisalRating, Country) %>%
+  tidyr::drop_na()
+
+# 2. Estimar el modelo nulo
+model_null <- glm(
+  LeaverStatus ~ 1,
+  data = df_log,
+  family = binomial
+)
+
+# 3. Estimar el modelo de regresión logística
+model_log <- glm(
+  LeaverStatus ~ Gender + Age + LengthOfService + AppraisalRating + Country,
+  data = df_log,
+  family = binomial
+)
+
+# 4. Mostrar el resumen del modelo
+summary(model_log)
+
+# 5. Evaluación del ajuste global
+lmtest::lrtest(model_null, model_log)
+
+# Nagelkerke R2
+NagelkerkeR2(model_log)
+```
+
+### Table of log-odds and odds ratios
+
+```{r prompt3.2}
+# Crear tabla combinada de Log-Odds y Odds Ratios con intervalos de confianza
+model_results <- tidy(model_log, conf.int = TRUE) %>%
+  mutate(
+    odds_ratio = exp(estimate),
+    conf.low_OR = exp(conf.low),
+    conf.high_OR = exp(conf.high)
+  ) %>%
+  select(term, log_odds = estimate, std.error, p.value, odds_ratio, conf.low_OR, conf.high_OR)
+
+knitr::kable(model_results, digits = 3, caption = "Resultados de Regresión Logística: Log-Odds y Odds Ratios")
+
+```
+
+### Interpretation: Which variables significantly predict turnover? How should HR interpret the effect of gender and performance ratings?
+
+Regarding the overall model fit, the logistic regression analysis reveals that the predictors included explain approximately 5.4% of the variance in employee turnover, as indicated by the Nagelkerke R\^2.
+While this figure may appear low, it is considered a meaningful and robust finding in People Analytics, where individual stay-or-leave decisions are influenced by a vast array of complex personal and professional factors.
+Furthermore, the likelihood ratio test confirms that the model significantly outperforms a null model.
+
+Among the variables tested, Gender and Performance Appraisal Ratings stand out as the most significant individual-level predictors of turnover.
+Although the analysis shows that turnover rates fluctuate depending on the specific Country, the impact of gender is particularly striking when examined through odds ratios.
+Specifically, after controlling for age, tenure, and performance, the data indicates that women are 1.879 times($1 / 0.532$) more likely to leave the organization than their male counterparts.
+This suggests a critical gender based retention gap that requires to futher investigate potential systemic issues such as career progression barriers or workplace flexibility.
+
+The interpretation of Performance Appraisal Ratings also provides vital insights into the organization's talent health.
+The model demonstrates a strong protective effect of high performance on retention, as employees are 29.5%(1 / 0.772 = 1.295) more likely to stay for each one-point increase in their performance rating.
+From a strategic standpoint, this indicates that the company is successfully retaining its top-tier talent.
+However, the significant disparity in turnover by gender remains the most pressing concern, suggesting that while the "High Performers" are staying, the organization may be losing qualified female talent at a disproportionate rate.
+
+Importantly, country is not a significant predictor once individual-level variables are included, indicating that previously observed differences across countries (prompt 2) may be explained by underlying individual or team characteristics rather than country itself.
+
+
+# Prompt 4: Gender Differences in Employee Turnover Over Tenure
+
+### Tasks
+
+-   Import 'Individual_Turnover.xlsx' into R (definitions of all fields are included in the 'variable key' worksheet within the Excel file).\
+-   Conduct a Kaplan–Meier survival analysis using: Length of service as time variable; Leaver status as event indicator; Gender as grouping variable.\
+-   Compare survival curves using a statistical test.\
+-   Visualize survival probabilities over time.
+
+### Deliverables
+
+-   Survival table and summary statistics.\
+-   Survival plot\
+-   Interpretation: At what stages of tenure are gender differences in turnover most pronounced, and what HR processes might this implicate?
+
+## Solution
+
+### Survival table and summary statistics
+
+```{r prompt4.1}
+library(readxl)
+library(survival)
+library(survminer)
+
+df4 <- read_excel("Databases/Individual_Turnover.xlsx")
+data4 <- df4 %>% 
+  dplyr::select(LengthOfService, LeaverStatus, Gender) %>%
+  tidyr::drop_na()
+
+data4$Gender <- as.factor(data4$Gender)
+
+km_model <- survfit(Surv(LengthOfService, LeaverStatus) ~ Gender, data = data4)
+
+summary(km_model)
+
+survdiff(Surv(LengthOfService, LeaverStatus) ~ Gender, data = data4)
+
+
+```
+##Interpretation of the Kaplan–Meier survival curves
+
+The Kaplan–Meier survival curves show how the probability of remaining in the organisation changes as length of service increases for each gender group. At the beginning of tenure, the two curves are relatively close, which suggests that men and women have fairly similar probabilities of staying during the early years of employment. This means that gender differences in turnover do not appear to be especially strong at the entry or very early career stage.
+
+As tenure increases, the curves begin to separate more clearly. The gap becomes more visible during mid-career, roughly from around 15 to 25 years of service, and this indicates that the retention experience of the two groups becomes less similar over time. The survival curves suggest that one gender consistently shows a lower probability of remaining in the organisation over time, indicating a higher turnover risk. This pattern is consistent with the findings from the logistic regression model, where gender was identified as a significant predictor of turnover.
+
+Overall, the curves suggest that gender differences in turnover are not constant across the employee lifecycle. Instead, they seem to emerge gradually and become more pronounced as employees move further into their careers. This is important because it suggests that turnover risk may depend not only on gender, but also on the stage of tenure at which employees are being considered.
+### Survival plot
+
+```{r prompt4.2}
+ggsurvplot(km_model,
+           data = data4,
+           pval = TRUE,
+           risk.table = FALSE,
+           legend.title = "Gender",
+           legend.labs = c("Male","Female"),
+           xlab = "Years of service",
+           ylab = "Probability of staying")
+
+```
+##Interpretation of the survival table and summary statistics
+The survival table provides the numerical detail behind the Kaplan–Meier curves. It shows the number of employees still “at risk” of leaving at different points in time, the number of turnover events observed, and the estimated survival probability. As expected, the number at risk decreases over time, because some employees leave the organisation and others are censored, meaning they are still employed at the end of the observation period.
+
+The steady reduction in survival probabilities confirms that the likelihood of remaining in the organisation falls as tenure increases. This is a normal pattern in survival analysis, since the longer employees are observed, the more opportunity there is for turnover to occur. What is more relevant here is that the table supports the graphical pattern seen in the curves: differences between genders become more noticeable at higher tenure levels.
+
+At the later stages of service, the number of employees still being observed is much smaller, so the estimates become less stable. This means the sharp drops near the end of the graph should be interpreted cautiously. Even so, the overall pattern still supports the conclusion that gender differences in turnover become more evident beyond the early years of service, particularly in the middle and later stages of tenure.
+
+##Interpretation of the log-rank test
+
+The log-rank test is used to compare the survival curves statistically and determine whether the difference between them is large enough to be considered significant. In this case, the result is statistically significant, with χ² = 21.6 and p < 0.001. This means that the survival patterns for men and women are not the same, and that the observed difference is very unlikely to be due to random chance alone.
+
+This is an important result because the visual difference in the curves is supported by formal statistical evidence. In other words, it is not just that the lines look different on the graph; the test confirms that gender is meaningfully associated with different turnover patterns across tenure.
+
+However, this should still be interpreted carefully. Statistical significance tells us that the groups differ, but it does not by itself explain why the difference exists. The result shows that gender is related to survival over tenure, but not which organisational factors are causing that pattern. To answer that, HR would need to consider broader issues such as promotion systems, career opportunities, leadership experiences, flexibility, or retention conditions at later career stages.
+
+### Interpretation: At what stages of tenure are gender differences in turnover most pronounced, and what HR processes might this implicate?
+Based on the survival curves and summary results, gender differences in turnover are most pronounced in the mid-to-late stages of tenure rather than at the beginning of employment. In the early years, retention patterns are relatively similar, so there is little evidence of a major gender gap at the start of the employee journey. The divergence becomes clearer in mid-career and is strongest at longer lengths of service, where the male survival curve declines more sharply.
+
+This pattern suggests that the most relevant HR processes are likely to be those that affect employees after they have already spent a substantial period in the organisation. These may include career progression opportunities, access to promotion, professional development, long-term engagement, recognition, and work–life balance support. If employees experience barriers or dissatisfaction in these areas later in their careers, this could increase the likelihood of leaving.
+
+From an HR perspective, the results imply that retention efforts should not focus only on onboarding or early-career support. Instead, the organisation should also review how employees are managed and supported over the longer term. Particular attention may need to be given to whether both genders experience fair and sustainable opportunities for advancement, development, and continued engagement as their tenure increases.
+
+These results should be interpreted with caution, as the number of employees at risk decreases substantially at higher tenure levels, making estimates less stable in the tail of the distribution.
+
+# Prompt 5: Team-Level Drivers of Employee Turnover
+
+### Tasks
+
+-   Import 'Turnover_Team_Data.xlsx' into R (definitions of all fields are included in the 'variable key' worksheet within the Excel file).\
+-   Estimate an OLS multiple regression model predicting team turnover using: Engagement; Team leader rating; CSR; Drive for performance; Performance, development and reward; Work–life balance; Country dummy variables (with one reference category).\
+-   Examine: Model fit (R², F-test).\
+-   Unstandardized and standardized coefficients.
+
+### Deliverables
+
+-   Regression output and Table of standardized coefficients.\
+-   Interpretation: Which team-level factors are most strongly associated with turnover, and how should HR respond?
+
+## Solution
+
+### Regression output and Table of standardized coefficients
+
+```{r}
+library(tidyverse)
+library(broom) # Para limpiar los resultados del modelo
+# install.packages("lm.beta") # Quita el '#' y ejecuta esto en la consola si no lo tienes
+library(lm.beta)
+```
+
+```{r prompt5.1}
+df5 <- read_excel("Databases/Turnover_Team_Data.xlsx")
+head(df5)
+```
+
+```{r}
+str(df5)
+```
+
+```{r}
+summary(df5)
+```
+
+```{r}
+# 3. Estimar el modelo OLS (Regresión Lineal Múltiple)
+modelo_ols <- lm(TeamSeparation ~ Engagement + TeamLeader + SociallyResponsible + 
+                 DriveForPerformance + PerfDevReward + WLB + 
+                 UKdummy + USAdummy + CanadaDummy + SpainDummy, 
+                 data = df5)
+```
+
+```{r}
+# Examinar el ajuste del modelo (Model fit: R-squared y F-test) y coeficientes no estandarizados
+cat("\n--- RESUMEN DEL MODELO (Unstandardized Coefficients & Model Fit) ---\n")
+resumen_modelo <- summary(modelo_ols)
+print(resumen_modelo)
+```
+
+```{r}
+# 5. Calcular los coeficientes ESTANDARIZADOS
+modelo_estandarizado <- lm.beta(modelo_ols)
+```
+
+```{r}
+# 6. Crear una tabla elegante con los coeficientes estandarizados para el entregable
+tabla_std <- tidy(modelo_estandarizado) %>%
+  select(term, estimate) %>%
+  rename(Variable = term, `Standardized Coefficient (Beta)` = estimate) %>%
+  arrange(desc(abs(`Standardized Coefficient (Beta)`))) # Ordenar del más fuerte al más débil
+
+# Mostrar la tabla bonita en el HTML
+knitr::kable(tabla_std, 
+             digits = 4, 
+             caption = "Table of Standardized Coefficients (Ranked by Impact)")
+```
+
+```{r}
+# 1. Estandarizamos SOLO las variables numéricas (dejamos las Dummies en paz)
+df_team_scaled <- df5 %>%
+  mutate(across(c(Engagement, TeamLeader, SociallyResponsible, 
+                  DriveForPerformance, PerfDevReward, WLB), scale))
+
+# 2. Corremos el modelo con los datos estandarizados
+modelo_estandarizado <- lm(TeamSeparation ~ Engagement + TeamLeader + SociallyResponsible + 
+                           DriveForPerformance + PerfDevReward + WLB + 
+                           UKdummy + USAdummy + CanadaDummy, # Quitamos SpainDummy para evitar el NA
+                           data = df_team_scaled)
+
+# 3. Creamos la tabla correcta
+tabla_std_corregida <- tidy(modelo_estandarizado) %>%
+  select(term, estimate, p.value) %>%
+  rename(Variable = term, `Standardized Beta` = estimate, `P-Value` = p.value) %>%
+  filter(Variable != "(Intercept)") %>% # Ocultamos el intercepto que no aporta valor aquí
+  arrange(desc(abs(`Standardized Beta`)))
+
+# 4. Imprimir la tabla bonita
+knitr::kable(tabla_std_corregida, digits = 4, caption = "Standardized Coefficients (True Impact)")
+```
+
+### Overall model fit and the reference variable
+
+The multiple regression model presents a highly significant overall fit, evidenced by an F-test p-value close to zero ($3.04 \times 10^{-10}$).
+Furthermore, the adjusted $R^2$ indicates that this set of variables explains approximately 23.3% of the variance in team turnover.
+Although this percentage might seem low in the hard sciences, in Human Resources analytics and organizational behavior, it represents a quite robust and useful level of fit for decision-making.
+On the other hand, the singularity message and the null value for the Spain variable is the normal and statistically necessary behavior of the model.
+When including all the country dummy variables, the software automatically omits one to use it as the base or reference category.
+Given that the p-values for the remaining countries are greater than 0.05, we can conclude that, when controlling for the other factors, geographic location does not generate statistically significant differences in team turnover.
+The loss of significance of country variables once team-level factors are included suggests that previously observed differences across countries (prompt 2) may be driven by underlying team characteristics rather than location itself.
+
+### The true drivers of turnover
+
+When evaluating the impact of each factor, the focus should be exclusively on the statistically significant variables.
+In this context, Engagement stands out as the primary protective factor; its negative coefficient demonstrates that higher engagement leads to lower turnover, consolidating it as the main retention tool.
+Conversely, the most critical finding for Human Resources lies in the Drive for Performance.
+By presenting a significant positive coefficient, the model warns us of a double-edged sword: increasing the pressure for performance is increasing team separations, pointing to a clear risk of exhaustion or "burnout." It is equally strategic for the department to discover which elements are not influencing the outcome.
+In this specific case, traditionally valued factors such as team leader ratings, corporate social responsibility policies, or work-life balance do not show a statistically demonstrable impact on the retention of these teams.
+
+### Technical correction and model explainability
+
+Despite the clarity of these findings, there is a technical detail in the standardized coefficients table that must be corrected for the final deliverable.
+The currently displayed values are identical to the raw coefficients, which happens due to a technical incompatibility when extracting the data with the library used.
+To obtain a true, standardized ranking of each variable's impact, it is necessary to mathematically scale the numeric columns before running the regression model.
+Once this detail is corrected, the model is outstanding in terms of explainability for the business context.
+It is not necessary to refine it by removing the non-significant variables, since, in talent management, demonstrating with empirical data that certain policies are not curbing turnover is just as valuable an insight as identifying the true root causes of the problem.
+
+### Interpretation: Which team-level factors are most strongly associated with turnover, and how should HR respond?
+
+Based on the OLS multiple regression model (Adjusted $R^2 = 0.233$, $p < 0.001$), only two team-level factors emerge as statistically significant drivers of turnover: Engagement and Drive for Performance.
+Notably, geographic location and other heavily discussed HR metrics—such as Work-Life Balance (WLB), Corporate Social Responsibility (CSR), and Team Leader ratings—do not show a statistically significant impact on team separation rates in this specific dataset.
+
+Delving into these core drivers, Engagement acts as the ultimate protective anchor for talent.
+It presents a highly significant negative coefficient ($p < 0.001$), meaning that as team engagement scores increase, the number of separations significantly decreases.
+This confirms that employee commitment is the strongest defense the company currently has against turnover.
+Conversely, Drive for Performance stands out as the primary risk factor, carrying a significant positive coefficient ($p < 0.05$).
+This serves as the most critical warning sign in the analysis: the harder a team is pushed to perform, the higher their turnover rate becomes.
+It highlights a clear "burnout" risk, indicating that while driving business results is important, an excessive or unbalanced push for performance is literally driving employees out the door.
+
+To address these findings, HR must implement a targeted, strategic response.
+First, HR should immediately audit high-pressure teams, specifically identifying those with the highest "Drive for Performance" scores to ensure that expectations are realistic and not creating a toxic, unsustainable environment.
+Simultaneously, HR needs to prioritize engagement initiatives over generic perks.
+Since the data shows that WLB and CSR scores do not significantly move the needle on turnover, the department should temporarily reallocate budgets away from broad campaigns and toward core engagement drivers, such as meaningful work, recognition, and internal communication.
+Finally, it is crucial to redefine management KPIs.
+HR must work with senior leadership to balance performance metrics with retention goals; if middle managers are exclusively rewarded for driving performance, they will continue to burn out their teams.
+Moving forward, managers must be evaluated on their ability to hit targets while simultaneously maintaining high team engagement and low turnover.
+
+# Prompt 6: Financial Implications of Gender Differences in Turnover
+
+### Tasks
+
+-   Import 'Individual_Turnover.xlsx' into R (definitions of all fields are included in the 'variable key' worksheet within the Excel file).\
+-   Estimate the proportion of individual turnover explained by gender alone using logistic regression.\
+-   Use the Nagelkerke R² to approximate the share of turnover costs attributable to gender.\
+-   Assume a total annual voluntary turnover cost of £4 million. Calculate potential cost savings if gender-related turnover were eliminated or reduced.
+
+### Deliverables
+
+-   Cost calculation.\
+-   Executive-style summary answering: Is there a strong enough business case to justify a targeted retention intervention?
+-   What cautions should HR keep in mind when interpreting these figures?
+
+## Solution
+
+### Cost calculation
+
+```{r prompt6.1}
+# Logistic regression with gender only
+df6 <- df4 %>%
+  dplyr::select(LeaverStatus, Gender) %>%
+  tidyr::drop_na()
+
+df6$Gender <- as.factor(df6$Gender)
+
+model_null_gender <- glm(
+  LeaverStatus ~ 1,
+  data = df6,
+  family = binomial
+)
+
+model_gender <- glm(
+  LeaverStatus ~ Gender,
+  data = df6,
+  family = binomial
+)
+
+summary(model_gender)
+
+rcompanion::nagelkerke(model_gender, null = model_null_gender)
+
+total_cost <- 4000000
+R2_gender <- 0.024
+
+cost_explained <- total_cost * R2_gender
+cost_explained
+
+
+```
+##Logistic regression results (Gender effect)
+
+The logistic regression model shows that gender is a statistically significant predictor of voluntary turnover. The coefficient for gender is negative and highly significant (p < 0.001), indicating that the probability of leaving differs between genders.
+
+Expressed as an odds ratio, the result suggests that one gender has substantially lower odds of leaving than the reference group. This confirms that gender is meaningfully associated with turnover outcomes at the individual level.
+
+##Model fit and Nagelkerke R²
+
+The Nagelkerke R² value is approximately 0.024, meaning that gender alone explains about 2.4% of the variance in turnover.
+
+This indicates that, although gender is statistically significant, it is not a strong predictor on its own. Most of the variation in turnover is driven by other factors not included in this model.
+
+Therefore, gender has a real but limited explanatory power in understanding why employees leave.
+
+##Cost Calculation
+Using the Nagelkerke R² as an approximation, gender-related turnover accounts for about 2.4% of total turnover costs.
+
+Given an annual turnover cost of £4,000,000, this translates into:
+
+£4,000,000 × 0.024 = £96,000 per year
+
+This represents the potential financial impact associated with gender differences in turnover.
+
+This should be interpreted as an approximate estimate of the financial significance of gender-related turnover differences, rather than as an exact or causal monetary attribution.
+
+### Executive-style summary: Is there a strong enough business case to justify a targeted retention intervention?
+The analysis shows that gender is a statistically significant factor in predicting employee turnover, but it explains only a small proportion of the overall variance.
+
+Despite the modest explanatory power, the financial implications are still meaningful. Gender-related turnover may account for approximately £96,000 annually, suggesting that there is a moderate business case for targeted retention interventions.
+
+However, given that most turnover is driven by other factors, gender-focused initiatives should be part of a broader, more comprehensive retention strategy rather than a standalone solution.
+### What cautions should HR keep in mind when interpreting these figures?
+HR should interpret these findings with caution. Although gender is identified as a statistically significant predictor of turnover, it explains only a small proportion of the overall variance (around 2.4%). This indicates that most of the factors driving employee turnover are not captured by this model and are likely related to other variables such as performance, engagement, leadership quality, career opportunities, or work–life balance.
+
+In addition, the analysis demonstrates an association between gender and turnover, but it does not establish a causal relationship. Therefore, it cannot be concluded that gender itself directly causes employees to leave, but rather that it may be linked to underlying organisational or structural factors.
+
+It is also important to recognise that some level of voluntary turnover can be functional and beneficial for the organisation, as it may allow for renewal of talent and improved performance. For this reason, HR should avoid interpreting these results in isolation and instead consider them as part of a broader, more comprehensive analysis of turnover drivers before designing targeted interventions.
