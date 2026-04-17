@@ -172,39 +172,189 @@ df2 <- df2 %>%
 
 ```{r prompt2.4}
 # 3. Generar Tablas Cruzadas y Pruebas Chi-cuadrado
-
 # Gender × Shortlisted
 cat("\n--- Gender x Shortlisted ---\n")
 tab_gen_short <- table(df2$Gender, df2$ShortlistedNY)
 print(tab_gen_short)
-print(chisq.test(tab_gen_short))
+test_chi_gen <- chisq.test(tab_gen_short)
+print(test_chi_gen)
 ```
+
+```{r}
+print(test_chi_gen$expected)
+```
+
+The analysis of the shortlisting stage aimed to evaluate the fairness and potential existence of gender bias in the initial recruitment decisions. The Chi test determines whether a statistically significant relationship exists between the candidates' gender and their probability of passing this first evaluation filter.
+
+The results yielded a p-value of 0.00019 \< 0.05, it conclusively confirms that shortlisting decisions are not independent of the applicant's gender. When contrasting this finding with the actual proportions of the sample, the disparity becomes evident: while almost half of the male candidates (48.7%) managed to advance to the interview phase, barely a quarter of the female candidates (24.8%) made the cut.
+
+Therefore, the current shortlisting process is not impartial and presents a statistically significant bias favoring men. Despite the organization attracting a volume of female talent that almost triples the male talent in the application phase (202 women compared to 78 men), their rejection rate is disproportionately high. This data points to a clear "bottleneck" for diversity at this early stage, suggesting an urgent need to audit and recalibrate the criteria or algorithms used during the initial profile review.
 
 ```{r prompt2.5}
 # UG × Shortlisted
 cat("\n--- UG (Underrepresented Group) x Shortlisted ---\n")
 tab_ug_short <- table(df2$UGyn, df2$ShortlistedNY)
 print(tab_ug_short)
-print(chisq.test(tab_ug_short))
+test_chi_ug <-chisq.test(tab_ug_short)
+print(test_chi_ug)
 ```
+
+```{r}
+print(test_chi_ug$expected)
+```
+
+Additionally in the analysis of the shortlisting stage we evaluated the fairness of decisions regarding candidates belonging to underrepresented groups (UG).
+
+The statistical results give a p-value of **1.472e-06**, the value is drastically lower than the standard significance level of 0.05, it confirms that a highly significant statistical relationship exists between the two variables. This means that the decision to shortlist a candidate is not independent of their underrepresented group status; on the contrary, there is a clear, non-random pattern in the results.
+
+When contrasting the observed proportions, the disadvantage is evident. Only **15.7%** of the candidates belonging to underrepresented groups (19 out of 121) managed to advance to the next stage. In contrast, candidates who do not belong to these groups had a much higher success rate, reaching a **43.4%** shortlisting rate (69 out of 159).
+
+This disparity is conclusively confirmed when reviewing the table of expected values. In a scenario where the selection process is completely neutral and equitable, statistics project that approximately 38 candidates from underrepresented groups should have been shortlisted. However, in reality, only 19 managed to pass the filter—exactly half of what would be expected under fair conditions.
+
+The shortlisting process also presents a significant bias against underrepresented groups. The disproportionate rejection rate toward this demographic and the large deviation from the expected values indicate that the criteria or methods used to filter candidates are not impartial.
 
 ```{r prompt2.6}
 # Gender × Offer
 cat("\n--- Gender x Offer ---\n")
 tab_gen_offer <- table(df2$Gender, df2$OfferNY)
 print(tab_gen_offer)
-print(chisq.test(tab_gen_offer))
+test_chi_gen_off <- chisq.test(tab_gen_offer)
+print(test_chi_gen_off)
 ```
+
+```{r}
+print(test_chi_gen_off$expected)
+```
+
+Moving on to teh next stage, we evaluated the fairness with the same variables, starting with gender.The aim is to determine whether the probability of a candidate receiving a formal proposal is independent of their gender.
+
+Because the p-value is 0.04279, it confirms that a statistically significant relationship exists between the two variables. This indicates that hiring decisions in this phase are not random and present an imbalance dependent on the candidate's gender.
+
+When analyzing the actual proportions of the sample, the bias becomes evident. Out of the 27 men who reached this stage, a large majority of 66.7% (18 candidates) received a job offer. In stark contrast, out of the 28 women evaluated, only 35.7% (10 candidates) managed to secure a proposal. This disparity is reaffirmed by examining the table of expected values: in a scenario of total equity, statistics projected that both groups would receive approximately 14 offers each (13.75 for men and 14.25 for women). However, in practice, men far exceeded this expectation, while women fell significantly below it.
+
+In conclusion, the quantitative evidence demonstrates that the final offer stage is not impartial and presents a statistically significant gender bias. Despite having reached the same evaluative stage, male candidates have a considerably higher probability of being hired than their female counterparts, suggesting that the decision criteria in this final phase require a review to ensure fairness.
 
 ```{r prompt2.7}
 # UG × Offer
 cat("\n--- UG (Underrepresented Group) x Offer ---\n")
 tab_ug_offer <- table(df2$UGyn, df2$OfferNY)
 print(tab_ug_offer)
-print(chisq.test(tab_ug_offer))
+test_chi_ug_off <- chisq.test(tab_ug_offer)
+print(test_chi_ug_off)
 ```
 
+```{r}
+print(test_chi_ug_off$expected)
+```
+
+Finally doing the same statistical analysis of the final stage of the selection process with regard to belonging to an underrepresented group, seeking to determine whether underrepresented group status influences the probability of a finalist receiving a formal hiring proposal.
+
+The results of the statistical test yielded a p-value of 0.5756. Since this indicator is considerably higher than the standard significance level of 0.05, there is no statistical evidence to assert that a relationship exists between the two variables. This means that the decisions made in this phase are independent of whether or not the candidate belongs to an underrepresented group; the observed differences are purely due to normal random variance and not to a systemic bias.
+
+When analyzing the proportions and the expected values, this fairness is confirmed. Out of the 13 candidates from underrepresented groups who reached this stage, 8 received an offer (61.5%). On the other hand, out of the 42 candidates from non-underrepresented groups, 20 received a proposal (47.6%). The actual figures align very closely with the statistical projections of a perfectly neutral scenario: the model expected that approximately 6.6 candidates from underrepresented groups would receive an offer, and in practice, there were 8.
+
+In conclusion, the quantitative evidence indicates that the final offer stage is fair and impartial regarding underrepresented groups. The data demonstrates that once these candidates manage to reach the final phase of the process, they do not face a discriminatory barrier to being hired, as their profiles are evaluated equitably compared to the rest of the applicants. But with the previous analysis just to reach this stage there is a bias regarding if you belong to the underrepresented group or not.
+
 ### Summary: Are the recruitment decisions fair and unbiased?
+
+Based on the quantitative analysis, the recruitment decisions are **not completely fair or unbiased**. While there is evidence of equitable treatment in one specific instance, significant systemic biases exist—particularly against women throughout the entire pipeline and against underrepresented groups during the initial screening.
+
+Here is a breakdown of the fairness across the different stages:
+
+#### **1. The Shortlisting Stage: A Major Diversity Bottleneck**
+
+The initial screening phase (*shortlisting*) lacks objectivity and presents severe, statistically significant biases against both women and underrepresented groups.
+
+-   **Gender Bias:** The process disproportionately favors male candidates ($p = 0.00019$). Although the organization attracted nearly three times as many female applicants (202 women vs. 78 men), their rejection rate was massive. Only **24.8%** of female candidates advanced, compared to nearly half (**48.7%**) of the male candidates.
+
+-   **Underrepresented Groups (UG) Bias:** The shortlisting phase also heavily penalizes UG talent ($p = 0.00000147$). Only **15.7%** of UG candidates successfully passed the initial filter, whereas non-UG candidates enjoyed a **43.4%** success rate. In a perfectly equitable scenario, statistical models expected around 38 UG candidates to advance; in reality, only exactly half of that number (19) succeeded.
+
+#### **2. The Offer Stage: Mixed Outcomes**
+
+At the final hiring stage, the outcomes diverge depending on the demographic group being evaluated.
+
+-   **Persistent Gender Bias:** The bias against women continues into the final decision-making process ($p = 0.04279$). Among the finalists, a sweeping **66.7%** of men received a formal job offer, compared to a mere **35.7%** of women. While statistical projections expected an even split (approximately 14 offers for each gender), male candidates significantly exceeded expectations at the direct expense of female candidates.
+
+-   **Fairness for Underrepresented Groups:** Conversely, the final offer stage is completely fair and impartial regarding UG status ($p = 0.5756$). The data shows no systemic barrier for UG candidates who make it to this phase. In fact, **61.5%** of UG finalists received an offer (compared to 47.6% for non-UG candidates), which perfectly aligns with the expected values of a neutral and unbiased selection scenario.
+
+Overall, the recruitment process is **not fair**. The data irrefutably points to a highly discriminatory initial shortlisting process that arbitrarily filters out diverse talent, followed by a final decision phase that continues to disadvantage women. The organization urgently needs to audit and recalibrate the criteria, algorithms, and human judgments used in its recruitment pipeline to guarantee true equity and inclusion.
+
+Next we provide with graphsx to visually interpret the bias:
+
+```{r visual_gender_pipeline, fig.width=8, fig.height=5}
+# Asegúrate de tener cargado tidyverse
+library(tidyverse)
+
+# 1. Preparar los datos del pipeline directamente desde df2
+pipeline_gender <- df2 %>%
+  group_by(Gender) %>%
+  summarise(
+    `1. Applicants` = n(),
+    `2. Shortlisted` = sum(ShortlistedNY == "Shortlisted", na.rm = TRUE),
+    `3. Offered` = sum(OfferNY == "Made Offer", na.rm = TRUE)
+  ) %>%
+  pivot_longer(cols = -Gender, names_to = "Stage", values_to = "Count")
+
+# 2. Crear el gráfico de caída (Pipeline)
+ggplot(pipeline_gender, aes(x = Stage, y = Count, group = Gender, color = Gender)) +
+  geom_line(linewidth = 1.5) +
+  geom_point(size = 4) +
+  geom_text(aes(label = Count), vjust = -1.5, size = 5, show.legend = FALSE) +
+  scale_color_manual(values = c("Male" = "#2c3e50", "Female" = "#e74c3c")) + # Azul oscuro y Rojo
+  theme_minimal() +
+  labs(
+    title = "Recruitment Pipeline by Gender: The Diversity Bottleneck",
+    subtitle = "While attracting almost 3x more women, the female talent pool drops drastically at the shortlisting stage.",
+    x = "Recruitment Stage",
+    y = "Number of Candidates",
+    color = "Gender"
+  ) +
+  theme(
+    plot.title = element_text(face = "bold", size = 14),
+    axis.text.x = element_text(size = 11, face = "bold"),
+    legend.position = "top"
+  )
+```
+
+```{r visual_ug_bias, fig.width=8, fig.height=5}
+# 1. Extraer los datos exactos de la prueba Chi-cuadrado que ya hiciste
+test_chi_ug <- chisq.test(table(df2$UGyn, df2$ShortlistedNY))
+
+# 2. Construir un dataframe resumen para el gráfico
+df_obs_exp_ug <- data.frame(
+  Group = c("UG (Underrepresented)", "UG (Underrepresented)", "Non-UG", "Non-UG"),
+  Metric = factor(c("Actual (Observed)", "Fair Expectation (Expected)", 
+                    "Actual (Observed)", "Fair Expectation (Expected)"),
+                  levels = c("Fair Expectation (Expected)", "Actual (Observed)")),
+  Count = c(
+    test_chi_ug$observed["Yes", "Shortlisted"],
+    test_chi_ug$expected["Yes", "Shortlisted"],
+    test_chi_ug$observed["No", "Shortlisted"],
+    test_chi_ug$expected["No", "Shortlisted"]
+  )
+)
+
+# 3. Crear el gráfico de barras agrupadas
+ggplot(df_obs_exp_ug, aes(x = Group, y = Count, fill = Metric)) +
+  geom_bar(stat = "identity", position = position_dodge(width = 0.8), width = 0.7) +
+  geom_text(aes(label = round(Count, 0)), 
+            position = position_dodge(width = 0.8), vjust = -0.5, size = 5, fontface = "bold") +
+  scale_fill_manual(values = c("Fair Expectation (Expected)" = "#bdc3c7", # Gris neutro
+                               "Actual (Observed)" = "#e74c3c")) +         # Rojo alerta
+  theme_minimal() +
+  labs(
+    title = "Shortlisting Bias: Actual Hires vs. Fair Expectations",
+    subtitle = "Underrepresented groups (UG) fall 50% short of what a completely unbiased process would predict.",
+    x = "Candidate Group",
+    y = "Number of Shortlisted Candidates",
+    fill = ""
+  ) +
+  theme(
+    plot.title = element_text(face = "bold", size = 14),
+    axis.text.x = element_text(size = 12, face = "bold"),
+    legend.position = "top"
+  )
+```
 
 # Prompt 3: Predicting Shortlisting Using Demographics
 
