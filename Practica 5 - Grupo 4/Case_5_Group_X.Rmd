@@ -210,18 +210,55 @@ print(chisq.test(tab_ug_offer))
 ### Model output
 
 ```{r prompt3.1}
+# Cargar la librería necesaria para calcular el Nagelkerke R²
+if(!require(DescTools)) install.packages("DescTools")
+library(DescTools)
 
+# Para la regresión logística, es más seguro usar una variable objetivo numérica (0 y 1).
+# Convertimos 'ShortlistedNY' (1 = Shortlisted, 0 = Rejected).
+df2$Shortlisted_num <- ifelse(df2$ShortlistedNY == "Shortlisted", 1, 0)
+
+# Ajustar el modelo de regresión logística con Gender y UGyn como predictores
+model_shortlist <- glm(Shortlisted_num ~ Gender + UGyn, 
+                       data = df2, 
+                       family = binomial)
+
+# Imprimir el resumen del modelo para ver los coeficientes y los p-valores (significancia estadística)
+summary(model_shortlist)
+
+# Calcular y mostrar el ajuste del modelo (Nagelkerke R²)
+cat("\n--- Model Fit (Nagelkerke R²) ---\n")
+PseudoR2(model_shortlist, which = "Nagelkerke")
 
 ```
 
 ### Odds ratios and statistical significance
 
 ```{r prompt3.2}
+# Calcular los Odds Ratios exponencializando los coeficientes del modelo
+cat("\n--- Odds Ratios ---\n")
+odds_ratios <- exp(coef(model_shortlist))
+print(odds_ratios)
 
-
+# Calcular los intervalos de confianza al 95% para los Odds Ratios
+cat("\n--- 95% Confidence Intervals for Odds Ratios ---\n")
+conf_intervals <- exp(confint(model_shortlist))
+print(conf_intervals)
 ```
 
 ### Recommendations to improve fairness in shortlisting
+
+Both gender and underrepresented group status are highly significant predictors in the shortlisting model, as their p-values are well below 0.05. This provides strong statistical evidence that the initial screening process is not demographically neutral.
+
+The model yields a Nagelkerke $R^{2}$ of 19.55%. While a 19.55% explanatory power might seem relatively low in some statistical contexts, in People Analytics and specifically when evaluating recruitment fairness, this is a very substantial and concerning figure. It indicates that nearly one-fifth of the variance in shortlisting decisions is driven solely by a candidate's gender and UG status, rather than their actual skills or merit.
+
+-   **Gender Disadvantage:** the negative coefficient for female candidates (-1.19) translates to an odds ratio of approximately 0.30. This means that, holding other factors constant, women have 70% lower odds of being shortlisted compared to men. The data clearly shows that being a woman in this specific selection process is a major disadvantage.
+
+-   **UG Status Advantage for the Majority:** Not belonging to an underrepresented group yields a large positive coefficient (+1.51), which translates to an odds ratio of approximately 4.55. This indicates that majority candidates (Non-UG) have 4.5 times higher odds of passing the screening phase compared to candidates from underrepresented groups.
+
+**Conclusion & Recommendations**
+
+The model reveals a severe systemic bias in the shortlisting phase. Furthermore, the combination of these factors points to a severe compound bias: a candidate who is both female and belongs to an underrepresented group faces a multiplicative penalty, making her chances of being shortlisted statistically minimal compared to a non-UG male candidate. To mitigate this, the organization should strongly consider implementing blind CV screening and structured evaluation rubrics for the initial stages of recruitment.
 
 # Prompt 4: Validating Selection Tools Using Performance Ratings
 
