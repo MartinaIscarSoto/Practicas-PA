@@ -60,18 +60,18 @@ library(dplyr)
 library(janitor)
 
 # Import dataset
-data <- read_excel("Databases/recruitment_applicants_2023.xlsx")
+df1 <- read_excel("Databases/recruitment_applicants_2023.xlsx")
 
 # Clean names
-data <- clean_names(data)
+df1 <- clean_names(df1)
 
 # Check names
-names(data)
-names(data)
-glimpse(data)
+names(df1)
+names(df1)
+glimpse(df1)
 # Recode variables
 # Recode variables
-data <- data %>%
+df1 <- df1 %>%
   mutate(
     gender_rec = case_when(
       gender %in% c(1, "1", "F", "Female") ~ "Female",
@@ -86,13 +86,13 @@ data <- data %>%
   )
 
 # Frequency tables
-freq_gender <- tabyl(data$gender_rec)
-freq_ug <- tabyl(data$ug_rec)
-freq_shortlisted <- tabyl(data$shortlisted_ny)
-freq_interviewed <- tabyl(data$interviewed)
-freq_offered <- tabyl(data$offer_ny)
-freq_accepted <- tabyl(data$accept_ny)
-freq_joined <- tabyl(data$join_yn)
+freq_gender <- tabyl(df1$gender_rec)
+freq_ug <- tabyl(df1$ug_rec)
+freq_shortlisted <- tabyl(df1$shortlisted_ny)
+freq_interviewed <- tabyl(df1$interviewed)
+freq_offered <- tabyl(df1$offer_ny)
+freq_accepted <- tabyl(df1$accept_ny)
+freq_joined <- tabyl(df1$join_yn)
 
 freq_gender
 freq_ug
@@ -105,8 +105,24 @@ freq_joined
 # Print results
 
 ```
+The results provide a clear overview of how the recruitment process operates and where the main issues may lie.
 
+First, the applicant pool is already imbalanced in terms of gender, with only around 28% female candidates compared to over 70% male candidates. This suggests that part of the diversity challenge originates before the selection process itself, likely at the attraction or application stage. In contrast, the proportion of candidates from underrepresented groups is more balanced, which makes it possible to meaningfully assess whether the selection process treats these groups fairly.
+
+Looking at the progression through the recruitment stages, the data shows a strong filtering effect in the early phases. Only about 31% of applicants are shortlisted, and less than 20% reach the interview stage. This indicates that the majority of candidates are eliminated very early in the process. However, once candidates reach the interview stage, the process becomes more selective but also more efficient, with approximately half of interviewed candidates receiving an offer. Finally, around 6% of the original applicant pool ends up accepting and joining the organization.
+
+This pattern suggests that the main bottleneck occurs during the shortlisting and interview selection phases. These stages are typically more subjective and involve greater human judgment, which increases the risk of inconsistency and potential bias. According to recruitment analytics theory, such stages are particularly vulnerable to effects like first impressions or unconscious stereotyping, which may influence decisions even when formal criteria are in place .
+
+Another important aspect is the structure of the data itself. The large number of missing values in later stages (offers, acceptance, and joining) is expected, as only candidates who progress through earlier stages are observed in subsequent ones. However, this means that any deeper analysis must account for this conditional structure, otherwise the conclusions could be misleading.
+
+Overall, the results indicate that the recruitment process is highly selective at the beginning and more consistent in later stages. While this may reflect an efficient filtering mechanism, it also raises concerns about whether early decisions are being made fairly and systematically. Further statistical analysis, such as chi-square tests or regression models, is necessary to determine whether these patterns reflect true merit-based selection or potential bias against certain groups.
 ### Initial diagnosis: Where in the pipeline are UG or female applicants being lost?
+The data indicates that the largest drop in candidates occurs during the transition from application to shortlisting, and then again before the interview stage. Since these are the most restrictive phases of the process, they are also the most likely points where female or UG applicants could be disproportionately filtered out.
+
+Although the current results do not yet provide a breakdown by gender or UG at each stage, the structure of the pipeline strongly suggests that any loss of diversity is happening early rather than later. Once candidates reach the interview stage, progression rates improve significantly, making it less likely that major disparities occur at that point.
+
+Therefore, the initial diagnosis is that shortlisting is the critical stage where potential bias or unequal outcomes may arise. Further analysis, such as comparing selection rates by gender and UG, would be necessary to confirm whether these groups are being systematically disadvantaged
+
 
 # Prompt 2: Testing for Bias in Shortlisting and Offers
 
