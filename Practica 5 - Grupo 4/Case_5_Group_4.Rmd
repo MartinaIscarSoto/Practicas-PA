@@ -162,8 +162,7 @@ concerns about whether early decisions are being made fairly and
 systematically. Further statistical analysis, such as chi-square tests
 or regression models, is necessary to determine whether these patterns
 reflect true merit-based selection or potential bias against certain
-groups.
-### Initial diagnosis: Where in the pipeline are UG or female
+groups. \### Initial diagnosis: Where in the pipeline are UG or female
 applicants being lost? The data indicates that the largest drop in
 candidates occurs during the transition from application to
 shortlisting, and then again before the interview stage. Since these are
