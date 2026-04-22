@@ -1,7 +1,7 @@
 ---
 title: "Recruitment and Selection Analytics" 
 subtitle: "Groupwork Use Case 5 - People Analytics"
-author: "Substitute Group_X by your Group number in the name of the .Rmd file"
+author: "Ferrán Extremera, Irene Morales, Amalia Varo y Martina Iscar"
 date: "`r Sys.Date()`"
 output: 
   html_document:
@@ -246,11 +246,27 @@ print(test_chi_gen)
 print(test_chi_gen$expected)
 ```
 
-The analysis of the shortlisting stage aimed to evaluate the fairness and potential existence of gender bias in the initial recruitment decisions. The Chi test determines whether a statistically significant relationship exists between the candidates' gender and their probability of passing this first evaluation filter.
+The analysis of the shortlisting stage aimed to evaluate the fairness
+and potential existence of gender bias in the initial recruitment
+decisions. The Chi test determines whether a statistically significant
+relationship exists between the candidates' gender and their probability
+of passing this first evaluation filter.
 
-The results yielded a p-value of 0.00019 \< 0.05, it conclusively confirms that shortlisting decisions are not independent of the applicant's gender. When contrasting this finding with the actual proportions of the sample, the disparity becomes evident: while almost half of the male candidates (48.7%) managed to advance to the interview phase, barely a quarter of the female candidates (24.8%) made the cut.
+The results yielded a p-value of 0.00019 \< 0.05, it conclusively
+confirms that shortlisting decisions are not independent of the
+applicant's gender. When contrasting this finding with the actual
+proportions of the sample, the disparity becomes evident: while almost
+half of the male candidates (48.7%) managed to advance to the interview
+phase, barely a quarter of the female candidates (24.8%) made the cut.
 
-Therefore, the current shortlisting process is not impartial and presents a statistically significant bias favoring men. Despite the organization attracting a volume of female talent that almost triples the male talent in the application phase (202 women compared to 78 men), their rejection rate is disproportionately high. This data points to a clear "bottleneck" for diversity at this early stage, suggesting an urgent need to audit and recalibrate the criteria or algorithms used during the initial profile review.
+Therefore, the current shortlisting process is not impartial and
+presents a statistically significant bias favoring men. Despite the
+organization attracting a volume of female talent that almost triples
+the male talent in the application phase (202 women compared to 78 men),
+their rejection rate is disproportionately high. This data points to a
+clear "bottleneck" for diversity at this early stage, suggesting an
+urgent need to audit and recalibrate the criteria or algorithms used
+during the initial profile review.
 
 ```{r prompt2.5}
 # UG × Shortlisted
@@ -265,15 +281,35 @@ print(test_chi_ug)
 print(test_chi_ug$expected)
 ```
 
-Additionally in the analysis of the shortlisting stage we evaluated the fairness of decisions regarding candidates belonging to underrepresented groups (UG).
+Additionally in the analysis of the shortlisting stage we evaluated the
+fairness of decisions regarding candidates belonging to underrepresented
+groups (UG).
 
-The statistical results give a p-value of **1.472e-06**, the value is drastically lower than the standard significance level of 0.05, it confirms that a highly significant statistical relationship exists between the two variables. This means that the decision to shortlist a candidate is not independent of their underrepresented group status; on the contrary, there is a clear, non-random pattern in the results.
+The statistical results give a p-value of **1.472e-06**, the value is
+drastically lower than the standard significance level of 0.05, it
+confirms that a highly significant statistical relationship exists
+between the two variables. This means that the decision to shortlist a
+candidate is not independent of their underrepresented group status; on
+the contrary, there is a clear, non-random pattern in the results.
 
-When contrasting the observed proportions, the disadvantage is evident. Only **15.7%** of the candidates belonging to underrepresented groups (19 out of 121) managed to advance to the next stage. In contrast, candidates who do not belong to these groups had a much higher success rate, reaching a **43.4%** shortlisting rate (69 out of 159).
+When contrasting the observed proportions, the disadvantage is evident.
+Only **15.7%** of the candidates belonging to underrepresented groups
+(19 out of 121) managed to advance to the next stage. In contrast,
+candidates who do not belong to these groups had a much higher success
+rate, reaching a **43.4%** shortlisting rate (69 out of 159).
 
-This disparity is conclusively confirmed when reviewing the table of expected values. In a scenario where the selection process is completely neutral and equitable, statistics project that approximately 38 candidates from underrepresented groups should have been shortlisted. However, in reality, only 19 managed to pass the filter—exactly half of what would be expected under fair conditions.
+This disparity is conclusively confirmed when reviewing the table of
+expected values. In a scenario where the selection process is completely
+neutral and equitable, statistics project that approximately 38
+candidates from underrepresented groups should have been shortlisted.
+However, in reality, only 19 managed to pass the filter—exactly half of
+what would be expected under fair conditions.
 
-The shortlisting process also presents a significant bias against underrepresented groups. The disproportionate rejection rate toward this demographic and the large deviation from the expected values indicate that the criteria or methods used to filter candidates are not impartial.
+The shortlisting process also presents a significant bias against
+underrepresented groups. The disproportionate rejection rate toward this
+demographic and the large deviation from the expected values indicate
+that the criteria or methods used to filter candidates are not
+impartial.
 
 ```{r prompt2.6}
 # Gender × Offer
@@ -288,13 +324,32 @@ print(test_chi_gen_off)
 print(test_chi_gen_off$expected)
 ```
 
-Moving on to teh next stage, we evaluated the fairness with the same variables, starting with gender.The aim is to determine whether the probability of a candidate receiving a formal proposal is independent of their gender.
+Moving on to teh next stage, we evaluated the fairness with the same
+variables, starting with gender.The aim is to determine whether the
+probability of a candidate receiving a formal proposal is independent of
+their gender.
 
-Because the p-value is 0.04279, it confirms that a statistically significant relationship exists between the two variables. This indicates that hiring decisions in this phase are not random and present an imbalance dependent on the candidate's gender.
+Because the p-value is 0.04279, it confirms that a statistically
+significant relationship exists between the two variables. This
+indicates that hiring decisions in this phase are not random and present
+an imbalance dependent on the candidate's gender.
 
-When analyzing the actual proportions of the sample, the bias becomes evident. Out of the 27 men who reached this stage, a large majority of 66.7% (18 candidates) received a job offer. In stark contrast, out of the 28 women evaluated, only 35.7% (10 candidates) managed to secure a proposal. This disparity is reaffirmed by examining the table of expected values: in a scenario of total equity, statistics projected that both groups would receive approximately 14 offers each (13.75 for men and 14.25 for women). However, in practice, men far exceeded this expectation, while women fell significantly below it.
+When analyzing the actual proportions of the sample, the bias becomes
+evident. Out of the 27 men who reached this stage, a large majority of
+66.7% (18 candidates) received a job offer. In stark contrast, out of
+the 28 women evaluated, only 35.7% (10 candidates) managed to secure a
+proposal. This disparity is reaffirmed by examining the table of
+expected values: in a scenario of total equity, statistics projected
+that both groups would receive approximately 14 offers each (13.75 for
+men and 14.25 for women). However, in practice, men far exceeded this
+expectation, while women fell significantly below it.
 
-In conclusion, the quantitative evidence demonstrates that the final offer stage is not impartial and presents a statistically significant gender bias. Despite having reached the same evaluative stage, male candidates have a considerably higher probability of being hired than their female counterparts, suggesting that the decision criteria in this final phase require a review to ensure fairness.
+In conclusion, the quantitative evidence demonstrates that the final
+offer stage is not impartial and presents a statistically significant
+gender bias. Despite having reached the same evaluative stage, male
+candidates have a considerably higher probability of being hired than
+their female counterparts, suggesting that the decision criteria in this
+final phase require a review to ensure fairness.
 
 ```{r prompt2.7}
 # UG × Offer
@@ -309,45 +364,104 @@ print(test_chi_ug_off)
 print(test_chi_ug_off$expected)
 ```
 
-Finally doing the same statistical analysis of the final stage of the selection process with regard to belonging to an underrepresented group, seeking to determine whether underrepresented group status influences the probability of a finalist receiving a formal hiring proposal.
+Finally doing the same statistical analysis of the final stage of the
+selection process with regard to belonging to an underrepresented group,
+seeking to determine whether underrepresented group status influences
+the probability of a finalist receiving a formal hiring proposal.
 
-The results of the statistical test yielded a p-value of 0.5756. Since this indicator is considerably higher than the standard significance level of 0.05, there is no statistical evidence to assert that a relationship exists between the two variables. This means that the decisions made in this phase are independent of whether or not the candidate belongs to an underrepresented group; the observed differences are purely due to normal random variance and not to a systemic bias.
+The results of the statistical test yielded a p-value of 0.5756. Since
+this indicator is considerably higher than the standard significance
+level of 0.05, there is no statistical evidence to assert that a
+relationship exists between the two variables. This means that the
+decisions made in this phase are independent of whether or not the
+candidate belongs to an underrepresented group; the observed differences
+are purely due to normal random variance and not to a systemic bias.
 
-When analyzing the proportions and the expected values, this fairness is confirmed. Out of the 13 candidates from underrepresented groups who reached this stage, 8 received an offer (61.5%). On the other hand, out of the 42 candidates from non-underrepresented groups, 20 received a proposal (47.6%). The actual figures align very closely with the statistical projections of a perfectly neutral scenario: the model expected that approximately 6.6 candidates from underrepresented groups would receive an offer, and in practice, there were 8.
+When analyzing the proportions and the expected values, this fairness is
+confirmed. Out of the 13 candidates from underrepresented groups who
+reached this stage, 8 received an offer (61.5%). On the other hand, out
+of the 42 candidates from non-underrepresented groups, 20 received a
+proposal (47.6%). The actual figures align very closely with the
+statistical projections of a perfectly neutral scenario: the model
+expected that approximately 6.6 candidates from underrepresented groups
+would receive an offer, and in practice, there were 8.
 
-In conclusion, the quantitative evidence indicates that the final offer stage is fair and impartial regarding underrepresented groups. The data demonstrates that once these candidates manage to reach the final phase of the process, they do not face a discriminatory barrier to being hired, as their profiles are evaluated equitably compared to the rest of the applicants. But with the previous analysis just to reach this stage there is a bias regarding if you belong to the underrepresented group or not.
+In conclusion, the quantitative evidence indicates that the final offer
+stage is fair and impartial regarding underrepresented groups. The data
+demonstrates that once these candidates manage to reach the final phase
+of the process, they do not face a discriminatory barrier to being
+hired, as their profiles are evaluated equitably compared to the rest of
+the applicants. But with the previous analysis just to reach this stage
+there is a bias regarding if you belong to the underrepresented group or
+not.
 
 ### Summary: Are the recruitment decisions fair and unbiased?
 
-Based on the quantitative analysis, the recruitment decisions are **not completely fair or unbiased**. While there is evidence of equitable treatment in one specific instance, significant systemic biases exist—particularly against women throughout the entire pipeline and against underrepresented groups during the initial screening.
+Based on the quantitative analysis, the recruitment decisions are **not
+completely fair or unbiased**. While there is evidence of equitable
+treatment in one specific instance, significant systemic biases
+exist—particularly against women throughout the entire pipeline and
+against underrepresented groups during the initial screening.
 
 Here is a breakdown of the fairness across the different stages:
 
 #### **1. The Shortlisting Stage: A Major Diversity Bottleneck**
 
-The initial screening phase (*shortlisting*) lacks objectivity and presents severe, statistically significant biases against both women and underrepresented groups.
+The initial screening phase (*shortlisting*) lacks objectivity and
+presents severe, statistically significant biases against both women and
+underrepresented groups.
 
--   **Gender Bias:** The process disproportionately favors male candidates ($p = 0.00019$). Although the organization attracted nearly three times as many female applicants (202 women vs. 78 men), their rejection rate was massive. Only **24.8%** of female candidates advanced, compared to nearly half (**48.7%**) of the male candidates.
+-   **Gender Bias:** The process disproportionately favors male
+    candidates ($p = 0.00019$). Although the organization attracted
+    nearly three times as many female applicants (202 women vs. 78 men),
+    their rejection rate was massive. Only **24.8%** of female
+    candidates advanced, compared to nearly half (**48.7%**) of the male
+    candidates.
 
--   **Underrepresented Groups (UG) Bias:** The shortlisting phase also heavily penalizes UG talent ($p = 0.00000147$). Only **15.7%** of UG candidates successfully passed the initial filter, whereas non-UG candidates enjoyed a **43.4%** success rate. In a perfectly equitable scenario, statistical models expected around 38 UG candidates to advance; in reality, only exactly half of that number (19) succeeded.
+-   **Underrepresented Groups (UG) Bias:** The shortlisting phase also
+    heavily penalizes UG talent ($p = 0.00000147$). Only **15.7%** of UG
+    candidates successfully passed the initial filter, whereas non-UG
+    candidates enjoyed a **43.4%** success rate. In a perfectly
+    equitable scenario, statistical models expected around 38 UG
+    candidates to advance; in reality, only exactly half of that number
+    (19) succeeded.
 
 #### **2. The Offer Stage: Mixed Outcomes**
 
-At the final hiring stage, the outcomes diverge depending on the demographic group being evaluated.
+At the final hiring stage, the outcomes diverge depending on the
+demographic group being evaluated.
 
--   **Persistent Gender Bias:** The bias against women continues into the final decision-making process ($p = 0.04279$). Among the finalists, a sweeping **66.7%** of men received a formal job offer, compared to a mere **35.7%** of women. While statistical projections expected an even split (approximately 14 offers for each gender), male candidates significantly exceeded expectations at the direct expense of female candidates.
+-   **Persistent Gender Bias:** The bias against women continues into
+    the final decision-making process ($p = 0.04279$). Among the
+    finalists, a sweeping **66.7%** of men received a formal job offer,
+    compared to a mere **35.7%** of women. While statistical projections
+    expected an even split (approximately 14 offers for each gender),
+    male candidates significantly exceeded expectations at the direct
+    expense of female candidates.
 
--   **Fairness for Underrepresented Groups:** Conversely, the final offer stage is completely fair and impartial regarding UG status ($p = 0.5756$). The data shows no systemic barrier for UG candidates who make it to this phase. In fact, **61.5%** of UG finalists received an offer (compared to 47.6% for non-UG candidates), which perfectly aligns with the expected values of a neutral and unbiased selection scenario.
+-   **Fairness for Underrepresented Groups:** Conversely, the final
+    offer stage is completely fair and impartial regarding UG status
+    ($p = 0.5756$). The data shows no systemic barrier for UG candidates
+    who make it to this phase. In fact, **61.5%** of UG finalists
+    received an offer (compared to 47.6% for non-UG candidates), which
+    perfectly aligns with the expected values of a neutral and unbiased
+    selection scenario.
 
-Overall, the recruitment process is **not fair**. The data irrefutably points to a highly discriminatory initial shortlisting process that arbitrarily filters out diverse talent, followed by a final decision phase that continues to disadvantage women. The organization urgently needs to audit and recalibrate the criteria, algorithms, and human judgments used in its recruitment pipeline to guarantee true equity and inclusion.
+Overall, the recruitment process is **not fair**. The data irrefutably
+points to a highly discriminatory initial shortlisting process that
+arbitrarily filters out diverse talent, followed by a final decision
+phase that continues to disadvantage women. The organization urgently
+needs to audit and recalibrate the criteria, algorithms, and human
+judgments used in its recruitment pipeline to guarantee true equity and
+inclusion.
 
 Next we provide with graphsx to visually interpret the bias:
 
 ```{r visual_gender_pipeline, fig.width=8, fig.height=5}
-# Asegúrate de tener cargado tidyverse
+# 0. Asegúrate de tener las librerías necesarias
 library(tidyverse)
 
-# 1. Preparar los datos del pipeline directamente desde df2
+# 1. Preparar los datos del pipeline
 pipeline_gender <- df2 %>%
   group_by(Gender) %>%
   summarise(
@@ -357,12 +471,12 @@ pipeline_gender <- df2 %>%
   ) %>%
   pivot_longer(cols = -Gender, names_to = "Stage", values_to = "Count")
 
-# 2. Crear el gráfico de caída (Pipeline)
+# 2. Crear el gráfico
 ggplot(pipeline_gender, aes(x = Stage, y = Count, group = Gender, color = Gender)) +
   geom_line(linewidth = 1.5) +
   geom_point(size = 4) +
   geom_text(aes(label = Count), vjust = -1.5, size = 5, show.legend = FALSE) +
-  scale_color_manual(values = c("Male" = "#2c3e50", "Female" = "#e74c3c")) + # Azul oscuro y Rojo
+  scale_color_manual(values = c("Male" = "#2c3e50", "Female" = "#e74c3c")) +
   theme_minimal() +
   labs(
     title = "Recruitment Pipeline by Gender: The Diversity Bottleneck",
@@ -479,17 +593,43 @@ print(conf_intervals)
 
 ### Recommendations to improve fairness in shortlisting
 
-Both gender and underrepresented group status are highly significant predictors in the shortlisting model, as their p-values are well below 0.05. This provides strong statistical evidence that the initial screening process is not demographically neutral.
+Both gender and underrepresented group status are highly significant
+predictors in the shortlisting model, as their p-values are well below
+0.05. This provides strong statistical evidence that the initial
+screening process is not demographically neutral.
 
-The model yields a Nagelkerke $R^{2}$ of 19.55%. While a 19.55% explanatory power might seem relatively low in some statistical contexts, in People Analytics and specifically when evaluating recruitment fairness, this is a very substantial and concerning figure. It indicates that nearly one-fifth of the variance in shortlisting decisions is driven solely by a candidate's gender and UG status, rather than their actual skills or merit.
+The model yields a Nagelkerke $R^{2}$ of 19.55%. While a 19.55%
+explanatory power might seem relatively low in some statistical
+contexts, in People Analytics and specifically when evaluating
+recruitment fairness, this is a very substantial and concerning figure.
+It indicates that nearly one-fifth of the variance in shortlisting
+decisions is driven solely by a candidate's gender and UG status, rather
+than their actual skills or merit.
 
--   **Gender Disadvantage:** the negative coefficient for female candidates (-1.19) translates to an odds ratio of approximately 0.30. This means that, holding other factors constant, women have 70% lower odds of being shortlisted compared to men. The data clearly shows that being a woman in this specific selection process is a major disadvantage.
+-   **Gender Disadvantage:** the negative coefficient for female
+    candidates (-1.19) translates to an odds ratio of approximately
+    0.30. This means that, holding other factors constant, women have
+    70% lower odds of being shortlisted compared to men. The data
+    clearly shows that being a woman in this specific selection process
+    is a major disadvantage.
 
--   **UG Status Advantage for the Majority:** Not belonging to an underrepresented group yields a large positive coefficient (+1.51), which translates to an odds ratio of approximately 4.55. This indicates that majority candidates (Non-UG) have 4.5 times higher odds of passing the screening phase compared to candidates from underrepresented groups.
+-   **UG Status Advantage for the Majority:** Not belonging to an
+    underrepresented group yields a large positive coefficient (+1.51),
+    which translates to an odds ratio of approximately 4.55. This
+    indicates that majority candidates (Non-UG) have 4.5 times higher
+    odds of passing the screening phase compared to candidates from
+    underrepresented groups.
 
 **Conclusion & Recommendations**
 
-The model reveals a severe systemic bias in the shortlisting phase. Furthermore, the combination of these factors points to a severe compound bias: a candidate who is both female and belongs to an underrepresented group faces a multiplicative penalty, making her chances of being shortlisted statistically minimal compared to a non-UG male candidate. To mitigate this, the organization should strongly consider implementing blind CV screening and structured evaluation rubrics for the initial stages of recruitment.
+The model reveals a severe systemic bias in the shortlisting phase.
+Furthermore, the combination of these factors points to a severe
+compound bias: a candidate who is both female and belongs to an
+underrepresented group faces a multiplicative penalty, making her
+chances of being shortlisted statistically minimal compared to a non-UG
+male candidate. To mitigate this, the organization should strongly
+consider implementing blind CV screening and structured evaluation
+rubrics for the initial stages of recruitment.
 
 # Prompt 4: Validating Selection Tools Using Performance Ratings
 
@@ -689,15 +829,65 @@ p5_results <- broom::tidy(model_p5, conf.int = TRUE, exponentiate = TRUE) %>%
 p5_results
 
 ```
-A binary logistic regression was conducted to predict LeaverYr2 using demographic variables, assessment-centre measures, aptitude scores, onboarding variables, job-function controls, and Year 1 performance rating. The model fit the data significantly better than the null model, as shown by the substantial reduction in deviance from 380.76 to 263.62, indicating that the predictors jointly provide meaningful information about early turnover. Based on the deviance reduction, the model explains approximately 31% of the variation in turnover risk, which represents a reasonably strong result for an HR attrition model.
 
-The strongest predictor in the model was Attend Induction Day, which was associated with substantially lower odds of leaving by Year 2 (OR = 0.14, 95% CI [0.04, 0.41], p < .001). This indicates that employees who attended Induction Day had approximately 86% lower odds of early turnover, holding the other variables constant. Significant positive risk factors included Gender (OR = 4.37, p = .013), Assessment Centre Personality Neuroticism (OR = 1.02, p = .033), and several job-function controls, particularly Finance, Marketing, Risk, and Operations, all of which showed substantially higher odds of turnover relative to the omitted reference function. However, these job-function effects should be interpreted cautiously because their confidence intervals are wide, indicating uncertainty around the precise magnitude of the effect.
+A binary logistic regression was conducted to predict LeaverYr2 using
+demographic variables, assessment-centre measures, aptitude scores,
+onboarding variables, job-function controls, and Year 1 performance
+rating. The model fit the data significantly better than the null model,
+as shown by the substantial reduction in deviance from 380.76 to 263.62,
+indicating that the predictors jointly provide meaningful information
+about early turnover. Based on the deviance reduction, the model
+explains approximately 31% of the variation in turnover risk, which
+represents a reasonably strong result for an HR attrition model.
 
-Importantly, Year 1 performance rating was not a significant predictor of leaving by Year 2 (OR = 1.09, p = .721). Most assessment-centre competency variables were also non-significant, as were UG status, education level, work experience, verbal aptitude, Induction Week, and OnBoardingBuddy. Overall, these findings suggest that early turnover in this sample is not primarily explained by lower first-year performance, but instead appears more closely related to onboarding participation, personality-related vulnerability, and structural differences across job functions.
+The strongest predictor in the model was Attend Induction Day, which was
+associated with substantially lower odds of leaving by Year 2 (OR =
+0.14, 95% CI [0.04, 0.41], p \< .001). This indicates that employees who
+attended Induction Day had approximately 86% lower odds of early
+turnover, holding the other variables constant. Significant positive
+risk factors included Gender (OR = 4.37, p = .013), Assessment Centre
+Personality Neuroticism (OR = 1.02, p = .033), and several job-function
+controls, particularly Finance, Marketing, Risk, and Operations, all of
+which showed substantially higher odds of turnover relative to the
+omitted reference function. However, these job-function effects should
+be interpreted cautiously because their confidence intervals are wide,
+indicating uncertainty around the precise magnitude of the effect.
+
+Importantly, Year 1 performance rating was not a significant predictor
+of leaving by Year 2 (OR = 1.09, p = .721). Most assessment-centre
+competency variables were also non-significant, as were UG status,
+education level, work experience, verbal aptitude, Induction Week, and
+OnBoardingBuddy. Overall, these findings suggest that early turnover in
+this sample is not primarily explained by lower first-year performance,
+but instead appears more closely related to onboarding participation,
+personality-related vulnerability, and structural differences across job
+functions.
 
 ### Recommendations for reducing graduate attrition
-The most immediate recommendation is to strengthen and monitor Induction Day participation, since it was the clearest protective factor in the model. If attendance is inconsistent, optional, or unevenly implemented across functions, the organization should review this urgently. The size of the observed association suggests that early integration may play an important role in whether graduates remain with the firm.
 
-Second, the company should investigate why turnover risk is markedly higher in Finance, Marketing, Risk, and Operations than in the reference function. Since Year 1 performance rating was not significant, these differences do not appear to be explained simply by weaker employees leaving. HR should therefore examine role demands, manager support, workload, expectations, and early career experience within those business areas.
+The most immediate recommendation is to strengthen and monitor Induction
+Day participation, since it was the clearest protective factor in the
+model. If attendance is inconsistent, optional, or unevenly implemented
+across functions, the organization should review this urgently. The size
+of the observed association suggests that early integration may play an
+important role in whether graduates remain with the firm.
 
-Third, the significant association between Gender and attrition suggests the need for a closer review of whether some groups experience the graduate journey differently. This should not be treated as proof of causality, but it is strong enough to justify follow-up analysis of support, inclusion, progression opportunities, and work climate. Finally, because Neuroticism was positively associated with leaving risk, the organization may benefit from strengthening resilience-building, check-ins, and tailored support during the early employment period. Overall, the most effective retention strategy is likely to focus on onboarding quality and function-specific experience, rather than assuming that early leavers are simply poor performers.
+Second, the company should investigate why turnover risk is markedly
+higher in Finance, Marketing, Risk, and Operations than in the reference
+function. Since Year 1 performance rating was not significant, these
+differences do not appear to be explained simply by weaker employees
+leaving. HR should therefore examine role demands, manager support,
+workload, expectations, and early career experience within those
+business areas.
+
+Third, the significant association between Gender and attrition suggests
+the need for a closer review of whether some groups experience the
+graduate journey differently. This should not be treated as proof of
+causality, but it is strong enough to justify follow-up analysis of
+support, inclusion, progression opportunities, and work climate.
+Finally, because Neuroticism was positively associated with leaving
+risk, the organization may benefit from strengthening
+resilience-building, check-ins, and tailored support during the early
+employment period. Overall, the most effective retention strategy is
+likely to focus on onboarding quality and function-specific experience,
+rather than assuming that early leavers are simply poor performers.
