@@ -424,6 +424,7 @@ underrepresented groups.
     candidates enjoyed a **43.4%** success rate. In a perfectly
     equitable scenario, statistical models expected around 38 UG
     candidates to advance; in reality, only exactly half of that number
+
     (19) succeeded.
 
 #### **2. The Offer Stage: Mixed Outcomes**
